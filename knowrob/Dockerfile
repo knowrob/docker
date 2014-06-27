@@ -34,5 +34,5 @@ EXPOSE 1111 9090
 
 
 USER ros
-ENTRYPOINT bash -l -c "roslaunch knowrob_vis knowrob_vis.launch"
+ENTRYPOINT /opt/ros/hydro/bin/roslaunch /home/ros/src/knowrob/knowrob_vis/launch/knowrob_vis.launch
 
