@@ -2,6 +2,7 @@ from flask import Flask, session, redirect, url_for, escape, request, render_tem
 import sqlite3
 import os
 import hashlib
+import docker
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -20,7 +21,92 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 
 
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Docker stuff
+
+def start_container():
+    c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
+    session['container_id'] = c.start(session['username'], publish_all_ports=True)
+    session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
+    session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
+
+def create_container():
+    print('Creating container for ' + session['username'])
+    c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
+    c.create_container('knowrob/hydro-knowrob:1.0.4', detach=True, tty=True, name=session['username'])
+
+#def stop_container():
+     #c.stop(session['username']
+
+
+    
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Web stuff
+
+@app.route('/')
+def show_user_data():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    get_user_data(session['username'])
+    return render_template('show_user_data.html')
+
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if (request.form['username'] != "" and request.form['password'] != ""):
+            if is_valid_user(request.form['username'], request.form['password']):
+                session['username'] = request.form['username']
+                session['logged_in'] = True
+                flash('You were logged in')
+                return redirect(url_for('show_user_data'))
+            else :
+                error = 'Invalid user data'
+    return render_template('login.html', error=error, action="login")
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('You were logged out')
+    return redirect(url_for('show_user_data'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    if request.method == 'POST':
+      
+        if (request.form['username'] == ""):
+            error = 'Please specify a user name.'
+            
+        elif (request.form['password'] == ""):
+            error = 'Please specify a password'
+            
+        elif(request.form['email'] == ""):
+            error = 'Please specify an email address.'
+            
+        else:
+            insert_user(request.form['username'], request.form['password'], request.form['email'])
+            session['username'] = request.form['username']
+            session['logged_in'] = True
+            return redirect(url_for('show_user_data'))
+            
+    return render_template('login.html', error=error, action="register")
+
+@app.route('/launch')
+def launch():
+    error=""
+    create_container()
+    #start_container()
+    return render_template('start_container.html', error=error)
+  
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# DB stuff
 
 def connect_db():
     """Connects to the specific database."""
@@ -84,88 +170,6 @@ def get_user_data(username):
     else:
         return False
 
-        
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-@app.route('/')
-def show_user_data():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    get_user_data(session['username'])
-    return render_template('show_user_data.html')
-
-
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        if (request.form['username'] != "" and request.form['password'] != ""):
-            if is_valid_user(request.form['username'], request.form['password']):
-                session['username'] = request.form['username']
-                session['logged_in'] = True
-                flash('You were logged in')
-                return redirect(url_for('show_user_data'))
-            else :
-                error = 'Invalid user data'
-    return render_template('login.html', error=error, action="login")
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    flash('You were logged out')
-    return redirect(url_for('show_user_data'))
-
-@app.route('/launch')
-def launch():
-    error=""
-    return render_template('start_container.html', error=error)
-  
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    error = None
-    if request.method == 'POST':
-      
-        if (request.form['username'] == ""):
-            error = 'Please specify a user name.'
-            
-        elif (request.form['password'] == ""):
-            error = 'Please specify a password'
-            
-        elif(request.form['email'] == ""):
-            error = 'Please specify an email address.'
-            
-        else:
-            insert_user(request.form['username'], request.form['password'], request.form['email'])
-            session['username'] = request.form['username']
-            session['logged_in'] = True
-            return redirect(url_for('show_user_data'))
-            
-    return render_template('login.html', error=error, action="register")
-
-
-
-##@app.route('/')
-##def index():
-    ##if 'username' in session:
-        ##return 'Logged in as %s' % escape(session['username'])
-    ##return 'You are not logged in'
-
-##@app.route("/login/", methods=['GET', 'POST'])
-##def login():
-    ##if request.method == 'POST':
-        ##session['username'] = request.form['username']
-        ##return redirect(url_for('index'))
-    ##return render_template('login.html', css_url = url_for('static', filename='screen.css'))
-
-
-##@app.route('/logout')
-##def logout():
-    ### remove the username from the session if it's there
-    ##session.pop('username', None)
-    ##return redirect(url_for('index'))
-
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -173,4 +177,3 @@ def register():
 
 if __name__ == '__main__':
     app.run()
-
