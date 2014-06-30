@@ -37,11 +37,12 @@ def create_container():
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
     c.create_container('knowrob/hydro-knowrob:1.0.4', detach=True, tty=True, name=session['username'])
 
-#def stop_container():
-     #c.stop(session['username']
+def stop_container():
+    c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=30)
+    c.stop(session['username'])
 
 
-    
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
@@ -69,6 +70,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    stop_container()
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('show_user_data'))
@@ -78,31 +80,31 @@ def logout():
 def register():
     error = None
     if request.method == 'POST':
-      
+
         if (request.form['username'] == ""):
             error = 'Please specify a user name.'
-            
+
         elif (request.form['password'] == ""):
             error = 'Please specify a password'
-            
+
         elif(request.form['email'] == ""):
             error = 'Please specify an email address.'
-            
+
         else:
             insert_user(request.form['username'], request.form['password'], request.form['email'])
             session['username'] = request.form['username']
             session['logged_in'] = True
+	    create_container()
             return redirect(url_for('show_user_data'))
-            
+
     return render_template('login.html', error=error, action="register")
 
 @app.route('/launch')
 def launch():
     error=""
-    create_container()
-    #start_container()
+    start_container()
     return render_template('start_container.html', error=error)
-  
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
