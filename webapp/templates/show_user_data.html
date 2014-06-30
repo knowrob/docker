@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>Your user data</h2>
+<dl>
+  <dt>Username: </dt><dd>{{ session.username }}</dd>
+  <dt>Email: </dt><dd>{{ session.email }}</dd>
+  <dt>KnowRob Container ID:</dt>
+  <dd>
+
+    {% if session.container_id %}
+      {{session.container_id}}
+    {% else %}
+      <a href="{{ url_for('launch') }}">Start new container</a>
+    {% endif %}</dd>
+
+</dl>
+
+{% endblock %}
