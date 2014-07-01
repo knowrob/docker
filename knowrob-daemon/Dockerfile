@@ -10,7 +10,7 @@ ENV HOME /home/ros
 
 RUN apt-get -y update
 RUN apt-get -y install python-yaml python-catkin-pkg python-rospkg emacs swi-prolog-java ros-hydro-catkin
-RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite
+RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server
 
 # ROS environment setup
 RUN cp /opt/ros/hydro/setup.sh /etc/profile.d/ros_hydro.sh
