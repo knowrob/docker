@@ -1,8 +1,9 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash
+from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash, Markup
 import sqlite3
 import os
 import hashlib
 import docker
+import markdown
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -35,7 +36,7 @@ def start_container():
 def create_container():
     print('Creating container for ' + session['username'])
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
-    c.create_container('knowrob/hydro-knowrob:1.0.4', detach=True, tty=True, name=session['username'])
+    c.create_container('knowrob/hydro-knowrob-daemon:1.0', detach=True, tty=True, name=session['username'])
 
 def stop_container():
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=30)
@@ -99,20 +100,26 @@ def register():
 
     return render_template('login.html', error=error, action="register")
 
-@app.route('/launch')
-def launch():
-    error=""
-    start_container()
-    return render_template('start_container.html', error=error)
-
+@app.route('/tutorials/')
+@app.route('/tutorials/<cat_id>/')
 @app.route('/tutorials/<cat_id>/<page>')
-def launch():
-    error=""
+def tutorials(cat_id='basics', page=1):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     start_container()
-    return render_template('knowrob_tutorial.html', error=error)
+    tut = read_tutorial_page(cat_id, page)
+    content = Markup(markdown.markdown(tut['text']))
+
+    # check whether there is another tutorial in this category
+    nxt  = read_tutorial_page(cat_id, int(page)+1)
+    prev = read_tutorial_page(cat_id, int(page)-1)
+
+    return render_template('knowrob_tutorial.html', **locals())
 
 @app.route('/knowrob')
-def launch():
+def knowrob():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     error=""
     start_container()
     return render_template('knowrob_simple.html', error=error)
@@ -188,9 +195,9 @@ def get_user_data(username):
 
 def read_tutorial_page(cat, page):
     db = get_db()
-    cur = db.execute('select cat_id, cat_title, title, text from tutorials where cat_id=? and page=?', [cat, page])
+    cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
     tut = cur.fetchone()
-    return render_template('show_entries.html', tutorial=tut)
+    return tut
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

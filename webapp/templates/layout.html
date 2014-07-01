@@ -8,13 +8,20 @@
 
 
 <body>
-  <div class=metanav>
-    {% if not session.logged_in %}
-      <a href="{{ url_for('login') }}">log in</a>
-    {% else %}
-      Logged in as {{ session.username }} &nbsp;
-      <a href="{{ url_for('logout') }}">log out</a>
-    {% endif %}
+  <div class="metanav">
+    <div class="metanav_left">
+      <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
+      <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp;
+      <a href="{{ url_for('tutorials') }}">Tutorials</a>
+    </div>
+    <div class="metanav_right">
+      {% if not session.logged_in %}
+	<a href="{{ url_for('login') }}">log in</a>
+      {% else %}
+	Logged in as <a href="{{ url_for('show_user_data') }}">{{ session.username }}</a> &nbsp;
+	<a href="{{ url_for('logout') }}">log out</a>
+      {% endif %}
+    </div>
   </div>
   <div style="padding-left:20px;">
   <h1>RoboHow Web Console</h1>

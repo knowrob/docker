@@ -39,7 +39,7 @@
       // Create the main viewer.
       var viewer = new ROS3D.Viewer({
         divID : 'markers',
-        width : 950,
+        width : 935,
         height : 495,
         antialias : true,
         background : '#ffffff'
@@ -170,18 +170,25 @@
 </head>
 
 
-<body>
-  <div class=metanav>
-    {% if not session.logged_in %}
-      <a href="{{ url_for('login') }}">log in</a>
-    {% else %}
-      Logged in as {{ session.username }} &nbsp;
-      <a href="{{ url_for('logout') }}">log out</a>
-    {% endif %}
+<body onload="init()">
+  <div class="metanav">
+    <div class="metanav_left">
+      <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
+      <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp;
+      <a href="{{ url_for('tutorials') }}">Tutorials</a>
+    </div>
+    <div class="metanav_right">
+      {% if not session.logged_in %}
+	<a href="{{ url_for('login') }}">log in</a>
+      {% else %}
+	Logged in as <a href="{{ url_for('show_user_data') }}">{{ session.username }}</a> &nbsp;
+	<a href="{{ url_for('logout') }}">log out</a>
+      {% endif %}
+    </div>
   </div>
 
-
-  <div id="console" style="position:absolute; left:0;  top:75px; width:510px; height:500px; border: 1px black solid;">
+  <div style="padding:15px;">
+  <div id="console" style="position:absolute; top:75px; width:510px; height:500px; border: 1px black solid;">
     <div style="padding:15px;">
     <form name="query_form" action="post">
 
@@ -195,17 +202,29 @@
     </div>
   </div>
 
-  <div id="markers"    style="position:absolute; left:520px;  top:75px; width:950px; border: 1px black solid; "></div>
+  <div id="markers"    style="position:absolute; left:540px;  top:75px; width:935px; height:500px; border: 1px black solid; "></div>
 
-  <div id="library"    style="position:absolute; left:0px; width:510px; top:510px; border: 1px black solid; position:relative;">
-      <h3>{{ tutorial.title }}</h3>{{ entry.text|safe }}
-    {% else %}
-      <li><em>Unbelievable.  No entries here so far</em>
-    {% endfor %}
-    </ul>
+  <div id="library"    style="position:relative; left:0px; top:530px; width:1430px; height: 300px; border: 1px black solid; position:relative; font-family: Open sans, sans-serif; font-size:10pt; padding:5px 15px; overflow:auto;">
+    <h2>{{ tut.cat_title }}</h2>
+    <h4>{{tut.page}}. {{ tut.title }}</h4>
+    {{ content }}
 
-  
-    {{ tutorial_text }}
+
+    <!-- Bottom navigation: prev and next tutorials -->
+    <div style="position:relative; bottom:0; width:1430px; height:25px; padding-bottom:10px;">
+      {% if prev %}
+	<div style="float:left;">
+	  <a href="{{ url_for('tutorials', cat_id=prev.cat_id, page=prev.page) }}">Previous: {{prev.title}}</a>
+	</div>
+      {% endif %}
+      {% if nxt %}
+	<div style="float:right;">
+	  <a href="{{ url_for('tutorials', cat_id=nxt.cat_id, page=nxt.page) }}">Next: {{nxt.title}}</a>
+	</div>
+      {% endif %}
+    </div>
+  </div>
+
   </div>
 
 </body>

@@ -170,14 +170,21 @@
 </head>
 
 
-<body>
-  <div class=metanav>
-    {% if not session.logged_in %}
-      <a href="{{ url_for('login') }}">log in</a>
-    {% else %}
-      Logged in as {{ session.username }} &nbsp;
-      <a href="{{ url_for('logout') }}">log out</a>
-    {% endif %}
+<body onload="init()">
+  <div class="metanav">
+    <div class="metanav_left">
+      <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
+      <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp;
+      <a href="{{ url_for('tutorials') }}">Tutorials</a>
+    </div>
+    <div class="metanav_right">
+      {% if not session.logged_in %}
+	<a href="{{ url_for('login') }}">log in</a>
+      {% else %}
+	Logged in as <a href="{{ url_for('show_user_data') }}">{{ session.username }}</a> &nbsp;
+	<a href="{{ url_for('logout') }}">log out</a>
+      {% endif %}
+    </div>
   </div>
 
 
@@ -211,6 +218,6 @@
 
   <div id="chart" style="position:absolute; left:520px; top:583px; width:920px; height:316px; border: 1px black solid; padding:15px;"></div>
 
-  
+
 </body>
 </html>

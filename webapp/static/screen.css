@@ -16,7 +16,9 @@
    Why I am doing this? Well, read <http://j.mp/eq8zSo>.
 */
 
-.metanav       { text-align: right; font-size: 0.8em; padding: 0.3em; margin-bottom: 1em; background: #dadada; }
+.metanav       { height: 25px; font-size: 0.8em; padding: 5px 15px ; margin-bottom: 1em; background: #dadada; }
+.metanav_left  { float: left; text-align: left;  }
+.metanav_right { float: right; text-align: right;  }
 .flash         { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
 .error         { background: #f0d6d6; padding: 0.5em; }
 
