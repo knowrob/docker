@@ -29,10 +29,17 @@
 
   <script type="text/javascript" type="text/javascript">
 
+    // global ROS handle
+    var ros;
+
+    //global jsonprolog handle
+    var prolog;
+
+
     function init() {
 
       // Connect to ROS.
-      var ros = new ROSLIB.Ros({
+      ros = new ROSLIB.Ros({
         url : 'ws://localhost:{{ session.port_9090 }}'
       });
 
@@ -82,7 +89,7 @@
       var dataVisClient = new DataVisClient(options);
 
       // fill example qurey select
-      populateQuerySelect('examplequery', "queriesForRobohow.json");
+      populateQuerySelect('examplequery', "http://localhost:{{ session.port_1111 }}/queriesForRobohow.json");
 
       master = new Control({
         sliderHigh: "slider1",
@@ -90,9 +97,6 @@
         timeDisplay: "currentTime"
       });
     };
-
-    //global jsonprolog handle
-    var prolog;
 
     function queryProlog(q) {
 
@@ -105,7 +109,7 @@
         }
 
 
-        prolog = new JsonProlog({});
+        prolog = new JsonProlog(ros, {});
 
         document.query_form.history.value += "?- " + q +  ".\n\n";
 

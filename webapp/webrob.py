@@ -36,7 +36,7 @@ def start_container():
 def create_container():
     print('Creating container for ' + session['username'])
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
-    c.create_container('knowrob/hydro-knowrob-daemon:1.0', detach=True, tty=True, name=session['username'])
+    c.create_container('knowrob/hydro-knowrob-daemon:1.0.1', detach=True, tty=True, name=session['username'])
 
 def stop_container():
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=30)
