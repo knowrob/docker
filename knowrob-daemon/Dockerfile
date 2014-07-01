@@ -56,6 +56,8 @@ ENV ROS_WORKSPACE /home/ros
 ENV ROS_IP 127.0.0.1
 ENV LD_LIBRARY_PATH /home/ros/devel/lib:/opt/ros/hydro/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/hydro/lib/python2.7/dist-packages
 ENV SWI_HOME_DIR /usr/lib/swi-prolog
+ENV PYTHONPATH /home/ros/devel/lib/python2.7/dist-packages:/opt/ros/hydro/lib/python2.7/dist-packages
+
 
 # forward ports: KnowRob webserver + rosbridge
 EXPOSE 1111 9090
