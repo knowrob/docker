@@ -89,7 +89,7 @@
       var dataVisClient = new DataVisClient(options);
 
       // fill example qurey select
-      populateQuerySelect('examplequery', "http://localhost:{{ session.port_1111 }}/queriesForRobohow.json");
+      populateQuerySelect('examplequery', "{{url_for('static', filename='queriesForRobohow.json')}}");
 
       master = new Control({
         sliderHigh: "slider1",
@@ -210,11 +210,11 @@
 
   <div id="markers"    style="position:absolute; left:540px;  top:75px; width:950px; border: 1px black solid; "></div>
 
-  <div id="library"    style="position:absolute; width:510px; top:583px; height:316px; border: 1px black solid;">
-    <select onclick="addSelectedToQueryform('examplequery')" size="26" name="examplequery" id="examplequery" style="width:510px; font-size:12px;"><option value=0></option></select>
+  <div id="library"    style="position:absolute; width:510px; top:583px; height:324px; border: 1px black solid;">
+    <select onclick="addSelectedToQueryform('examplequery')" size="20" name="examplequery" id="examplequery" style="width:510px; font-size:12px;"><option value=0></option></select>
   </div>
 
-  <div id="chart" style="position:absolute; left:540px; top:583px; width:950px; height:316px; border: 1px black solid; "></div>
+  <div id="chart" style="position:absolute; left:540px; top:583px; width:950px; height:324px; border: 1px black solid; "></div>
 
   </div>
 
