@@ -105,6 +105,19 @@ def launch():
     start_container()
     return render_template('start_container.html', error=error)
 
+@app.route('/tutorials/<cat_id>/<page>')
+def launch():
+    error=""
+    start_container()
+    return render_template('knowrob_tutorial.html', error=error)
+
+@app.route('/knowrob')
+def launch():
+    error=""
+    start_container()
+    return render_template('knowrob_simple.html', error=error)
+
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -172,6 +185,12 @@ def get_user_data(username):
     else:
         return False
 
+
+def read_tutorial_page(cat, page):
+    db = get_db()
+    cur = db.execute('select cat_id, cat_title, title, text from tutorials where cat_id=? and page=?', [cat, page])
+    tut = cur.fetchone()
+    return render_template('show_entries.html', tutorial=tut)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
