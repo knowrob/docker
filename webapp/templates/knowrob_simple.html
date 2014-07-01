@@ -192,7 +192,8 @@
   </div>
 
 
-  <div id="console" style="position:absolute; left:0;  top:75px; width:510px; height:500px; border: 1px black solid;">
+  <div style="padding:15px;">
+  <div id="console" style="position:absolute; top:75px; width:510px; height:500px; border: 1px black solid;">
     <div style="padding:15px;">
     <form name="query_form" action="post">
 
@@ -200,28 +201,22 @@
 
       <textarea name="user_query" cols="66" rows="10" style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt; border: 1px black solid; margin-bottom:5px; "></textarea>
 
-      <input type="button" name="q" value="Send query"
-      onclick="queryProlog(document.query_form.user_query.value);">
-
-      <!-- <input type="button" name="n" value="Next solution"
-      onclick="nextQueryProlog();"> -->
-      <input id="slider1" type="range" min="0" max="100" value="0">
-      <input id="controlInitButton" type="button" value="start slider control">
-      <span id="currentTime">0</span>
+      <input type="button" name="q" value="Send query" onclick="queryProlog(document.query_form.user_query.value);" style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt; border: 1px black solid; background:#fff; ">
 
     </form>
     </div>
   </div>
 
 
-  <div id="markers"    style="position:absolute; left:520px;  top:75px; width:950px; border: 1px black solid; "></div>
+  <div id="markers"    style="position:absolute; left:540px;  top:75px; width:950px; border: 1px black solid; "></div>
 
-  <div id="library"    style="position:absolute; left:0px; width:510px; top:510px; border: 1px black solid; position:relative;">
-    <select onclick="addSelectedToQueryform('examplequery')" size="23" name="examplequery" id="examplequery" style="width:510px; font-size:12px;"><option value=0></option></select>
+  <div id="library"    style="position:absolute; width:510px; top:583px; height:316px; border: 1px black solid;">
+    <select onclick="addSelectedToQueryform('examplequery')" size="26" name="examplequery" id="examplequery" style="width:510px; font-size:12px;"><option value=0></option></select>
   </div>
 
-  <div id="chart" style="position:absolute; left:520px; top:583px; width:920px; height:316px; border: 1px black solid; padding:15px;"></div>
+  <div id="chart" style="position:absolute; left:540px; top:583px; width:950px; height:316px; border: 1px black solid; "></div>
 
+  </div>
 
 </body>
 </html>
