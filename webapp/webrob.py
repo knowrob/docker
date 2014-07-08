@@ -63,6 +63,7 @@ def login():
             if is_valid_user(request.form['username'], request.form['password']):
                 session['username'] = request.form['username']
                 session['logged_in'] = True
+                session['rosauth_mac'] = generate_mac()
                 flash('You were logged in')
                 return redirect(url_for('show_user_data'))
             else :
@@ -95,6 +96,7 @@ def register():
             insert_user(request.form['username'], request.form['password'], request.form['email'])
             session['username'] = request.form['username']
             session['logged_in'] = True
+            session['rosauth_mac'] = generate_mac()
 	    create_container()
             return redirect(url_for('show_user_data'))
 
@@ -201,6 +203,23 @@ def read_tutorial_page(cat, page):
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+def generate_mac():
+
+    secret = "RW6WZ2yp67ETMdj2"
+    client = request.remote_addr
+    dest   = request.host_url # TODO: find out the actual IP; this will return the hostname
+
+    rand = "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(30)])
+
+    t = int(time.time())
+    level = "user"
+    end = int(t + 3600)
+
+    mac = hashlib.sha512(secret + client + dest + rand + str(t) + level + str(end) ).hexdigest()
+
+    return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + t + ", " + level + ", " + end + ")"
+    
 
 
 if __name__ == '__main__':
