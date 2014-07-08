@@ -1,7 +1,7 @@
 drop table if exists tutorial;
 create table tutorial (
 	id integer primary key autoincrement,
-	cat_id text not null,	
+	cat_id text not null,
 	cat_title text not null,
 	title text not null,
 	text text not null

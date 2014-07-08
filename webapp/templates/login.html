@@ -4,11 +4,11 @@
 
 
   <div id="login" style="position:relative; left:0;  top:5px; width:215px; height:125px; border: 1px black solid; padding:5px 25px; text-align:right;">
-  
+
     <h4>{% if action=='login' %} Login {% elif action=='register' %}Sign up{% endif %} </h4>
 
     {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-    
+
     <form action="{% if action=='login' %} {{ url_for('login') }} {% elif action=='register' %} {{ url_for('register') }} {% endif %}" method=post>
 
       <input type="text" name="username" value="Username" size=30 style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt;background:#ffffff;border: 1px black solid;" />
@@ -25,5 +25,5 @@
       {% endif %}
     </form>
   </div>
-    
+
 {% endblock %}
