@@ -1,6 +1,5 @@
 FROM ubuntu:12.04
- 
-# ubuntu precise image doesn't have universe repo
+
 run apt-get update
 RUN apt-get install -y wget apt-utils
  

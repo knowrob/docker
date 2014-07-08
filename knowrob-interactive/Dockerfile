@@ -61,6 +61,9 @@ ENV PYTHONPATH /home/ros/devel/lib/python2.7/dist-packages:/opt/ros/hydro/lib/py
 # forward ports: KnowRob webserver + rosbridge
 EXPOSE 1111 9090
 
+# Volumes for mounting data containers
+VOLUME /home/ros/knowrob_data
+VOLUME /home/ros/sandbox
 
 # ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_vis knowrob_vis.launch
 

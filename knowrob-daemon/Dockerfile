@@ -58,10 +58,12 @@ ENV LD_LIBRARY_PATH /home/ros/devel/lib:/opt/ros/hydro/lib:/usr/lib/jvm/default-
 ENV SWI_HOME_DIR /usr/lib/swi-prolog
 ENV PYTHONPATH /home/ros/devel/lib/python2.7/dist-packages:/opt/ros/hydro/lib/python2.7/dist-packages
 
-
 # forward ports: KnowRob webserver + rosbridge
 EXPOSE 1111 9090
 
+# Volumes for mounting data containers
+VOLUME /home/ros/knowrob_data
+VOLUME /home/ros/sandbox
 
 ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_vis knowrob_vis.launch
 
