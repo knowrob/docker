@@ -194,7 +194,7 @@ a:link:active,
 a:visited,
 a:visited:active {
     text-decoration: none;
-    color: __existing__;
+    color: #606060;
 }
 a:link:hover,
 a:link:focus,
