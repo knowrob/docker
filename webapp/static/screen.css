@@ -20,9 +20,9 @@
 .metanav_left  { float: left; text-align: left;  }
 .metanav_right { float: right; text-align: right;  }
 .flash         { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
-.error         { background: #f0d6d6; padding: 0.5em; }
-
-
+.error         { background: #f0d6d6; padding: 0.5em; margin-top:20px; text-align:left; font-size:10pt; line-height: 120%;}
+.black_border  { border: 1px black solid; }
+.code          { font-family: Source Code Pro,Consolas,monospace; font-size:9pt; }
 
 
 /******************************************************************************
@@ -43,7 +43,7 @@ html {
 }
 body {
     margin: 0 auto;
-    font: normal 100%/1.4em Verdana,Arial,Helvetica,sans-serif;
+    font: normal 100%/1.4em 'Open Sans',Arial,Helvetica,sans-serif;
     /* same font stack should be used for ".dokuwiki div.toc" */
 }
 h1, h1 a,
@@ -299,23 +299,34 @@ label {
     vertical-align: middle;
     cursor: pointer;
 }
+
+
+
+/* *********************************************************************** */
+/* FORMS                                                                    */
+
 input,
 textarea,
 button,
 select,
 optgroup,
 option {
-    font: inherit;
+    background:#ffffff;
+    border: 1px black solid;
+    
+    font-family: inherit;
+    font-size:12px;
     color: inherit;
     /* background-color destroys button look */
     line-height: 1;
-    margin: 0;
+/*     margin: 0; */
     vertical-align: middle;
 }
 input[type=text],
 input[type=password],
 textarea {
-    padding: .1em;
+    padding:2px;
+    margin: 2px 0;
 }
 input[type=radio],
 input[type=checkbox],
@@ -325,6 +336,8 @@ input.check {
 input[type=submit],
 input.button,
 button {
+    padding:1px;
+    margin: 2px 0;
     cursor: pointer;
 }
 input[disabled],
@@ -342,7 +355,13 @@ option {
     font-weight: normal;
 }
 
+
+
+
+/* *********************************************************************** */
 /* general classes */
+
+
 div.clearer {
     /* additional to what's already in DokuWiki's lib/styles/all.css: */
     font-size: 1px;

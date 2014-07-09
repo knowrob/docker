@@ -1,176 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" media="all" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700|Oswald|Source+Code+Pro" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
-
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ColladaLoader2.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/roslib.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/mjpegcanvas.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ros3d.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/json_prolog.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerClient.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerArrayClient.js"></script>
-
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3.v3.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3-tip.js"></script>
-
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DonutChart.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/BarChart.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/TreeDiagram.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DataVisClient.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/array-nonstandard.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/Control.js"></script>
-
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/designator/desig.js"></script>
-
-  <script type="text/javascript" type="text/javascript">
-
-    // global ROS handle
-    var ros;
-
-    //global jsonprolog handle
-    var prolog;
-
-    function init() {
-
-      // Connect to ROS.
-      ros = new ROSLIB.Ros({
-        url : 'ws://localhost:{{ session.port_9090 }}'
-      });
-
-      // Create the main viewer.
-      var viewer = new ROS3D.Viewer({
-        divID : 'markers',
-        width : 935,
-        height : 495,
-        antialias : true,
-        background : '#ffffff'
-      });
-
-      viewer.addObject(new ROS3D.Grid());
-
-      // Setup a client to listen to TFs.
-      var tfClient = new ROSLIB.TFClient({
-        ros : ros,
-        angularThres : 0.01,
-        transThres : 0.01,
-        rate : 10.0,
-        fixedFrame : '/my_frame'
-      });
-
-      // Setup the marker client.
-      var markerClient = new ROS3D.MarkerClient({
-        ros : ros,
-        tfClient : tfClient,
-        topic : '/visualization_marker',
-        rootObject : viewer.scene
-      });
-
-      // Setup the marker array client.
-      var markerArrayClient = new ROS3D.MarkerArrayClient({
-        ros : ros,
-        tfClient : tfClient,
-        topic : '/visualization_marker_array',
-        markerClient : markerClient
-      });
-
-    };
-
-    function queryProlog(q) {
-
-      if (q.substr(q.length - 1) == ".") {
-        q = q.substr(0, q.length - 1);
-
-        if (prolog != null && prolog.finished == false) {
-          //console.log(prolog.finished);
-          prolog.finishClient();
-        }
+{% extends "knowrob.html" %}
 
 
-        prolog = new JsonProlog(ros, {});
+{% block content %}
 
-        document.query_form.history.value += "?- " + q +  ".\n\n";
-
-        prolog.jsonQuery(q, function(result) {
-            document.query_form.history.value += result;
-        });
-
-        document.query_form.user_query.value = "";
-        document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
-
-        // reset select
-        //var select = document.getElementById('examplequery');
-        //select.selectedIndex = 0;
-      } else if (q.substr(q.length - 1) == ";") {
-        nextQueryProlog();
-      } else {
-        if (prolog != null && prolog.finished == false) {
-          prolog.finishClient();
-        }
-      }
-    };
-
-    function nextQueryProlog() {
-      prolog.nextQuery(function(result) {
-            document.query_form.history.value += result;
-        });
-      document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
-    };
-
-
-</script>
-</head>
-
-
-<body onload="init()">
-  <div class="metanav">
-    <div class="metanav_left">
-      <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
-      <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp;
-      <a href="{{ url_for('tutorials') }}">Tutorials</a>
-    </div>
-    <div class="metanav_right">
-      {% if not session.logged_in %}
-	<a href="{{ url_for('login') }}">log in</a>
-      {% else %}
-	Logged in as <a href="{{ url_for('show_user_data') }}">{{ session.username }}</a> &nbsp;
-	<a href="{{ url_for('logout') }}">log out</a>
-      {% endif %}
-    </div>
-  </div>
-
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-  {% endwith %}
-
-  <div style="padding:15px;">
-  <div id="console" style="position:absolute; top:75px; width:510px; height:500px; border: 1px black solid;">
+  <div id="console" class="black_border" style="position:absolute; top:75px; width:510px; height:500px;">
     <div style="padding:15px;">
     <form name="query_form" action="post">
 
-      <textarea name="history" readonly  cols="66" rows="23" style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt;background:#ffffff;border: 1px black solid; margin-bottom:5px;"></textarea>
+      <textarea name="history" readonly  cols="66" rows="23" class="code" style="margin-bottom:5px;"></textarea>
 
-      <textarea name="user_query" cols="66" rows="10" style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt; border: 1px black solid; margin-bottom:5px; "></textarea>
+      <textarea name="user_query" cols="66" rows="10" class="code" style="margin-bottom:5px; "></textarea>
 
-      <input type="button" name="q" value="Send query" onclick="queryProlog(document.query_form.user_query.value);" style="font-family: Source Code Pro,Consolas,monospace; font-size:9pt; border: 1px black solid; background:#fff; ">
+      <input type="button" name="q" value="Send query" class="code" onclick="queryProlog(document.query_form.user_query.value);">
 
     </form>
     </div>
   </div>
 
-  <div id="markers"    style="position:absolute; left:540px;  top:75px; width:935px; height:500px; border: 1px black solid; "></div>
+  <div id="markers" class="black_border" style="position:absolute; left:540px;  top:75px; width:935px; height:500px;"></div>
 
-  <div id="library"    style="position:relative; left:0px; top:530px; width:1430px; height: 300px; border: 1px black solid; position:relative; font-family: Open sans, sans-serif; font-size:10pt; padding:5px 15px; overflow:auto;">
+  <div id="library" class="black_border" style="position:relative; left:0px; top:530px; width:1430px; height: 300px; font-size:10pt; padding:5px 15px; overflow:auto;">
     <h2>{{ tut.cat_title }}</h2>
     <h4>{{tut.page}}. {{ tut.title }}</h4>
     {{ content }}
@@ -191,7 +40,4 @@
     </div>
   </div>
 
-  </div>
-
-</body>
-</html>
+{% endblock %}

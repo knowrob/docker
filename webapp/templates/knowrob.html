@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+
+<!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+
+
+{% block head %}
+
+
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ColladaLoader2.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/roslib.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/mjpegcanvas.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ros3d.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/json_prolog.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerClient.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerArrayClient.js"></script>
+
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3.v3.min.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3-tip.js"></script>
+
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DonutChart.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/BarChart.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/TreeDiagram.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DataVisClient.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/array-nonstandard.js"></script>
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/Control.js"></script>
+
+  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/designator/desig.js"></script>
+
+  <script type="text/javascript" type="text/javascript">
+
+    // global ROS handle
+    var ros;
+
+    //global jsonprolog handle
+    var prolog;
+
+    function init() {
+
+      // Connect to ROS.
+      ros = new ROSLIB.Ros({
+        url : 'ws://localhost:{{ session.port_9090 }}'
+      });
+
+      // Create the main viewer.
+      var viewer = new ROS3D.Viewer({
+        divID : 'markers',
+        width : 935,
+        height : 495,
+        antialias : true,
+        background : '#ffffff'
+      });
+
+      viewer.addObject(new ROS3D.Grid());
+
+      // Setup a client to listen to TFs.
+      var tfClient = new ROSLIB.TFClient({
+        ros : ros,
+        angularThres : 0.01,
+        transThres : 0.01,
+        rate : 10.0,
+        fixedFrame : '/my_frame'
+      });
+
+      // Setup the marker client.
+      var markerClient = new ROS3D.MarkerClient({
+        ros : ros,
+        tfClient : tfClient,
+        topic : '/visualization_marker',
+        rootObject : viewer.scene
+      });
+
+      // Setup the marker array client.
+      var markerArrayClient = new ROS3D.MarkerArrayClient({
+        ros : ros,
+        tfClient : tfClient,
+        topic : '/visualization_marker_array',
+        markerClient : markerClient
+      });
+
+    };
+
+    function queryProlog(q) {
+
+      if (q.substr(q.length - 1) == ".") {
+        q = q.substr(0, q.length - 1);
+
+        if (prolog != null && prolog.finished == false) {
+          //console.log(prolog.finished);
+          prolog.finishClient();
+        }
+
+
+        prolog = new JsonProlog(ros, {});
+
+        document.query_form.history.value += "?- " + q +  ".\n\n";
+
+        prolog.jsonQuery(q, function(result) {
+            document.query_form.history.value += result;
+        });
+
+        document.query_form.user_query.value = "";
+        document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
+
+        // reset select
+        //var select = document.getElementById('examplequery');
+        //select.selectedIndex = 0;
+      } else if (q.substr(q.length - 1) == ";") {
+        nextQueryProlog();
+      } else {
+        if (prolog != null && prolog.finished == false) {
+          prolog.finishClient();
+        }
+      }
+    };
+
+    function nextQueryProlog() {
+      prolog.nextQuery(function(result) {
+            document.query_form.history.value += result;
+        });
+      document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
+    };
+
+
+</script>
+
+{% endblock %}
+
+<!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+
+{% block bodyargs %}
+ onload="init()"
+{% endblock %}
+

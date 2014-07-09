@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" media="all" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700|Oswald|Source+Code+Pro" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
+   {% block head %}{% endblock %}
 </head>
 
 
-<body>
+<body {% block bodyargs %}{% endblock %}>
   <div class="metanav">
     <div class="metanav_left">
       <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
@@ -23,8 +24,8 @@
       {% endif %}
     </div>
   </div>
+  
   <div style="padding-left:20px;">
-  <h1>RoboHow Web Console</h1>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -36,11 +37,7 @@
     {% endif %}
   {% endwith %}
 
-
-<!--   {% for message in get_flashed_messages() %} -->
-<!--   <div class=flash>{{ message }}</div> -->
-<!--     {% endfor %} -->
-    {% block body %}{% endblock %}
+  {% block content %}{% endblock %}
   </div>
 
 </body>
