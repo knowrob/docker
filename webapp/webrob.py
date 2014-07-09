@@ -7,6 +7,8 @@ import markdown
 import random
 import string
 import time
+from docker.errors import *
+from requests import ConnectionError
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -30,23 +32,81 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Docker stuff
 
-def start_container():
+def docker_connect():
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
-    session['container_id'] = c.start(session['username'], publish_all_ports=True)
-    session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
-    session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
+    return c
+    
 
-def create_container():
-    print('Creating container for ' + session['username'])
-    c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
-    c.create_container('knowrob/hydro-knowrob-daemon:1.0.1', detach=True, tty=True, name=session['username'])
+def create_data_containers():
+
+    try:
+        c = docker_connect()
+
+        session['user_data_container_name'] = session['username'] + "_data"
+        session['common_data_container_name'] = "knowrob_data"
+
+        if(c is not None):
+            c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'])
+
+    except ConnectionError:
+        flash("Error: Connection to your KnowRob instance failed.")
+        return None
+
+
+def start_container():
+
+    try:
+        c = docker_connect()
+
+        if(c is not None):
+            
+            # check if container for this user still persists:
+
+            found=False
+            for cont in c.containers(all=True):
+              if "/"+session['username'] in cont['Names']:
+                found=True
+
+            if not found:
+                print('Creating container for ' + session['username'])
+                c.create_container('knowrob/hydro-knowrob-daemon:1.0.1', detach=True, tty=True, name=session['username'])
+                
+            session['user_container_name'] = session['username']
+
+            session['user_container_id'] = c.start(session['user_container_name'], publish_all_ports=True)
+            session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
+            session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
+
+    except APIError, e:
+        if "Conflict" in str(e.message):
+            flash("Name conflict: Container for this user already exists")
+        else:
+            flash(e.message)
+        return None
+    except ConnectionError:
+        flash("Error: Connection to your KnowRob instance failed.")
+        return None
+
 
 def stop_container():
-    c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=30)
-    c.stop(session['username'])
+
+    try:
+        c = docker_connect()
+        
+        if(c is not None):
+            print("Stopping container " + session['user_container_name'] + "...\n")
+            c.stop(session['user_container_name'], timeout=5)
+
+            print("Removing container " + session['user_container_name'] + "...\n")
+            c.remove_container(session['user_container_name'])
+            session.pop('user_container_name')
+
+    except ConnectionError:
+        flash("Error: Connection to your KnowRob instance failed.")
+        return None
 
 
-
+    
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
@@ -68,6 +128,7 @@ def login():
                 session['logged_in'] = True
                 session['rosauth_mac'] = generate_mac()
                 flash('You were logged in')
+                start_container()
                 return redirect(url_for('show_user_data'))
             else :
                 error = 'Invalid user data'
@@ -95,23 +156,29 @@ def register():
         elif(request.form['email'] == ""):
             error = 'Please specify an email address.'
 
+        elif(user_exists(request.form['username'])):
+            error = 'This username already exists. Please choose another username.'
+            
         else:
             insert_user(request.form['username'], request.form['password'], request.form['email'])
             session['username'] = request.form['username']
             session['logged_in'] = True
             session['rosauth_mac'] = generate_mac()
-	    create_container()
+	    create_data_containers()
+            start_container()
             return redirect(url_for('show_user_data'))
 
     return render_template('login.html', error=error, action="register")
+
+
 
 @app.route('/tutorials/')
 @app.route('/tutorials/<cat_id>/')
 @app.route('/tutorials/<cat_id>/<page>')
 def tutorials(cat_id='basics', page=1):
+  
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    start_container()
     tut = read_tutorial_page(cat_id, page)
     content = Markup(markdown.markdown(tut['text']))
 
@@ -126,7 +193,6 @@ def knowrob():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     error=""
-    start_container()
     return render_template('knowrob_simple.html', error=error)
 
 
@@ -163,6 +229,17 @@ def close_db(error):
         g.sqlite_db.close()
 
 
+def user_exists(username):
+    db = get_db()
+    cur = db.execute('select username from users where username=?', [username])
+    entries = cur.fetchall()
+
+    if len(entries)>0:
+        return True
+    else:
+        return False
+
+
 def is_valid_user(username, password):
     db = get_db()
     pwd_hash = hashlib.sha256(password).hexdigest()
@@ -192,7 +269,7 @@ def get_user_data(username):
     if data is not None:
         session['pwd_has'] = data['passwd']
         session['email'] = data['email']
-        session['container_id'] = data['container_id']
+        session['user_container_id'] = data['container_id']
         return data
     else:
         return False
@@ -221,7 +298,7 @@ def generate_mac():
 
     mac = hashlib.sha512(secret + client + dest + rand + str(t) + level + str(end) ).hexdigest()
 
-    return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + t + ", " + level + ", " + end + ")"
+    return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + str(t) + ", " + level + ", " + str(end) + ")"
     
 
 

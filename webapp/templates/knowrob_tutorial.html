@@ -143,6 +143,16 @@
     </div>
   </div>
 
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  {% endwith %}
+
   <div style="padding:15px;">
   <div id="console" style="position:absolute; top:75px; width:510px; height:500px; border: 1px black solid;">
     <div style="padding:15px;">
