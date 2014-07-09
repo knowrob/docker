@@ -6,6 +6,7 @@
 
 {% block head %}
 
+  <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}"></script>
 
   <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
   <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
@@ -84,8 +85,10 @@
 
     };
 
-    function queryProlog(q) {
+    function queryProlog(query, history) {
 
+      var q = query.getValue();
+    
       if (q.substr(q.length - 1) == ".") {
         q = q.substr(0, q.length - 1);
 
@@ -94,23 +97,17 @@
           prolog.finishClient();
         }
 
-
         prolog = new JsonProlog(ros, {});
 
-        document.query_form.history.value += "?- " + q +  ".\n\n";
+        history.setValue(history.getValue() + "?- " + q +  ".\n\n", -1);
 
         prolog.jsonQuery(q, function(result) {
-            document.query_form.history.value += result;
+            history.setValue(history.getValue() + result, -1);
         });
-
-        document.query_form.user_query.value = "";
-        document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
-
-        // reset select
-        //var select = document.getElementById('examplequery');
-        //select.selectedIndex = 0;
-      } else if (q.substr(q.length - 1) == ";") {
-        nextQueryProlog();
+        history.gotoLine(history.session.getLength());
+        
+        query.setValue("");
+        
       } else {
         if (prolog != null && prolog.finished == false) {
           prolog.finishClient();
@@ -118,11 +115,12 @@
       }
     };
 
-    function nextQueryProlog() {
+    function nextQueryProlog(history) {
       prolog.nextQuery(function(result) {
-            document.query_form.history.value += result;
+            history.setValue(history.getValue() + result, -1);
         });
-      document.query_form.history.scrollTop = document.query_form.history.scrollHeight;
+
+        history.gotoLine(history.session.getLength());
     };
 
 
@@ -153,8 +151,68 @@
     // append the selected query to the user_query form
     function addSelectedToQueryform(selectid) {
       var select = document.getElementById(selectid);
-      document.query_form.user_query.value = select.options[select.selectedIndex].value;
+      setQueryValue(select.options[select.selectedIndex].value);
     }
+
+    // set the value of the query editor and move the cursor to the end
+    function setQueryValue(val){
+      user_query.setValue(val, -1);
+      user_query.focus();
+      session = user_query.getSession();
+      count = session.getLength();
+      user_query.gotoLine(count, session.getLine(count-1).length);
+    }
+
+
+    function setupHistoryField() {
+        var history = ace.edit("history");
+        history.setTheme("ace/theme/solarized_light");
+        history.getSession().setMode("ace/mode/prolog");
+        history.getSession().setUseWrapMode(true);
+        history.setOptions({
+            readOnly: true,
+            showGutter: false,
+            printMarginColumn: false,
+            highlightActiveLine: false,
+            highlightGutterLine: false
+        });
+        history.renderer.$cursorLayer.element.style.opacity=0
+        return history;
+    }
+
+    function setupQueryField() {
+
+        var user_query = ace.edit("user_query");
+        user_query.setTheme("ace/theme/solarized_light");
+        user_query.getSession().setMode("ace/mode/prolog");
+        user_query.getSession().setUseWrapMode(true);
+        user_query.setOptions({
+            showGutter: false,
+            printMarginColumn: false,
+            highlightActiveLine: false,
+            highlightGutterLine: false
+        });
+        user_query.commands.addCommand({
+            name: 'send_query',
+            bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+            exec: function(editor) {
+                queryProlog(user_query, history);
+            },
+            readOnly: false
+        });
+        user_query.commands.addCommand({
+            name: 'next_result',
+            bindKey: {win: 'Ctrl-;',  mac: 'Command-;'},
+            exec: function(editor) {
+                console.log("next result");
+                nextQueryProlog(history);
+            },
+            readOnly: false
+        });
+
+        return user_query;
+    }
+    
 </script>
 
 {% endblock %}

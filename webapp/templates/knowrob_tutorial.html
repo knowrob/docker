@@ -4,17 +4,15 @@
 {% block content %}
 
   <div id="console" class="black_border" style="position:absolute; top:50px; width:495px; height:460px;">
-    <div style="padding:5px;">
-    <form name="query_form" action="post">
+    <div id="history" style="position:relative; top:0px; height:330px; padding:5px;"></div>
+    <script>
+      var history = setupHistoryField();
+    </script>
 
-      <textarea name="history" readonly  cols="66" rows="23" class="code" style="margin-bottom:5px;"></textarea>
-
-      <textarea name="user_query" cols="66" rows="8" class="code" style="margin-bottom:5px; "></textarea>
-
-      <input type="button" name="q" value="Send query" class="code" onclick="queryProlog(document.query_form.user_query.value);">
-
-    </form>
-    </div>
+    <div id="user_query" style="position:relative; top:0px; height:115px; border-top:1px solid black;">member(A, [a,b,c]).</div>
+    <script>
+      var user_query = setupQueryField();
+    </script>
   </div>
 
   <div id="markers" class="black_border" style="position:absolute; left:520px; top:50px; width:820px; height:460px;"></div>
