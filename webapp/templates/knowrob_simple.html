@@ -3,13 +3,13 @@
 
 {% block content %}
 
-  <div id="console" class="black_border" style="position:absolute; top:75px; width:510px; height:500px;">
-    <div style="padding:15px;">
+  <div id="console" class="black_border" style="position:absolute; top:50px; width:495px; height:460px;">
+    <div style="padding:5px;">
     <form name="query_form" action="post">
 
       <textarea name="history" readonly  cols="66" rows="23" class="code" style="margin-bottom:5px;"></textarea>
 
-      <textarea name="user_query" cols="66" rows="10" class="code" style="margin-bottom:5px;"></textarea>
+      <textarea name="user_query" cols="66" rows="8" class="code" style="margin-bottom:5px; "></textarea>
 
       <input type="button" name="q" value="Send query" class="code" onclick="queryProlog(document.query_form.user_query.value);">
 
@@ -17,13 +17,13 @@
     </div>
   </div>
 
+  <div id="markers" class="black_border" style="position:absolute; left:520px; top:50px; width:820px; height:460px;"></div>
 
-  <div id="markers" class="black_border" style="position:absolute; left:540px;  top:75px; width:950px; "></div>
-
-  <div id="library" class="black_border" style="position:absolute; width:510px; top:583px; height:324px;">
-    <select onclick="addSelectedToQueryform('examplequery')" size="23" name="examplequery" id="examplequery" style="width:510px; border:none;"><option value=0></option></select>
+  
+  <div id="library" class="black_border" style="position:absolute;  top:520px; width:495px; height:324px;">
+    <select onclick="addSelectedToQueryform('examplequery')" class="code" size="20" name="examplequery" id="examplequery" style="width:495px; border:none;"><option value=0></option></select>
   </div>
 
-  <div id="chart" class="black_border" style="position:absolute; left:540px; top:583px; width:950px; height:324px;"></div>
+  <div id="chart" class="black_border" style="position:absolute; left:520px; top:520px; width:820px; height:324px;"></div>
 
 {% endblock %}
