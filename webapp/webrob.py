@@ -3,7 +3,7 @@ import sqlite3
 import os
 import hashlib
 import docker
-import markdown
+from flask.ext.misaka import markdown
 import random
 import string
 import time
@@ -180,8 +180,8 @@ def tutorials(cat_id='basics', page=1):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     tut = read_tutorial_page(cat_id, page)
-    content = Markup(markdown.markdown(tut['text']))
-
+    content = Markup(markdown(tut['text'], fenced_code=True))
+    
     # check whether there is another tutorial in this category
     nxt  = read_tutorial_page(cat_id, int(page)+1)
     prev = read_tutorial_page(cat_id, int(page)-1)
