@@ -79,6 +79,8 @@
         topic : '/visualization_marker_array',
         markerClient : markerClient
       });
+      // fill example qurey select
+      populateQuerySelect('examplequery', "{{ url_for('static', filename='queriesForRobohow.json') }}");
 
     };
 
@@ -124,6 +126,35 @@
     };
 
 
+    // example query selection stuff
+    // -------------------------------------
+
+    // fill the select with json data from url
+    function populateQuerySelect(id, url) {
+
+      // url must point to a json-file containing an array named "query" with
+      // the query strings to display in the select
+      var request = new XMLHttpRequest
+      request.open("GET", url, false);
+      request.send(null);
+
+      var querylist = JSON.parse(request.responseText);
+
+      var select = document.getElementById(id);
+
+      for (var i = 0; i < querylist.query.length; i++) {
+        var opt = document.createElement('option');
+        opt.value = querylist.query[i].q;
+        opt.innerHTML = querylist.query[i].text;
+        select.appendChild(opt);
+      }
+    }
+
+    // append the selected query to the user_query form
+    function addSelectedToQueryform(selectid) {
+      var select = document.getElementById(selectid);
+      document.query_form.user_query.value = select.options[select.selectedIndex].value;
+    }
 </script>
 
 {% endblock %}

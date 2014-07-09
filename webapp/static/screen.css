@@ -309,8 +309,7 @@ input,
 textarea,
 button,
 select,
-optgroup,
-option {
+optgroup {
     background:#ffffff;
     border: 1px black solid;
     
