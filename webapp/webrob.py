@@ -7,6 +7,7 @@ from flask.ext.misaka import markdown
 import random
 import string
 import time
+import re
 from docker.errors import *
 from requests import ConnectionError
 
@@ -180,8 +181,13 @@ def tutorials(cat_id='basics', page=1):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     tut = read_tutorial_page(cat_id, page)
-    content = Markup(markdown(tut['text'], fenced_code=True))
-    
+    content = markdown(tut['text'], fenced_code=True)
+
+    # automatically add "ask as query" links after code blocks
+    content = re.sub('</code>(\s)?</pre>', "</code></pre><a href='#' class='show_code'>Ask as query</a>", str(content))
+
+    content = Markup(content)
+
     # check whether there is another tutorial in this category
     nxt  = read_tutorial_page(cat_id, int(page)+1)
     prev = read_tutorial_page(cat_id, int(page)-1)

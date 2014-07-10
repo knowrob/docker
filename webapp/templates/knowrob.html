@@ -7,6 +7,7 @@
 {% block head %}
 
   <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
 
   <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
   <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
@@ -163,6 +164,14 @@
       user_query.gotoLine(count, session.getLine(count-1).length);
     }
 
+    // hook for links of class "show_code" that pastes the content of the
+    // previous code block into the query field
+    $( document ).ready(function() {
+      $( "a" ).click(function( event ) {
+        setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+        event.preventDefault();
+      });
+    });
 
     function setupHistoryField() {
         var history = ace.edit("history");
