@@ -184,7 +184,7 @@ def tutorials(cat_id='basics', page=1):
     content = markdown(tut['text'], fenced_code=True)
 
     # automatically add "ask as query" links after code blocks
-    content = re.sub('</code>(\s)?</pre>', "</code></pre><a href='#' class='show_code'>Ask as query</a>", str(content))
+    content = re.sub('</code>(\s)?</pre>', "</code></pre><div class='show_code'><a href='#' class='show_code'>Ask as query</a></div>", str(content))
 
     content = Markup(content)
 

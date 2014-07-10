@@ -31,7 +31,7 @@
 
   <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/designator/desig.js"></script>
 
-  <script type="text/javascript" type="text/javascript">
+  <script type="text/javascript">
 
     // global ROS handle
     var ros;
@@ -167,7 +167,7 @@
     // hook for links of class "show_code" that pastes the content of the
     // previous code block into the query field
     $( document ).ready(function() {
-      $( "a" ).click(function( event ) {
+      $( "a.show_code" ).click(function( event ) {
         setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
         event.preventDefault();
       });
