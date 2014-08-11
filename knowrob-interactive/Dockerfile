@@ -33,10 +33,10 @@ ENV CMAKE_PREFIX_PATH /opt/ros/hydro
 ENV PKG_CONFIG_PATH /opt/ros/hydro/lib/pkgconfig
 ENV PATH /home/ros/devel/bin:/opt/ros/hydro/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-
 # set up workspace and setup knowrob
 WORKDIR /home/ros/src
 
+RUN echo "Checking out knowrob...\n"
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 RUN git clone https://github.com/knowrob/knowrob.git -b indigo-devel
 WORKDIR /home/ros
