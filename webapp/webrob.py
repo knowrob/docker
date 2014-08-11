@@ -10,6 +10,7 @@ import time
 import re
 from docker.errors import *
 from requests import ConnectionError
+from urlparse import urlparse
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -22,7 +23,8 @@ app.config.update(dict(
     DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
-    PASSWORD='default'
+    PASSWORD='default'#,
+    #SERVER_NAME='192.168.100.184:5000'
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
@@ -116,6 +118,7 @@ def show_user_data():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     get_user_data(session['username'])
+    print request.host
     return render_template('show_user_data.html')
 
 
@@ -165,10 +168,10 @@ def register():
             session['username'] = request.form['username']
             session['logged_in'] = True
             session['rosauth_mac'] = generate_mac()
-	    create_data_containers()
+            create_data_containers()
             start_container()
             return redirect(url_for('show_user_data'))
-
+    print urlparse(request.host_url).hostname
     return render_template('login.html', error=error, action="register")
 
 
@@ -180,12 +183,16 @@ def tutorials(cat_id='basics', page=1):
   
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut['text'], fenced_code=True)
 
     # automatically add "ask as query" links after code blocks
     content = re.sub('</code>(\s)?</pre>', "</code></pre><div class='show_code'><a href='#' class='show_code'>Ask as query</a></div>", str(content))
-
     content = Markup(content)
 
     # check whether there is another tutorial in this category
@@ -199,8 +206,34 @@ def knowrob():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     error=""
-    return render_template('knowrob_simple.html', error=error)
 
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    
+    return render_template('knowrob_simple.html', **locals())
+
+
+@app.route('/editor')
+@app.route('/editor/<filename>/')
+def editor(filename=""):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+        
+    error=""
+    sandbox = '/home/tenorth/sandbox/'
+    glob = sandbox + filename
+
+    # check if still in sandbox
+    if not str(os.path.abspath(glob)).startswith(sandbox):
+        error = "Access denied to folders outside of sandbox"
+        filename = ""
+
+    files = os.listdir(glob)
+
+
+    #poem = open("ad_lesbiam.txt").read()
+    return render_template('editor.html', error=error, files=files)
 
 
 
@@ -309,4 +342,4 @@ def generate_mac():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

@@ -9,27 +9,27 @@
   <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
 
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ColladaLoader2.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/roslib.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/mjpegcanvas.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/ros3d.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/json_prolog.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerClient.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/ros/MarkerArrayClient.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/three.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/ColladaLoader2.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/roslib.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/mjpegcanvas.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/ros3d.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/json_prolog.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/MarkerClient.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/ros/MarkerArrayClient.js"></script>
 
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3.v3.min.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/d3/d3-tip.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/d3/d3.v3.min.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/d3/d3-tip.js"></script>
 
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DonutChart.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/BarChart.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/TreeDiagram.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/DataVisClient.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/array-nonstandard.js"></script>
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/chart/Control.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/DonutChart.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/BarChart.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/TreeDiagram.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/DataVisClient.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/array-nonstandard.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/chart/Control.js"></script>
 
-  <script type="text/javascript" src="http://localhost:{{ session.port_1111 }}/lib/designator/desig.js"></script>
+  <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/designator/desig.js"></script>
 
   <script type="text/javascript">
 
@@ -43,7 +43,7 @@
 
       // Connect to ROS.
       ros = new ROSLIB.Ros({
-        url : 'ws://localhost:{{ session.port_9090 }}'
+        url : 'ws://{{ host_url }}:{{ session.port_9090 }}'
       });
 
       // Create the main viewer.
