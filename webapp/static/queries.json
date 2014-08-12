@@ -1,0 +1,23 @@
+{
+  "query": [
+    {"q": "", "text": "----- init -----"},
+    {"q": "register_ros_package(knowrob_mongo), register_ros_package(knowrob_cram),visualisation_canvas, diagram_canvas.", "text": "Initialize canvases"},
+    {"q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl').", "text": "Load pick-and-place experiment from 'knowrob_data' library"},
+
+    {"q": "owl_parse('package://iai_semantic_maps/owl/room.owl').", "text": "Load semantic map"},
+    {"q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).", "text": "Visualize semantic map"},
+
+    
+    {"q": "", "text": ""},
+    {"q": "", "text": "----- Belief of the Robot -----"},
+    {"q": "task(T), task_goal(T, '(OBJECT-PLACED-AT ?OBJ ?LOC)'), task_start(T, S), task_end(T, E), add_trajectory('/base_link', S, E, 1.0).", "text": "Path of the PR2 during the pick-and-place task"},
+    {"q": "remove_object_with_children(pr2:'PR2Robot1').", "text": "Stop publishing PR2 markers"},
+    {"q": "remove_trajectory('/base_link'), \n remove_trajectory('/l_wrist_roll_link'), \n remove_trajectory('/r_wrist_roll_link').", "text": "Stop publishing trajectories to the scene"},
+
+    
+    {"q": "", "text": ""},
+    {"q": "", "text": "----- Highlighting an object -----"},
+    {"q": "highlight_object_with_children('http://ias.cs.tum.edu/kb/knowrob.owl#drawer_fridge_upper').", "text": "Highlight the refrigerator"},
+
+  ]
+}
