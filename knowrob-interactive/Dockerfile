@@ -13,7 +13,6 @@ RUN apt-get -y install python-yaml python-catkin-pkg python-rospkg emacs swi-pro
 RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server
 RUN apt-get -y install mongodb-clients
 
-
 # ROS environment setup
 RUN cp /opt/ros/hydro/setup.sh /etc/profile.d/ros_hydro.sh
 
@@ -33,12 +32,16 @@ ENV CMAKE_PREFIX_PATH /opt/ros/hydro
 ENV PKG_CONFIG_PATH /opt/ros/hydro/lib/pkgconfig
 ENV PATH /home/ros/devel/bin:/opt/ros/hydro/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
+
 # set up workspace and setup knowrob
 WORKDIR /home/ros/src
 
-RUN echo "Checking out knowrob...\n"
+RUN echo "Cloning repositories..."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 RUN git clone https://github.com/knowrob/knowrob.git -b indigo-devel
+RUN git clone https://github.com/knowrob/knowrob_addons.git -b indigo-devel
+RUN git clone https://github.com/code-iai/iai_maps.git
+RUN git clone https://github.com/code-iai/iai_cad_tools.git
 WORKDIR /home/ros
 
 # build the catkin workspace
