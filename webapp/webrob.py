@@ -79,8 +79,8 @@ def start_container():
             session['user_container_id'] = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
                                                    links={('mongo_db', 'mongo')},
-                                                   volumes_from={session['user_data_container_name'],
-                                                                 session['common_data_container_name']})
+                                                   volumes_from=[session['user_data_container_name'],
+                                                                 session['common_data_container_name']])
                                                                  
             session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
             session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
