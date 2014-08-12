@@ -26,7 +26,7 @@ app.config.update(dict(
     PASSWORD='default'#,
     #SERVER_NAME='192.168.100.184:5000'
 ))
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+#app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 
 
@@ -74,7 +74,6 @@ def start_container():
                 print('Creating container for ' + session['username'])
                 c.create_container('knowrob/hydro-knowrob-daemon', detach=True, tty=True, name=session['username'])
 
-            session['user_container_name'] = session['username']
 
             session['user_container_id'] = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
@@ -133,10 +132,17 @@ def login():
     if request.method == 'POST':
         if (request.form['username'] != "" and request.form['password'] != ""):
             if is_valid_user(request.form['username'], request.form['password']):
+              
                 session['username'] = request.form['username']
+
+                session['user_container_name'] = session['username']
+                session['user_data_container_name'] = session['username'] + "_data"
+                session['common_data_container_name'] = "knowrob_data"
+                
                 session['logged_in'] = True
                 session['rosauth_mac'] = generate_mac()
                 flash('You were logged in')
+                
                 start_container()
                 return redirect(url_for('show_user_data'))
             else :
@@ -145,8 +151,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    stop_container()
     session.pop('logged_in', None)
+    stop_container()
     flash('You were logged out')
     return redirect(url_for('show_user_data'))
 
@@ -171,6 +177,11 @@ def register():
         else:
             insert_user(request.form['username'], request.form['password'], request.form['email'])
             session['username'] = request.form['username']
+
+            session['user_container_name'] = session['username']
+            session['user_data_container_name'] = session['username'] + "_data"
+            session['common_data_container_name'] = "knowrob_data"
+            
             session['logged_in'] = True
             session['rosauth_mac'] = generate_mac()
             create_data_containers()
