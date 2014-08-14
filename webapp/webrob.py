@@ -2,15 +2,15 @@ from flask import Flask, session, redirect, url_for, escape, request, render_tem
 import sqlite3
 import os
 import hashlib
-import docker
 from flask.ext.misaka import markdown
 import random
 import string
 import time
 import re
-from docker.errors import *
 from requests import ConnectionError
 from urlparse import urlparse
+import docker
+from docker.errors import *
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -40,20 +40,20 @@ def docker_connect():
     return c
     
 
-def create_data_containers():
+#def create_data_containers():
 
-    try:
-        c = docker_connect()
+    #try:
+        #c = docker_connect()
 
-        session['user_data_container_name'] = session['username'] + "_data"
-        session['common_data_container_name'] = "knowrob_data"
+        #session['user_data_container_name'] = session['username'] + "_data"
+        #session['common_data_container_name'] = "knowrob_data"
 
-        if(c is not None):
-            c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'])
+        #if(c is not None):
+            #c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'])
 
-    except ConnectionError:
-        flash("Error: Connection to your KnowRob instance failed.")
-        return None
+    #except ConnectionError:
+        #flash("Error: Connection to your KnowRob instance failed.")
+        #return None
 
 
 def start_container():
@@ -62,18 +62,45 @@ def start_container():
         c = docker_connect()
 
         if(c is not None):
+
+            all_containers = c.containers(all=True)
+
             
-            # check if container for this user still persists:
+            # check if containers exist:
+            user_cont_exists=False
+            user_data_cont_exists=False
+            common_data_exists=False
+            mongo_cont_exists=False
 
-            found=False
-            for cont in c.containers(all=True):
-              if "/"+session['username'] in cont['Names']:
-                found=True
+            for cont in all_containers:
+              if "/"+session['user_container_name'] in cont['Names']:
+                user_cont_exists=True
+              if "/"+session['user_data_container_name'] in cont['Names']:
+                user_data_cont_exists=True
+              if "/"+session['common_data_container_name'] in cont['Names']:
+                common_data_exists=True
+              if "/mongo_db" in cont['Names']:
+                mongo_cont_exists=True
 
-            if not found:
+
+            # Create containers if they do not exist yet
+            if not user_cont_exists:
                 print('Creating container for ' + session['username'])
-                c.create_container('knowrob/hydro-knowrob-daemon', detach=True, tty=True, name=session['username'])
+                c.create_container('knowrob/hydro-knowrob-daemon', detach=True, tty=True, name=session['user_container_name'])
 
+            if not user_data_cont_exists:
+                c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'], entrypoint='true')
+                c.start(session['user_data_container_name'])
+                
+            if not common_data_exists:
+                c.create_container('knowrob/knowrob_data', detach=True, name=session['common_data_container_name'], entrypoint='true')
+                c.start(name=session['common_data_container_name'])
+
+            if not mongo_cont_exists:
+                c.create_container('busybox', detach=True, name='mongo_data', volumes=['/data/db'], entrypoint='true')
+                c.create_container('mongo',   detach=True,ports=[27017], name='mongo_db')
+                c.start('mongo', port_bindings={27017:27017}, volumes_from=['mongo_data'])
+                
 
             session['user_container_id'] = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
@@ -184,7 +211,7 @@ def register():
             
             session['logged_in'] = True
             session['rosauth_mac'] = generate_mac()
-            create_data_containers()
+            #create_data_containers()
             start_container()
             return redirect(url_for('show_user_data'))
     print urlparse(request.host_url).hostname
