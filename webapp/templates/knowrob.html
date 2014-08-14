@@ -105,8 +105,8 @@
 
         prolog.jsonQuery(q, function(result) {
             history.setValue(history.getValue() + result, -1);
+            history.gotoLine(history.getSession().getLength(), 0);
         });
-        history.gotoLine(history.session.getLength());
         
         query.setValue("");
         
@@ -122,9 +122,10 @@
       var history = ace.edit("history");
       prolog.nextQuery(function(result) {
             history.setValue(history.getValue() + result, -1);
+            history.gotoLine(history.getSession().getLength(), 0);
         });
 
-        history.gotoLine(history.session.getLength());
+      user_query.focus();
     };
 
 
@@ -196,6 +197,7 @@
     function setupQueryField() {
 
         var user_query = ace.edit("user_query");
+        user_query.resize(true);
         user_query.setTheme("ace/theme/solarized_light");
         user_query.getSession().setMode("ace/mode/prolog");
         user_query.getSession().setUseWrapMode(true);
