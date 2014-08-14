@@ -17,7 +17,7 @@
     
     {"q": "", "text": ""},
     {"q": "", "text": "----- Highlighting an object -----"},
-    {"q": "highlight_object_with_children('http://ias.cs.tum.edu/kb/knowrob.owl#drawer_fridge_upper').", "text": "Highlight the refrigerator"},
+    {"q": "highlight_object_with_children('http://ias.cs.tum.edu/kb/knowrob.owl#drawer_fridge_upper').", "text": "Highlight the refrigerator"}
 
   ]
 }
