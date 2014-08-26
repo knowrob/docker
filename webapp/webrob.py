@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash, Markup
+from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash, Markup, send_from_directory
 import sqlite3
 import os
 import hashlib
@@ -65,7 +65,6 @@ def start_container():
 
             all_containers = c.containers(all=True)
 
-            
             # check if containers exist:
             user_cont_exists=False
             user_data_cont_exists=False
@@ -91,7 +90,7 @@ def start_container():
             if not user_data_cont_exists:
                 c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'], entrypoint='true')
                 c.start(session['user_data_container_name'])
-                
+
             if not common_data_exists:
                 c.create_container('knowrob/knowrob_data', detach=True, name=session['common_data_container_name'], entrypoint='true')
                 c.start(name=session['common_data_container_name'])
@@ -101,13 +100,11 @@ def start_container():
                 c.create_container('mongo',   detach=True,ports=[27017], name='mongo_db')
                 c.start('mongo', port_bindings={27017:27017}, volumes_from=['mongo_data'])
                 
-
             session['user_container_id'] = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
                                                                  session['common_data_container_name']])
-                                                                 
             session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
             session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
 
@@ -152,6 +149,10 @@ def show_user_data():
     print request.host
     return render_template('show_user_data.html')
 
+@app.route('/pr2_description/meshes/<path:filename>')
+def download_file(filename):
+    return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
+    
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
