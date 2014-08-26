@@ -10,7 +10,7 @@ ENV HOME /home/ros
 
 RUN apt-get -y update
 RUN apt-get -y install python-yaml python-catkin-pkg python-rospkg emacs swi-prolog-java ros-hydro-catkin
-RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server
+RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server ros-hydro-pr2-description
 RUN apt-get -y install mongodb-clients
 
 # ROS environment setup
@@ -43,6 +43,10 @@ RUN git clone https://github.com/knowrob/knowrob_addons.git -b indigo-devel
 RUN git clone https://github.com/code-iai/iai_maps.git
 RUN git clone https://github.com/code-iai/iai_cad_tools.git
 WORKDIR /home/ros
+
+# copy PR2 meshes into docroot
+RUN mkdir -p /home/ros/knowrob/knowrob_vis/html/pr2_description/meshes
+RUN cp -r /opt/ros/hydro/share/pr2_description/meshes/* /home/ros/knowrob/knowrob_vis/html/pr2_description/meshes/
 
 # build the catkin workspace
 RUN /opt/ros/hydro/bin/catkin_make
