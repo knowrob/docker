@@ -1,0 +1,24 @@
+#
+#
+# The following commands need to be executed once to set up the MongoDB
+# container and fill it with test data
+#
+#
+
+
+# create data volume for MongoDB
+docker run -d -v /data/db --name mongo_data busybox true
+
+# pull and start MongoDB container
+docker pull mongo
+docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
+
+# start temporary container to import the stored tf log file:
+docker run -t -P --rm --link mongo_db:mongo -v /media/ICRA2012:/var/roslog -i knowrob/hydro-knowrob-interactive /bin/bash
+
+# execute the import procedure inside the container
+mongoimport --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT" --db roslog --collection tf /var/roslog/tf.json
+
+# exit the container
+exit
+
