@@ -117,6 +117,7 @@
 
         
         history.setValue(history.getValue() + "\n\n?- " + q +  ".\n", -1);
+        history.gotoLine(history.getSession().getLength(), 0);
 
         prolog.jsonQuery(q, function(result) {
             history.setValue(history.getValue() + result, -1);
