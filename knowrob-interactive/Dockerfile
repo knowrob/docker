@@ -15,11 +15,13 @@ RUN apt-get -y install mongodb-clients
 
 # ROS environment setup
 RUN cp /opt/ros/hydro/setup.sh /etc/profile.d/ros_hydro.sh
+RUN rosdep init
 
 WORKDIR /home/ros
 USER ros
 RUN mkdir /home/ros/src
 RUN chown -R ros:ros /home/ros
+RUN rosdep update
 
 RUN echo "export LD_LIBRARY_PATH=/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc
 RUN echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /home/ros/.bashrc
@@ -40,6 +42,7 @@ RUN echo "Cloning repositories..."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 RUN git clone https://github.com/knowrob/knowrob.git -b indigo-devel
 RUN git clone https://github.com/knowrob/knowrob_addons.git -b indigo-devel
+RUN git clone https://github.com/code-iai/knowrob_dev.git -b indigo-devel
 RUN git clone https://github.com/code-iai/iai_maps.git
 RUN git clone https://github.com/code-iai/iai_cad_tools.git
 WORKDIR /home/ros
