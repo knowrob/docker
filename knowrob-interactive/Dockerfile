@@ -40,6 +40,9 @@ WORKDIR /home/ros/src
 
 RUN echo "Cloning repositories..."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
+
+# dummy 'add' command to always check out the repositories
+ADD ./Dockerfile /home/ros/src/
 RUN git clone https://github.com/knowrob/knowrob.git -b indigo-devel
 RUN git clone https://github.com/knowrob/knowrob_addons.git -b indigo-devel
 RUN git clone https://github.com/code-iai/knowrob_dev.git -b indigo-devel
