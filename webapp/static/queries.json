@@ -6,7 +6,11 @@
         },
         {
             "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl').",
-            "text": "Load pick-and-place experiment from 'knowrob_data' library"
+            "text": "Load single-arm pick-and-place experiment from 'knowrob_data' library"
+        },
+        {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/dual-arm-pick-and-place/cram_log.owl').",
+            "text": "Load dual-arm pick-and-place experiment"
         },
         {
             "q": "",
@@ -49,7 +53,7 @@
             "text": "Which path did the PR2 follow during the pick-and-place task?"
         },
         {
-            "q": "findall(E,((task_end(T,E), task_goal(T,'PUTDOWN'))), Es),!, member(E, Es), \n mng_robot_pose_at_time(pr2:'PR2Robot1','/map',E,Pose),\n add_robot_as_basic_semantic_instance(Pose, E, SemanticMapInstance), \nadd_object_with_children(SemanticMapInstance), \nhighlight_object(SemanticMapInstance).",
+            "q": "findall(E, (task_goal(T,'PUTDOWN'), task_end(T, E)), Es), member(E, Es),  mng_lookup_transform('/base_link', '/map', E, Transform), add_robot_as_basic_semantic_instance(Transform, E, Inst), add_object(Inst), highlight_object(Inst).",
             "text": "Where did it stand during the PUT-DOWN actions?"
         },
         {
@@ -61,8 +65,12 @@
             "text": "What was the pose of the PR2 at the end of the PUTDOWN action?"
         },
         {
-            "q": "task_start(T,S), task_end(T,E), task_goal(T,'PUTDOWN'),\n arm_used_for_manipulation(T, Link), add_trajectory(Link, S, E, 0.1).",
+            "q": "task_goal(T, 'PUTDOWN'), \n subtask_all(T, Sub),\n owl_has(Sub, knowrob:'voluntaryMovementDetails', D),\n mng_designator_props(D, 'LINK', Link),\n task_start(T, St), task_end(T, E),\n atomic_list_concat(['/', Link], TfLink), add_trajectory(TfLink, St, E, 0.1).",
             "text": "What was the arm trajectory during the PUTDOWN action?"
+        },
+        {
+            "q": "task_goal(T, 'GRASP'),\n subtask_all(T, SubL),\n owl_has(SubL, knowrob:graspDetails, DL),\n mng_designator_props(DL, 'SIDE', 'LEFT'),\n subtask_all(T, SubR),\n owl_has(SubR, knowrob:graspDetails, DR),\n mng_designator_props(DR, 'SIDE', 'RIGHT'),\n task_start(T, S), task_end(T, E),\n add_trajectory('l_wrist_roll_link', S, E, 0.3),\n add_trajectory('r_wrist_roll_link', S, E, 0.3).",
+            "text": "What were the trajectories of both arms in a dual-handed GRASP action?"
         },
         {
             "q": "remove_object_with_children(pr2:'PR2Robot1').",
