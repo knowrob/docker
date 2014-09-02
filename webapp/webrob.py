@@ -123,13 +123,26 @@ def stop_container():
 
     try:
         c = docker_connect()
-        
-        if(c is not None):
-            print("Stopping container " + session['user_container_name'] + "...\n")
-            c.stop(session['user_container_name'], timeout=5)
 
-            print("Removing container " + session['user_container_name'] + "...\n")
-            c.remove_container(session['user_container_name'])
+        if(c is not None):
+            all_containers = c.containers(all=True)
+
+            # check if containers exist:
+            user_cont_exists=False
+
+            for cont in all_containers:
+                if "/"+session['user_container_name'] in cont['Names']:
+                    user_cont_exists=True
+
+            if user_cont_exists:
+          
+                print("Stopping container " + session['user_container_name'] + "...\n")
+                c.stop(session['user_container_name'], timeout=5)
+
+                print("Removing container " + session['user_container_name'] + "...\n")
+                c.remove_container(session['user_container_name'])
+
+
             session.pop('user_container_name')
 
     except ConnectionError:
@@ -179,6 +192,8 @@ def login():
 
 @app.route('/logout')
 def logout():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     session.pop('logged_in', None)
     stop_container()
     flash('You were logged out')
