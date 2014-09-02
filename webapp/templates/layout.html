@@ -3,17 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" media="all" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700|Oswald|Source+Code+Pro" />
-   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
-   {% block head %}{% endblock %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
+  <link rel="stylesheet" src="{{ url_for('static', filename='overlay/iosOverlay.css') }}"/>
+  <link rel="stylesheet" src="{{ url_for('static', filename='overlay/prettify.css') }}"/>
+  <script type="text/javascript" href="{{ url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
+  {% block head %}{% endblock %}
 </head>
 
 
 <body {% block bodyargs %}{% endblock %}>
   <div class="metanav">
     <div class="metanav_left">
-      <a href="{{ url_for('knowrob') }}">KnowRob Query Interface</a> &nbsp;&nbsp;
-      <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp;
-      <a href="{{ url_for('tutorials') }}">Tutorials</a>
+      <a href="{{ url_for('knowrob') }}" id="loading">KnowRob Query Interface</a> &nbsp;&nbsp;
+<!--       <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp; -->
+<!--       <a href="{{ url_for('tutorials') }}">Tutorials</a> -->
     </div>
     <div class="metanav_right">
       {% if not session.logged_in %}
@@ -39,6 +42,40 @@
 
   {% block content %}{% endblock %}
   </div>
+
+
+  <script type="text/javascript">
+    // Overlay for loading
+    function showSpinnerOverlay() {
+        var opts = {
+                lines: 13, // The number of lines to draw
+                length: 11, // The length of each line
+                width: 5, // The line thickness
+                radius: 17, // The radius of the inner circle
+                corners: 1, // Corner roundness (0..1)
+                rotate: 0, // The rotation offset
+                color: '#FFF', // #rgb or #rrggbb
+                speed: 1, // Rounds per second
+                trail: 60, // Afterglow percentage
+                shadow: false, // Whether to render a shadow
+                hwaccel: false, // Whether to use hardware acceleration
+                className: 'spinner', // The CSS class to assign to the spinner
+                zIndex: 2e9, // The z-index (defaults to 2000000000)
+                top: 'auto', // Top position relative to parent in px
+                left: 'auto' // Left position relative to parent in px
+        };
+        var target = document.createElement("div");
+        document.body.appendChild(target);
+        var spinner = new Spinner(opts).spin(target);
+        iosOverlay({
+                text: "Loading",
+                duration: 2e3,
+                spinner: spinner
+        });
+        return false;
+    }
+
+</script>
 
 </body>
 </html>
