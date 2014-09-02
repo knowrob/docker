@@ -29,6 +29,3 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
   echo "Web app container exists, starting it..."
   docker start webrob
 fi
-
-# keep shell window open in case this is started via a Gnome shortcut
-$SHELL
