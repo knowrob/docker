@@ -251,7 +251,7 @@ def register():
 @app.route('/tutorials/')
 @app.route('/tutorials/<cat_id>/')
 @app.route('/tutorials/<cat_id>/<page>')
-def tutorials(cat_id='basics', page=1):
+def tutorials(cat_id='getting_started', page=1):
   
     if not session.get('logged_in'):
         return redirect(url_for('login'))
