@@ -30,9 +30,6 @@
 
   <script type="text/javascript" src="http://{{ host_url }}:{{ session.port_1111 }}/lib/designator/desig.js"></script>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='overlay/iosOverlay.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='overlay/spin.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='overlay/prettify.js') }}"></script>
   
   <script type="text/javascript">
 
@@ -44,8 +41,6 @@
 
     function init() {
 
-//       showSpinnerOverlay();
-    
       // Connect to ROS.
       ros = new ROSLIB.Ros({
         url : 'ws://{{ host_url }}:{{ session.port_9090 }}'
@@ -251,7 +246,5 @@
 
 <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
 
-{% block bodyargs %}
- onload="init()"
-{% endblock %}
+{% block bodyargs %} onload="init()"{% endblock %}
 

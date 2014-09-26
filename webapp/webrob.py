@@ -160,7 +160,16 @@ def show_user_data():
         return redirect(url_for('login'))
     get_user_data(session['username'])
     print request.host
-    return render_template('show_user_data.html')
+
+    
+    overlay = None
+    if(session.get('show_loading_overlay') == True):
+        overlay = True
+        
+        print "set overlay"
+        session.pop('show_loading_overlay')
+    
+    return render_template('show_user_data.html', overlay=overlay)
 
 @app.route('/pr2_description/meshes/<path:filename>')
 def download_file(filename):
@@ -183,6 +192,8 @@ def login():
                 session['logged_in'] = True
                 session['rosauth_mac'] = generate_mac()
                 flash('You were logged in')
+
+                session['show_loading_overlay'] = True
                 
                 start_container()
                 return redirect(url_for('show_user_data'))
@@ -229,8 +240,10 @@ def register():
             session['rosauth_mac'] = generate_mac()
             #create_data_containers()
             start_container()
+            
+            session['show_loading_overlay'] = True
             return redirect(url_for('show_user_data'))
-    print urlparse(request.host_url).hostname
+
     return render_template('login.html', error=error, action="register")
 
 
