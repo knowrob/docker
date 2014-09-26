@@ -2,6 +2,7 @@
 
 docker pull knowrob/hydro-knowrob-daemon
 docker pull knowrob/webrob
+docker pull knowrob/user_db
 docker pull knowrob/user_data
 
 # update the common data container:

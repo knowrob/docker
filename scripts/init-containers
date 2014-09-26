@@ -5,6 +5,9 @@
 #
 #
 
+# create data volume for MongoDB
+docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
+
 
 # create data volume for MongoDB
 docker run -d -v /data/db --name mongo_data busybox true

@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+
+
+
 # Check if mongo_db is running or stopped and start otherwise
 
 RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)
@@ -16,13 +19,21 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
 fi
 
 
+# Check if user_db container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" user_db 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No user DB container exists, creating a new one..."
+  docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
+fi
+
 
 # start webrob container
 RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p 5000:5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
+  docker run --rm -i -p 5000:5000 --name webrob --volumes-from user_db -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
