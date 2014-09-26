@@ -79,6 +79,7 @@ EXPOSE 1111 9090
 # Volumes for mounting data containers
 VOLUME /home/ros/knowrob_data
 VOLUME /home/ros/sandbox
+VOLUME /home/ros
 
 # ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_vis knowrob_vis.launch
 

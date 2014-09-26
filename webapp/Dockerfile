@@ -17,5 +17,8 @@ RUN mkdir -p /opt/webapp/pr2_description/meshes
 RUN cp -r /opt/ros/hydro/share/pr2_description/meshes/* /opt/webapp/pr2_description/meshes/
 
 
+# Expose volumes for maintenance
+VOLUME /opt/webapp/
+
 EXPOSE 5000
 CMD ["python", "webrob.py"]
