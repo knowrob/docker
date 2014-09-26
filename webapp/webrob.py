@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'webrob.db'),
+    DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
     DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
