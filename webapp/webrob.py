@@ -333,6 +333,16 @@ def close_db(error):
 
 
 def user_exists(username):
+
+    # username blacklist
+    if username=="knowrob":
+      return True
+    elif username=="mongo":
+      return True
+    elif username=="tenorth":
+      return True
+      
+  
     db = get_db()
     cur = db.execute('select username from users where username=?', [username])
     entries = cur.fetchall()
