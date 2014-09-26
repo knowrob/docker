@@ -261,7 +261,8 @@ def tutorials(cat_id='basics', page=1):
     return render_template('knowrob_tutorial.html', **locals())
 
 @app.route('/knowrob')
-def knowrob():
+@app.route('/exp/<exp_id>')
+def knowrob(exp_id=None):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     error=""
@@ -272,6 +273,7 @@ def knowrob():
     
     return render_template('knowrob_simple.html', **locals())
 
+    
 
 @app.route('/editor')
 @app.route('/editor/<filename>/')

@@ -96,8 +96,12 @@
       };
       var dataVisClient = new DataVisClient(options);
       
-      // fill example qurey select
-      populateQuerySelect('examplequery', "{{ url_for('static', filename='queries.json') }}");
+      // fill example query select
+      populateQuerySelect('examplequery', "{% if exp_id
+          %}{{ url_for('static', filename='queries-'+exp_id+'.json') }}{%
+        else
+          %}{{ url_for('static', filename='queries.json') }}{%
+        endif %}");
 
     };
 
