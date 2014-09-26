@@ -104,7 +104,7 @@
     function queryProlog(query) {
     
       var history = ace.edit("history");
-      var q = query.getValue();
+      var q = query.getValue().trim();
     
       if (q.substr(q.length - 1) == ".") {
         q = q.substr(0, q.length - 1);
