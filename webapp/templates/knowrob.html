@@ -97,8 +97,8 @@
       var dataVisClient = new DataVisClient(options);
       
       // fill example query select
-      populateQuerySelect('examplequery', "{% if exp_id
-          %}{{ url_for('static', filename='queries-'+exp_id+'.json') }}{%
+      populateQuerySelect('examplequery', "{% if exp_query_file
+          %}{{ url_for('static', filename=exp_query_file) }}{%
         else
           %}{{ url_for('static', filename='queries.json') }}{%
         endif %}");

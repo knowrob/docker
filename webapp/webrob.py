@@ -270,6 +270,9 @@ def knowrob(exp_id=None):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
+
+    if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
+        exp_query_file='queries-' + exp_id + '.json'
     
     return render_template('knowrob_simple.html', **locals())
 
