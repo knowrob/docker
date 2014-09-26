@@ -16,11 +16,11 @@
 
       {% if action == "register" %}
         <input type="text" name="email" value="Email" size=30  />
-        <input type="submit" value="{{ action }}"  style="float:right; overflow:auto;" >
+        <input type="submit" value="{{ action }}"  style="float:right; margin-right:0;" >
       {% endif %}
       {% if action == "login" %}
         <a href="{{ url_for('register') }}" style="float:left; font-size:12px;">sign up</a>
-        <input type="submit" value="{{ action }}" style="float:right; overflow:auto;" >
+        <input type="submit" value="{{ action }}" style="float:right; width:50px; margin-right:0px;" >
       {% endif %}
       &nbsp;
     </form>
