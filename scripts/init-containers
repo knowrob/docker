@@ -5,7 +5,7 @@
 #
 #
 
-# create data volume for MongoDB
+# create data volume for user db
 docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
 
 
@@ -28,7 +28,8 @@ mongoimport --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT" --db 
 mongo --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT"
 db.tf.ensureIndex( { __recorded : 1 } )
 db.logged_designators.ensureIndex( { __recorded : 1 } )
-db.logged_designators.ensureIndex( { designator : 1 } )
+db.logged_designators.ensureIndex( { "transforms.header.stamp" : 1 } )
+
 
 # exit the container
 exit
