@@ -7,10 +7,21 @@ import random
 import string
 import time
 import re
+from flask.ext.babel import Babel
+from flask.ext.mail import Mail
 from requests import ConnectionError
 from urlparse import urlparse
-import docker
-from docker.errors import *
+from functools import wraps
+from flask.ext.user import roles_required
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.user import current_user, login_required, SQLAlchemyAdapter, UserManager, UserMixin
+from flask.ext.user.forms import RegisterForm
+from wtforms import validators
+from wtforms import StringField
+from wtforms import SelectField
+from wtforms.validators import Required
+#import docker
+#from docker.errors import *
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -20,21 +31,83 @@ app.config.from_object(__name__)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///webrob.db',
+    CSRF_ENABLED = True,
+    #DATABASE='/home/adminuser/GIT/docker/user_db/webrob.db',
     DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
-    PASSWORD='default'#,
+    PASSWORD='default',
+    USER_ENABLE_USERNAME = True,
     #SERVER_NAME='192.168.100.184:5000'
+    MAIL_SERVER   = 'smtp.gmail.com',
+    MAIL_PORT     = 465,
+    MAIL_USE_SSL  = True,                            # Some servers use MAIL_USE_TLS=True instead
+    MAIL_USERNAME = 'email@example.com',
+    MAIL_PASSWORD = 'password',
+    MAIL_DEFAULT_SENDER = '"Sender" <noreply@example.com>',
+    USER_ENABLE_EMAIL           = True,              # Register with email
+    USER_ENABLE_CONFIRM_EMAIL   = False		     
 ))
 #app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
+babel = Babel(app)                              # Initialize Flask-Babel
+mail = Mail(app)                                # Initialize Flask-Mail
+db = SQLAlchemy(app)                            # Initialize Flask-SQLAlchemy
 
+@babel.localeselector
+def get_locale():
+    translations = [str(translation) for translation in babel.list_translations()]
+    return request.accept_languages.best_match(translations)
 
+# Define the User-Roles pivot table
+user_roles = db.Table('user_roles',
+    db.Column('id', db.Integer(), primary_key=True),
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
+
+# Define Role model
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+# Define User model. Make sure to add flask.ext.user UserMixin!!
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean(), nullable=False, default=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    confirmed_at = db.Column(db.DateTime())
+    password = db.Column(db.String(255), nullable=False, default='')
+    reset_password_token = db.Column(db.String(100), nullable=False, default='')
+    container_id = db.Column(db.String(255), nullable=False, default='')
+
+    # Relationships
+    roles = db.relationship('Role', secondary=user_roles,
+            backref=db.backref('users', lazy='dynamic'))
+
+#class MyRegisterForm(RegisterForm):
+    #roles = SelectField('Rolle', validators=[Required('Rolle erforderlich')])
+
+# Reset all the database tables
+db.create_all()
+
+# Setup Flask-User
+db_adapter = SQLAlchemyAdapter(db,  User)
+user_manager = UserManager(db_adapter, app)#, register_form=MyRegisterForm)
+
+if not User.query.filter(User.username=='user007').first():
+    user1 = User(username='user007', email='user007@example.com', active=True,
+        password=user_manager.hash_password('Password1'))
+    user1.roles.append(Role(name='secret'))
+    user1.roles.append(Role(name='agent'))
+    db.session.add(user1)
+    db.session.commit()
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Docker stuff
-
+"""
 def docker_connect():
     c = docker.Client(base_url='unix://var/run/docker.sock', version='1.12',timeout=10)
     return c
@@ -148,17 +221,32 @@ def stop_container():
     except ConnectionError:
         flash("Error: Connection to your KnowRob instance failed.")
         return None
-
-
+"""
     
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
+"""
+def roles_required(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if get_role(session['username']) not in roles:
+		return "You are not authorized to access this page :("
+	        #return render_template('knowrob.html', **locals())
+	    return f(*args, **kwargs)
+    	return decorated_function
+    return wrapper
+"""		 
+
 @app.route('/')
+@login_required
 def show_user_data():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    get_user_data(session['username'])
+    if not current_user.is_authenticated():
+        return redirect(url_for('user.login'))
+    #if not session.get('logged_in'):
+        #return redirect(url_for('login'))
+    #get_user_data(current_user.username)
     print request.host
 
     
@@ -189,13 +277,14 @@ def login():
                 session['user_data_container_name'] = session['username'] + "_data"
                 session['common_data_container_name'] = "knowrob_data"
                 
+		session['role'] = get_role(request.form['username'])
                 session['logged_in'] = True
                 session['rosauth_mac'] = generate_mac()
                 flash('You were logged in')
 
                 session['show_loading_overlay'] = True
                 
-                start_container()
+                #start_container()
                 return redirect(url_for('show_user_data'))
             else :
                 error = 'Invalid user data'
@@ -203,10 +292,10 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    if not current_user.is_authenticated():
+        return redirect(url_for('user.login'))
     session.pop('logged_in', None)
-    stop_container()
+    #stop_container()
     flash('You were logged out')
     return redirect(url_for('show_user_data'))
 
@@ -229,9 +318,9 @@ def register():
             error = 'This username already exists. Please choose another username.'
             
         else:
-            insert_user(request.form['username'], request.form['password'], request.form['email'])
+            insert_user(request.form['username'], request.form['password'], request.form['email'], request.form['role'])
             session['username'] = request.form['username']
-
+	    session['role'] = request.form['role']
             session['user_container_name'] = session['username']
             session['user_data_container_name'] = session['username'] + "_data"
             session['common_data_container_name'] = "knowrob_data"
@@ -239,7 +328,7 @@ def register():
             session['logged_in'] = True
             session['rosauth_mac'] = generate_mac()
             #create_data_containers()
-            start_container()
+            #start_container()
             
             session['show_loading_overlay'] = True
             return redirect(url_for('show_user_data'))
@@ -251,10 +340,11 @@ def register():
 @app.route('/tutorials/')
 @app.route('/tutorials/<cat_id>/')
 @app.route('/tutorials/<cat_id>/<page>')
+@login_required
 def tutorials(cat_id='getting_started', page=1):
   
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    #if not session.get('logged_in'):
+    #    return redirect(url_for('login'))
 
     # determine hostname/IP we are currently using
     # (needed for accessing container)
@@ -275,9 +365,10 @@ def tutorials(cat_id='getting_started', page=1):
 
 @app.route('/knowrob')
 @app.route('/exp/<exp_id>')
+@roles_required('secret')
 def knowrob(exp_id=None):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    #if not current_user.is_authenticated():
+    #    return redirect(url_for('user.login'))
     error=""
 
     # determine hostname/IP we are currently using
@@ -293,9 +384,10 @@ def knowrob(exp_id=None):
 
 @app.route('/editor')
 @app.route('/editor/<filename>/')
+@roles_required('admin')
 def editor(filename=""):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    #if not current_user.is_authenticated():
+       # return redirect(url_for('user.login'))
         
     error=""
     sandbox = '/home/tenorth/sandbox/'
@@ -365,6 +457,14 @@ def user_exists(username):
     else:
         return False
 
+"""
+def role_exists(role_name):
+    db = get_db()
+    cur = db.execute('select name from roles where name = ?' [role_name])
+    entries = cur.fetchall()
+
+    return len(entries)>0
+"""
 
 def is_valid_user(username, password):
     db = get_db()
@@ -378,14 +478,45 @@ def is_valid_user(username, password):
         return False
 
 
-def insert_user(username, password, email):
+def insert_user(username, password, email, role):
     db = get_db()
     pwd_hash = hashlib.sha256(password).hexdigest()
     cur = db.execute('insert into users (username, passwd, email, container_id) values (?,?,?,"")', [username, pwd_hash, email])
     db.commit()
+    #insert_role(role)
+    #insert_user_role(username,role)
     flash('New user was successfully created')
     return redirect(url_for('show_user_data'))
 
+"""
+def insert_role(role_name):
+    db = get_db()
+    cur = db.execute('insert into roles (name) values (?)', [role_name])
+    db.commit()
+
+
+def insert_user_role(username,role_name):
+    db = get_db()
+    cur = db.execute('select id from users where username = ?', [username])
+
+    userid = cur.fetchone()
+
+    cur = db.execute('select id from roles where name = ?', [role_name])
+
+    roleid = cur.fetchone()
+
+    cur = db.execute('insert into user_roles (user_id,role_id) values (?,?)', [userid['id'],roleid['id']])
+    db.commit()
+
+def get_role(username):
+    db = get_db()
+    cur = db.execute('select id from users where username = ?', [username])
+
+    userid = cur.fetchone()
+    cur = db.execute('select name from roles where id in (select role_id from user_roles where user_id = ?)', [userid['id']])
+    roledata = cur.fetchone()
+    return roledata['name']
+"""
 
 def get_user_data(username):
     db = get_db()
@@ -396,7 +527,19 @@ def get_user_data(username):
         session['pwd_has'] = data['passwd']
         session['email'] = data['email']
         session['user_container_id'] = data['container_id']
+	
+	#cur = db.execute('select id from users where username = ?', [username])
+	#userid = cur.fetchone()
+	#cur = db.execute('select name from roles where id in (select role_id from user_roles where user_id = ?)', [userid['id']])
+	#roledata = cur.fetchone()
+	#if len(roledata)>0:
+	#    session['role'] = roledata['name']
+	#    return data
+	#else:
+	#    return False
+
         return data
+
     else:
         return False
 
@@ -426,7 +569,7 @@ def generate_mac():
 
     return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + str(t) + ", " + level + ", " + str(end) + ")"
     
-
+#init_db()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
