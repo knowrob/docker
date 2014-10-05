@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" media="all" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700|Oswald|Source+Code+Pro" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='overlay/iosOverlay.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='overlay/prettify.css') }}"/>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='overlay/iosOverlay.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='overlay/spin.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='overlay/prettify.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
+  {% block head %}{% endblock %}
+</head>
+
+
+<body{% block bodyargs %}{% endblock %}>
+  <div class="metanav">
+    <div class="metanav_left">
+      <a href="{{ url_for('knowrob') }}" id="loading">KnowRob Query Interface</a> &nbsp;&nbsp;
+<!--       <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp; -->
+<!--       <a href="{{ url_for('tutorials') }}">Tutorials</a> -->
+    </div>
+    <div class="metanav_right">
+      {% if not session.logged_in %}
+	<a href="{{ url_for('user.login') }}">log in</a>
+      {% else %}
+	Logged in as <a href="{{ url_for('show_user_data') }}">{{ session.username }}</a> &nbsp;
+	<a href="{{ url_for('logout') }}">log out</a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div style="padding-left:15px;">
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+  </div>
+
+
+  {% block spinner %}{% endblock %}
+
+
+</body>
+</html>
