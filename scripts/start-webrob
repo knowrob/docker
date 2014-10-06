@@ -3,7 +3,7 @@
 
 if [ -z "$KNOWROB_WEB_PORT" ]
 then
-   export KNOWROB_WEB_PORT=80
+   export KNOWROB_WEB_PORT=5000
 fi
 
 
@@ -22,6 +22,21 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
 fi
 
 
+# Check if nginx-proxy is running or stopped and start otherwise
+
+RUNNING=$(docker inspect --format="{{ .State.Running }}" nginx-proxy 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No nginx-proxy container exists, creating a new one..."
+  docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock --name nginx-proxy -t knowrob/nginx-proxy
+fi
+
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "nginx-proxy container exists, starting it..."
+  docker start nginx-proxy
+fi
+
+
 # Check if user_db container exists and create otherwise
 RUNNING=$(docker inspect --format="{{ .State.Running }}" user_db 2>/dev/null)
 
@@ -36,7 +51,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --name webrob --volumes-from user_db -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
+  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob --volumes-from user_db -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
