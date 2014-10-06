@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash, Markup, send_from_directory
+from flask import Flask, session, redirect, url_for, escape, request, render_template, g, abort, flash, Markup, send_from_directory, current_app
 import sqlite3
 import os
 import hashlib
@@ -24,9 +24,7 @@ app.config.update(dict(
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
     PASSWORD='default'#,
-    #SERVER_NAME='192.168.100.184:5000'
 ))
-#app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 
 
@@ -85,7 +83,11 @@ def start_container():
             # Create containers if they do not exist yet
             if not user_cont_exists:
                 print('Creating container for ' + session['username'])
-                c.create_container('knowrob/hydro-knowrob-daemon', detach=True, tty=True, name=session['user_container_name'])
+                c.create_container('knowrob/hydro-knowrob-daemon',
+                                    detach=True,
+                                    tty=True,
+                                    environment={"VIRTUAL_HOST" : session['user_container_name'], "VIRTUAL_PORT" : "9090"}, # for nginx reverse proxy
+                                    name=session['user_container_name'])
 
             if not user_data_cont_exists:
                 c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'], entrypoint='true')
@@ -105,8 +107,6 @@ def start_container():
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
                                                                  session['common_data_container_name']])
-            session['port_1111'] = c.port(session['username'], 1111)[0]['HostPort']
-            session['port_9090'] = c.port(session['username'], 9090)[0]['HostPort']
 
     except APIError, e:
         if "Conflict" in str(e.message):
@@ -170,6 +170,15 @@ def show_user_data():
         session.pop('show_loading_overlay')
     
     return render_template('show_user_data.html', overlay=overlay)
+
+
+@app.route('/ws/<user_id>/')
+def ws_url(user_id=None): 
+  # dummy method to define endpoint; will be re-routed by reverse proxy
+  # to the websockets endpoints
+  return
+
+
 
 @app.route('/pr2_description/meshes/<path:filename>')
 def download_file(filename):
@@ -259,7 +268,7 @@ def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-
+    
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut['text'], fenced_code=True)
 
@@ -279,11 +288,12 @@ def knowrob(exp_id=None):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     error=""
-
+    #current_app.logger.debug(request)
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-
+    #host_url = url_for('/ws/tenorth') # TODO
+    
     if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
         exp_query_file='queries-' + exp_id + '.json'
     
