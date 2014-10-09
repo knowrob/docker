@@ -51,7 +51,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob --volumes-from user_db -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
+  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from user_db -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped

@@ -172,11 +172,11 @@ def show_user_data():
     return render_template('show_user_data.html', overlay=overlay)
 
 
-@app.route('/ws/<user_id>/')
-def ws_url(user_id=None): 
+#@app.route('/ws/<user_id>/')
+#def ws_url(user_id=None): 
   # dummy method to define endpoint; will be re-routed by reverse proxy
   # to the websockets endpoints
-  return
+  #return
 
 
 
@@ -292,7 +292,7 @@ def knowrob(exp_id=None):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-    #host_url = url_for('/ws/tenorth') # TODO
+
     
     if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
         exp_query_file='queries-' + exp_id + '.json'
