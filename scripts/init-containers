@@ -16,20 +16,18 @@ docker run -d -v /data/db --name mongo_data busybox true
 docker pull mongo
 docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
 
-# start temporary container to import the stored tf log file:
-docker run -t -P --rm --link mongo_db:mongo -v /media/ICRA_2012:/var/roslog -i knowrob/hydro-knowrob-interactive /bin/bash
 
 # execute the import procedure inside the container
+
 cd /var/roslog
-mongoimport --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT" --db roslog --collection tf /var/roslog/tf.json
-mongoimport --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT" --db roslog --collection logged_designators logged_designators.json
+mongoimport --db roslog --collection tf tf.json
+mongoimport --db roslog --collection logged_designators logged_designators.json
 
 # set mongo indexes:
-mongo --host "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT"
+mongo roslog
 db.tf.ensureIndex( { __recorded : 1 } )
+db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )
 db.logged_designators.ensureIndex( { __recorded : 1 } )
-db.logged_designators.ensureIndex( { "transforms.header.stamp" : 1 } )
-
 
 # exit the container
 exit
