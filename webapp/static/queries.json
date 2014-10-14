@@ -49,7 +49,7 @@
             "text": "Load PR2 robot model"
         },
         {
-            "q": "task(T), task_goal(T, '(OBJECT-PLACED-AT ?OBJ ?LOC)'), task_start(T, S), task_end(T, E), add_trajectory('/base_link', S, E, 1.0).",
+            "q": "task(T), task_goal(T, '(OBJECT-PLACED-AT ?OBJ ?LOC)'), task_start(T, S), task_end(T, E), add_trajectory('/base_link', S, E, 0.5).",
             "text": "Which path did the PR2 follow during the pick-and-place task?"
         },
         {
