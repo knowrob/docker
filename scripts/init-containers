@@ -4,6 +4,10 @@
 # container and fill it with test data
 #
 #
+# IMPORTANT: THIS IS NOT AN EXECUTABLE SCRIPT! Some of the commands have
+#            to be performed in the mongodb shell, not in bash, so they
+#            have to be performed one after another by hand for now.
+#
 
 # create data volume for user db
 docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
