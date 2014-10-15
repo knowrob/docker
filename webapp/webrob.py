@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
-    DEBUG=False,
+    DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
     PASSWORD='default'#,
@@ -265,12 +265,10 @@ def register():
 @app.route('/tutorials/<cat_id>/<page>')
 def tutorials(cat_id='getting_started', page=1):
   
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
+    container_name = 'tutorials'
     
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut['text'], fenced_code=True)
@@ -295,7 +293,7 @@ def knowrob(exp_id=None):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-
+    container_name = session['user_container_name']
     
     if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
         exp_query_file='queries-' + exp_id + '.json'
@@ -418,6 +416,7 @@ def read_tutorial_page(cat, page):
     db = get_db()
     cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
     tut = cur.fetchone()
+    print(tut)
     return tut
 
 
