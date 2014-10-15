@@ -178,12 +178,15 @@ def show_user_data():
   # to the websockets endpoints
   #return
 
-
-
+  
 @app.route('/pr2_description/meshes/<path:filename>')
-def download_file(filename):
-    return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
+def download_mesh(filename):
+  return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
     
+@app.route('/knowrob_data/<path:filename>')
+def download_logged_image(filename):
+  return send_from_directory('/home/ros/knowrob_data/', filename)
+      
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
