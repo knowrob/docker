@@ -1,17 +1,42 @@
+#!/bin/bash
+
 #
 #
 # The following commands need to be executed once to set up the MongoDB
 # container and fill it with test data
 #
-#
-# IMPORTANT: THIS IS NOT AN EXECUTABLE SCRIPT! Some of the commands have
-#            to be performed in the mongodb shell, not in bash, so they
-#            have to be performed one after another by hand for now.
-#
 
+# this is where the script (attempts to) get the path to roslog. This should be given as a parameter
+# to the script. If the parameter is missing, then the script uses the current working directory path
+# returned by pwd. 
+MY_ROSLOG_PATH="$1"
+
+if [ -z "$1" ] ; then
+    # if no parameter given to the script, use the default (path to working directory)
+    # for MY_ROSLOG_PATH
+    MY_ROSLOG_PATH="`(pwd)`"
+fi
+
+echo "Using the following path to roslog files tf.json and logged_designators.json ..."
+echo "$MY_ROSLOG_PATH"
+
+# this is where the script (attempts to) get the path to itself. This is needed to find the user_db 
+# in the docker package. We assume here that there is a fixed relationship between this script's path
+# and the path to user_db
+MY_PATH="`dirname \"$0\"`"
+MY_PATH="`(cd \"$MY_PATH\" && pwd)`"
+
+if [ -z "$MY_PATH" ] ; then
+    echo "ERROR: cannot access own path. Maybe a permission denied case."
+    exit 1
+fi
+
+echo "Current path for this script is ... "
+echo "$MY_PATH"
 
 # create data volume for user db
-cd ~/docker/user_db
+cd $MY_PATH
+cd ../user_db
 docker build -t knowrob/user_db .
 docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
 
@@ -26,13 +51,12 @@ docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
 
 
 # execute the import procedure
-cd /var/roslog
+
+cd $MY_ROSLOG_PATH
 mongoimport --db roslog --collection tf tf.json
 mongoimport --db roslog --collection logged_designators logged_designators.json
 
 # set mongo indexes:
-mongo roslog
-db.tf.ensureIndex( { __recorded : 1 } )
-db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )
-db.logged_designators.ensureIndex( { __recorded : 1 } )
-exit
+cd $MY_PATH
+mongo roslog auxiliary_SetIndexes.js
+
