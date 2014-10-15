@@ -1,0 +1,44 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl').",
+            "text": "Load logged OWL data for the Xsens dataset"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- XSens -----"
+        },
+        {
+            "q": "owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', knowrob:'drawer_sinkblock_dishwasher'), owl_individual_of(EVENT, knowrob:'ClosingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1).",
+            "text": "What are the time ranges of DishWasher closing events?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ).",
+            "text": "What are the events that acted on dinner plates?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_human_pose(T0).",
+            "text": "Show the human pose at the start of dinner plate taking events."
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), add_trajectory('/RightHand', T0, T1, 0.5).",
+            "text": "Show the trajectory of the right hand for dinner plate taking events."
+        },
+        {
+            "q": "add_trajectory('/RightHand', 'timepoint_1398864712', 'timepoint_1398864745', 0.25).",
+            "text": "How was the trajectory of the right hand in given interval?"
+        },
+        {
+            "q": "add_human_pose('timepoint_1398864712').",
+            "text": "How was the pose of the human at given timepoint?"
+        }
+    ]
+}
