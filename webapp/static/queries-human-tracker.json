@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl').",
+            "q": "owl_parse('package://knowrob_srdl/owl/xsens-human.owl'), rdf_register_ns(xsens, 'http://knowrob.org/kb/xsens.owl#', [keep(true)]), load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl').",
             "text": "Load logged OWL data for the Xsens dataset"
         },
         {
