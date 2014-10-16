@@ -30,12 +30,15 @@ app.config.from_object(__name__)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
-    DEBUG=False,
+    #DATABASE=
+    DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
     PASSWORD='default',
-
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'db/webrob.db'),
+    SQLALCHEMY_DATABASE_URI = 'postgresql://docker@' + os.environ['DB1_PORT_5432_TCP_ADDR'] + ':' + os.environ['DB1_PORT_5432_TCP_PORT'] + '/docker',
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'db/webrob.db'),
+    #SQLALCHEMY_DATABASE_URI = 'postgresql://docker@localhost/db1/docker',
+    
     CSRF_ENABLED = True,
     #SERVER_NAME=''
     MAIL_SERVER   = 'smtp.gmail.com',
@@ -108,9 +111,6 @@ if not User.query.filter(User.username=='testuser').first():
     db.session.add(user1)
     db.session.commit()
 
-
-
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Docker stuff
 
@@ -163,7 +163,7 @@ def start_container():
 
             # Create containers if they do not exist yet
             if not user_cont_exists:
-                print('Creating container for ' + session['username'])
+                print('Creating container for ' + current_user.username)
                 c.create_container('knowrob/hydro-knowrob-daemon',
                                     detach=True,
                                     tty=True,
