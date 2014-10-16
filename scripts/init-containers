@@ -6,6 +6,9 @@
 # container and fill it with test data
 #
 
+echo "Current working directory ..."
+echo "`(pwd)`"
+
 # this is where the script (attempts to) get the path to roslog. This should be given as a parameter
 # to the script. If the parameter is missing, then the script uses the current working directory path
 # returned by pwd. 
@@ -16,6 +19,13 @@ if [ -z "$1" ] ; then
     # for MY_ROSLOG_PATH
     MY_ROSLOG_PATH="`(pwd)`"
 fi
+
+# if the roslog path is a relative path, it should be converted to an absolute one. That's what's done
+# here.
+cd $MY_ROSLOG_PATH
+MY_ROSLOG_PATH="`(pwd)`"
+# undo side-effect of previous cd: we need pwd restored to its previous value for the next step to work.
+cd "$OLDPWD"
 
 echo "Using the following path to roslog files tf.json and logged_designators.json ..."
 echo "$MY_ROSLOG_PATH"
