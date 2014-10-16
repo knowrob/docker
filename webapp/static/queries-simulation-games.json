@@ -5,7 +5,7 @@
             "text": "----- Initialize Setup -----"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_sim.owl').",
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/pancakemaking_sim.owl').",
             "text": "Load full pancake-making simulation data from library"
         },
         {
