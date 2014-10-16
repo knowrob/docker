@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
-    DEBUG=True,
+    DEBUG=False,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
     PASSWORD='default'#,
