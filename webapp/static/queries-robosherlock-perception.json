@@ -5,20 +5,20 @@
             "q": "----- init -----"
         },
         {
-            "text": "load_experiment('/home/ros/knowrob_data/logs/robots/robosherlock/table-top-scene/cram_log.owl').",
-            "q": "Load table-top experiment"
+            "q": "load_experiment('/home/ros/knowrob_data/logs/robots/robosherlock/table-top-scene/cram_log.owl').",
+            "text": "Load table-top experiment"
         },
         {
-            "text": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
-            "q": "Load semantic map"
+            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
+            "text": "Load semantic map"
         },
 	{
-            "text": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
-            "q": "Visualize Semantic map"
+            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
+            "text": "Visualize Semantic map"
         },
         {
-            "text": "",
-            "q": "----- Queries to perception results -----"
+            "q": "",
+            "text": "----- Queries to perception results -----"
         },
 	{
             "text": "How many objects did we see at time=t0?",
