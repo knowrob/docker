@@ -9,10 +9,6 @@
             "text": "Load single-arm pick-and-place experiment from 'knowrob_data' library"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/dual-arm-pick-and-place/cram_log.owl').",
-            "text": "Load dual-arm pick-and-place experiment"
-        },
-        {
             "q": "",
             "text": ""
         },
