@@ -102,8 +102,7 @@
       });
 
       img_listener.subscribe(function(message) {
-        console.log(message);
-        document.getElementById("mjpeg").innerHTML='<img src="/'+message.data+'" />';
+        document.getElementById("mjpeg").innerHTML='<img src="/'+message.data+'" width="300" height="240"/>';
       });
       
       var options = {

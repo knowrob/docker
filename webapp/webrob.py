@@ -159,14 +159,11 @@ def show_user_data():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     get_user_data(session['username'])
-    print request.host
 
     
     overlay = None
     if(session.get('show_loading_overlay') == True):
         overlay = True
-        
-        print "set overlay"
         session.pop('show_loading_overlay')
     
     return render_template('show_user_data.html', overlay=overlay)
@@ -416,7 +413,6 @@ def read_tutorial_page(cat, page):
     db = get_db()
     cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
     tut = cur.fetchone()
-    print(tut)
     return tut
 
 
