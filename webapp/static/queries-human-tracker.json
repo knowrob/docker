@@ -26,27 +26,23 @@
         },
         {
             "q": "owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', knowrob:'drawer_sinkblock_dishwasher'), owl_individual_of(EVENT, knowrob:'ClosingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1).",
-            "text": "What are the time ranges of DishWasher closing events?"
+            "text": "When was the dish washer closed?"
         },
         {
             "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ).",
-            "text": "What are the events that acted on dinner plates?"
+            "text": "Which events occurred that acted on dinner plates?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_human_pose(T0).",
-            "text": "Show the human pose at the start of dinner plate taking events."
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,'http://knowrob.org/kb/datalabel.owl#bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart').",
+            "text": "Which body part(s) were used for dinner plate taking events?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), add_trajectory('/RightHand', T0, T1, 0.1).",
-            "text": "Show the trajectory of the right hand for dinner plate taking events."
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), owl_has(EVENT,'http://knowrob.org/kb/datalabel.owl#bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart'), owl_has(PART, srdl2comp:'urdfName', literal(type(_,URDF))), add_trajectory(URDF, T0, T1, 0.5).",
+            "text": "What was the trajectory of endeffectors for dinner plate taking events?"
         },
         {
-            "q": "add_trajectory('/RightHand', 'timepoint_1398864712', 'timepoint_1398864745', 0.5).",
-            "text": "How was the trajectory of the right hand in given interval?"
-        },
-        {
-            "q": "add_human_pose('timepoint_1398864712').",
-            "text": "How was the pose of the human at given timepoint?"
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_human_pose(xsens:'XSensHuman1', T0).",
+            "text": "How was the human pose when dinner plate taking events started?"
         }
     ]
 }
