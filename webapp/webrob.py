@@ -30,7 +30,6 @@ app.config.from_object(__name__)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/webrob.db'),
-    #DATABASE=
     DEBUG=True,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
@@ -275,12 +274,17 @@ def show_user_data():
   # to the websockets endpoints
   #return
 
+  
 
 
 @app.route('/pr2_description/meshes/<path:filename>')
-def download_file(filename):
-    return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
+def download_mesh(filename):
+  return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
     
+@app.route('/knowrob_data/<path:filename>')
+def download_logged_image(filename):
+  return send_from_directory('/home/ros/knowrob_data/', filename)
+      
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -366,6 +370,7 @@ def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
+    container_name = 'tutorials'
     
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut['text'], fenced_code=True)
@@ -391,7 +396,7 @@ def knowrob(exp_id=None):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-
+    container_name = session['user_container_name']
     
     if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
         exp_query_file='queries-' + exp_id + '.json'

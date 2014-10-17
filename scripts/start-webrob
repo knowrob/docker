@@ -46,12 +46,26 @@ if [ $? -eq 1 ]; then # container does not exist
 fi
 
 
+# start a knowrob container for the tutorials
+RUNNING=$(docker inspect --format="{{ .State.Running }}" tutorials 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No tutorials container exists, creating a new one..."
+  docker run -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from knowrob_data --link mongo_db:mongo --name tutorials -d knowrob/hydro-knowrob-daemon
+fi
+
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "tutorials container exists, starting it..."
+  docker start tutorials
+fi
+
+
 # start webrob container
 RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from user_db -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
+  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from user_db --volumes-from knowrob_data -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped

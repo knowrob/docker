@@ -4,21 +4,28 @@
 # container and fill it with test data
 #
 #
+# IMPORTANT: THIS IS NOT AN EXECUTABLE SCRIPT! Some of the commands have
+#            to be performed in the mongodb shell, not in bash, so they
+#            have to be performed one after another by hand for now.
+#
+
 
 # create data volume for user db
+cd ~/docker/user_db
+docker build -t knowrob/user_db .
 docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
 
 
 # create data volume for MongoDB
 docker run -d -v /data/db --name mongo_data busybox true
 
+
 # pull and start MongoDB container
 docker pull mongo
 docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
 
 
-# execute the import procedure inside the container
-
+# execute the import procedure
 cd /var/roslog
 mongoimport --db roslog --collection tf tf.json
 mongoimport --db roslog --collection logged_designators logged_designators.json
@@ -28,7 +35,4 @@ mongo roslog
 db.tf.ensureIndex( { __recorded : 1 } )
 db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )
 db.logged_designators.ensureIndex( { __recorded : 1 } )
-
-# exit the container
 exit
-

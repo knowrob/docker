@@ -21,9 +21,12 @@
   <script type="text/javascript" src="{{ url_for('static', filename='d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='d3/d3-tip.js') }}"></script>
 
+  <script type="text/javascript" src="{{ url_for('static', filename='chart/google-jsapi.js') }}"></script>
+  
   <script type="text/javascript" src="{{ url_for('static', filename='chart/DonutChart.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='chart/BarChart.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='chart/TreeDiagram.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='chart/Timeline.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='chart/DataVisClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='chart/array-nonstandard.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='chart/Control.js') }}"></script>
@@ -43,7 +46,7 @@
 
       // Connect to ROS.
       ros = new ROSLIB.Ros({
-        url : 'ws://{{ host_url }}/ws/{{ session.user_container_name }}/'
+        url : 'ws://{{ host_url }}/ws/{{ container_name }}/'
       });
 
       // Create the main viewer.
@@ -82,6 +85,26 @@
         markerClient : markerClient
       });
 
+      var desig_listener = new ROSLIB.Topic({
+        ros : ros,
+        name : '/logged_designators',
+        messageType : 'designator_integration_msgs/Designator'
+      });
+
+      desig_listener.subscribe(function(message) {
+        document.getElementById("designator").innerHTML=format_designator(message.description, "", 0, 0);
+      });
+
+      var img_listener = new ROSLIB.Topic({
+        ros : ros,
+        name : '/logged_images',
+        messageType : 'std_msgs/String'
+      });
+
+      img_listener.subscribe(function(message) {
+        document.getElementById("mjpeg").innerHTML='<img src="/'+message.data+'" width="300" height="240"/>';
+      });
+      
       var options = {
         ros: ros,
         containerId: '#chart',
