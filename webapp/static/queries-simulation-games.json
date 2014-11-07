@@ -37,16 +37,28 @@
             "text": "Did flipping occur in this episode?"
         },
         {
-            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolContactObject, 0.5,3), add_trajectory('Spatula', ToolContactObject, ObjectLifted, 0.5,3), add_trajectory('Spatula', ObjectLifted, ObjectFlipped, 0.5,3).",
-            "text": "Show the trajectory of the Spatula as it's brought to the Pancake and the Pancake is flipped"
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.5,3).",
+            "text": "Show the trajectory of the Spatula for the flipping interval"
         },
         {
-            "q": "simflip_fliponly(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), add_trajectory('LiquidTangibleThing', Start, End, 0.5,2).",
-            "text": "Visualize trajectory of the Pancake while it's on the Spatula"
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ToolContactObject, ObjectFlipped, 'ff0000').",
+            "text": "Highlight the trajectory of the Spatula while it's in contact with the Pancake "
+        },
+        {
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ObjectFlipped, ToolReleased, 'ff8000').",
+            "text": "Highlight the trajectory of the Spatula after flipping the Pancake "
+        },
+        {
+            "q": "simlift_liftonly(knowrob:'Cup', Start, End), highlight_trajectory('Cup', Start, End, '0080ff'), remove_highlight('Spatula').",
+            "text": "Highlight the trajectory of the cup and remove highlighting of the spatula"
         },
         {
             "q": "simflip_full(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), add_trajectory('LiquidTangibleThing', Start, End, 0.5,2).",
-            "text": "Visualize trajectory of the Pancake for the whole flipping interval"
+            "text": "Visualize trajectory of the Pancake for the flipping interval"
+        },
+        {
+            "q": "simflip_fliponly(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), highlight_trajectory('LiquidTangibleThing', Start, End, '00FF00').",
+            "text": "Highlight trajectory of the Pancake while it's on the Spatula"
         },
         {
             "q": "",
