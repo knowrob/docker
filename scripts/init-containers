@@ -68,5 +68,8 @@ mongoimport --db roslog --collection logged_designators logged_designators.json
 
 # set mongo indexes:
 cd $MY_PATH
-mongo roslog auxiliary_SetIndexes.js
+
+mongo roslog --eval "db.tf.ensureIndex( { __recorded : 1 } )"
+mongo roslog --eval "db.tf.ensureIndex( { 'transforms.header.stamp' : 1 } )"
+mongo roslog --eval "db.logged_designators.ensureIndex( { __recorded : 1 } )"
 
