@@ -1,0 +1,24 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/...').",
+            "text": "Load ..."
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- AsdF -----"
+        },
+        {
+            "q": "asdf().",
+            "text": "ASDF?"
+        }
+    ]
+}

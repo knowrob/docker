@@ -65,6 +65,18 @@
             "text": "What was the arm trajectory during the PUTDOWN action?"
         },
         {
+            "q": "task_goal(T, 'GRASP'),\n subtask_all(T, SubL),\n owl_has(SubL, knowrob:graspDetails, DL),\n mng_designator_props(DL, 'SIDE', 'LEFT'),\n subtask_all(T, SubR),\n owl_has(SubR, knowrob:graspDetails, DR),\n mng_designator_props(DR, 'SIDE', 'RIGHT'),\n task_start(T, S), task_end(T, E),\n add_trajectory('l_wrist_roll_link', S, E, 0.3),\n add_trajectory('r_wrist_roll_link', S, E, 0.3).",
+            "text": "What were the trajectories of both arms in a dual-handed GRASP action?"
+        },
+        {
+            "q": "remove_object_with_children(pr2:'PR2Robot1').",
+            "text": "Stop publishing PR2 markers"
+        },
+        {
+            "q": "remove_trajectory('/base_link'), \n remove_trajectory('/l_wrist_roll_link'), \n remove_trajectory('/r_wrist_roll_link').",
+            "text": "Stop publishing trajectory markers"
+        },
+        {
             "q": "",
             "text": ""
         },

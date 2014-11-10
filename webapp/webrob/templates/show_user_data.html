@@ -9,8 +9,8 @@
 
 <h2>Your user data</h2>
 <dl>
-  <dt>Username: </dt><dd>{{ session.username }}</dd>
-  <dt>Email: </dt><dd>{{ session.email }}</dd>
+  <dt>Username: </dt><dd>{{ current_user.username }}</dd>
+  <dt>Email: </dt><dd>{{ current_user.email }}</dd>
   <br/>
 
   <dt>KnowRob container: </dt><dd>{{ session.user_container_name }}</dd>
