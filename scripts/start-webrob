@@ -7,6 +7,8 @@ then
 fi
 
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
 
 RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)
@@ -22,6 +24,8 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
 fi
 
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if nginx-proxy is running or stopped and start otherwise
 
 RUNNING=$(docker inspect --format="{{ .State.Running }}" nginx-proxy 2>/dev/null)
@@ -37,6 +41,7 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
 fi
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if user_db container exists and create otherwise
 RUNNING=$(docker inspect --format="{{ .State.Running }}" user_db 2>/dev/null)
 
@@ -46,6 +51,24 @@ if [ $? -eq 1 ]; then # container does not exist
 fi
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if postgres_db is running or stopped and start otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" postgres_db 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No Postgres container exists, creating a new one..."
+  docker run -d --volumes-from user_db --p 5432:5432 --name postgres_db knowrob/postgres
+else
+  echo 'asdf'
+fi
+
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "Postgres container exists, starting it..."
+  docker start postgres_db
+fi
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
 RUNNING=$(docker inspect --format="{{ .State.Running }}" tutorials 2>/dev/null)
 
@@ -60,12 +83,13 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
 fi
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start webrob container
 RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from user_db --volumes-from knowrob_data -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
+  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --link postgres_db:postgres -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python webrob.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
