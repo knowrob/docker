@@ -11,7 +11,17 @@ from requests import ConnectionError
 from urlparse import urlparse
 import docker
 from docker.errors import *
-
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.babel import Babel
+from flask.ext.mail import Mail
+from flask.ext.user import current_user, login_required, roles_required, SQLAlchemyAdapter, UserManager, UserMixin
+from flask.ext.user.signals import user_logged_in
+from flask.ext.user.signals import user_logged_out
+from flask.ext.user.forms import RegisterForm
+from wtforms import validators
+from wtforms import StringField
+from wtforms import SelectField
+from wtforms.validators import Required
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -23,12 +33,82 @@ app.config.update(dict(
     DEBUG=False,
     SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<',
     USERNAME='admin',
-    PASSWORD='default'#,
+    PASSWORD='default',
+    SQLALCHEMY_DATABASE_URI = 'postgresql://docker@' + os.environ['DB1_PORT_5432_TCP_ADDR'] + ':' + os.environ['DB1_PORT_5432_TCP_PORT'] + '/docker',
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'db/webrob.db'),
+    #SQLALCHEMY_DATABASE_URI = 'postgresql://docker@localhost/db1/docker',
+    
+    CSRF_ENABLED = True,
+    #SERVER_NAME=''
+    MAIL_SERVER   = 'smtp.gmail.com',
+    MAIL_PORT     = 465,
+    MAIL_USE_SSL  = True,
+    MAIL_USERNAME = 'email@example.com',
+    MAIL_PASSWORD = 'password',
+    MAIL_DEFAULT_SENDER = '"Sender" <noreply@example.com>',
+    USER_ENABLE_USERNAME = True,
+    USER_ENABLE_EMAIL           = True,
+    USER_ENABLE_CONFIRM_EMAIL = False
+
 ))
 
+babel = Babel(app)
+mail = Mail(app)
+db = SQLAlchemy(app)
 
+@babel.localeselector
+def get_locale():
+    translations = [str(translation) for translation in babel.list_translations()]
+    return request.accept_languages.best_match(translations)
 
+# Define the User-Roles pivot table
+user_roles = db.Table('user_roles',
+    db.Column('id', db.Integer(), primary_key=True),
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
 
+class TutorialPage(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    cat_id = db.Column(db.Integer(), nullable=False)
+    cat_title = db.Column(db.String(), nullable=False)
+    title = db.Column(db.String(), nullable=False)
+    text = db.Column(db.String(), nullable=False)
+
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean(), nullable=False, default=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    confirmed_at = db.Column(db.DateTime())
+    password = db.Column(db.String(255), nullable=False, default='')
+    reset_password_token = db.Column(db.String(100), nullable=False, default='')
+    container_id = db.Column(db.String(255), nullable=False, default='')
+
+    # Relationships
+    roles = db.relationship('Role', secondary=user_roles,
+            backref=db.backref('users', lazy='dynamic'))
+
+#class MyRegisterForm(RegisterForm):
+    #roles = SelectField('Rolle', validators=[Required('Rolle erforderlich')])
+
+# Reset all the database tables
+db.create_all()
+
+# Setup Flask-User
+db_adapter = SQLAlchemyAdapter(db,  User)
+user_manager = UserManager(db_adapter, app)#, register_form=MyRegisterForm)
+
+if not User.query.filter(User.username=='testuser').first():
+    user1 = User(username='testuser', email='testuser@example.com', active=True,
+        password=user_manager.hash_password('Password1'))
+    user1.roles.append(Role(name='admin'))
+    user1.roles.append(Role(name='user'))
+    db.session.add(user1)
+    db.session.commit()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Docker stuff
@@ -82,7 +162,7 @@ def start_container():
 
             # Create containers if they do not exist yet
             if not user_cont_exists:
-                print('Creating container for ' + session['username'])
+                print('Creating container for ' + current_user.username)
                 c.create_container('knowrob/hydro-knowrob-daemon',
                                     detach=True,
                                     tty=True,
@@ -102,7 +182,7 @@ def start_container():
                 c.create_container('mongo',   detach=True,ports=[27017], name='mongo_db')
                 c.start('mongo', port_bindings={27017:27017}, volumes_from=['mongo_data'])
                 
-            session['user_container_id'] = c.start(session['user_container_name'],
+            current_user.container_id = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
@@ -154,16 +234,35 @@ def stop_container():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
+@user_logged_in.connect_via(app)
+def track_login(sender, user, **extra):
+    session['user_container_name'] = user.username
+    session['user_data_container_name'] = user.username + "_data"
+    session['common_data_container_name'] = "knowrob_data"
+    session['rosauth_mac'] = generate_mac()
+    session['show_loading_overlay'] = True
+    start_container()
+    #sender.logger.info('user logged in')
+
+@user_logged_out.connect_via(app)
+def track_logout(sender, user, **extra): 
+    stop_container()
+    #sender.logger.info('user logged out')
+
+
 @app.route('/')
 def show_user_data():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    get_user_data(session['username'])
+    if not current_user.is_authenticated():
+        return redirect(url_for('user.login'))
+    get_user_data(current_user.username)
+    print request.host
 
     
     overlay = None
     if(session.get('show_loading_overlay') == True):
         overlay = True
+        
+        print "set overlay"
         session.pop('show_loading_overlay')
     
     return render_template('show_user_data.html', overlay=overlay)
@@ -176,6 +275,8 @@ def show_user_data():
   #return
 
   
+
+
 @app.route('/pr2_description/meshes/<path:filename>')
 def download_mesh(filename):
   return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
@@ -260,8 +361,12 @@ def register():
 @app.route('/tutorials/')
 @app.route('/tutorials/<cat_id>/')
 @app.route('/tutorials/<cat_id>/<page>')
+@login_required
 def tutorials(cat_id='getting_started', page=1):
   
+    #if not session.get('logged_in'):
+    #    return redirect(url_for('login'))
+
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
@@ -282,9 +387,10 @@ def tutorials(cat_id='getting_started', page=1):
 
 @app.route('/knowrob')
 @app.route('/exp/<exp_id>')
+@login_required
 def knowrob(exp_id=None):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    #if not session.get('logged_in'):
+    #    return redirect(url_for('login'))
     error=""
     #current_app.logger.debug(request)
     # determine hostname/IP we are currently using
@@ -301,9 +407,10 @@ def knowrob(exp_id=None):
 
 @app.route('/editor')
 @app.route('/editor/<filename>/')
+@login_required
 def editor(filename=""):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    #if not session.get('logged_in'):
+    #    return redirect(url_for('login'))
         
     error=""
     sandbox = '/home/tenorth/sandbox/'
@@ -409,11 +516,15 @@ def get_user_data(username):
         return False
 
 
+#def read_tutorial_page(cat, page):
+#    db = get_db()
+#    cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
+#    tut = cur.fetchone()
+#    return tut
+
 def read_tutorial_page(cat, page):
-    db = get_db()
-    cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
-    tut = cur.fetchone()
-    return tut
+    next_page = TutorialPage.query.filter_by(cat_id=cat,page=page)
+    return next_page
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
