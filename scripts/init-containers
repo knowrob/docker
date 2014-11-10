@@ -48,7 +48,7 @@ echo "$MY_PATH"
 cd $MY_PATH
 cd ../user_db
 docker build -t knowrob/user_db .
-docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
+docker run -d -v /var/lib/postgresql/data --name user_db knowrob/user_db true
 
 
 # create data volume for MongoDB

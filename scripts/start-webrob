@@ -42,7 +42,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" user_db 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No user DB container exists, creating a new one..."
-  docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
+  docker run -d -v /var/lib/postgresql/data --name user_db knowrob/user_db true
 fi
 
 
