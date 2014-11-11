@@ -5,6 +5,7 @@ docker pull knowrob/webrob
 docker pull knowrob/user_db
 docker pull knowrob/user_data
 docker pull knowrob/nginx-proxy
+docker pull knowrob/postgres
 
 # update the common data container:
 docker pull knowrob/knowrob_data:latest
