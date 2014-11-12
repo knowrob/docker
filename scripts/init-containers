@@ -1,17 +1,22 @@
 #!/bin/bash
-
 #
+# This script initializes a MongoDB container and fills it with test data.
+# By default, it imports the files tf.json and logged_designators.json from
+# the local folder or from the directory given as argument.
 #
-# The following commands need to be executed once to set up the MongoDB
-# container and fill it with test data
-#
+# Usage:
+# init-containers
+# init-containers <dirname>
+# 
+# (with the MongoDB .json files being in the same folder)
+# 
 
-echo "Current working directory ..."
-echo "`(pwd)`"
 
-# this is where the script (attempts to) get the path to roslog. This should be given as a parameter
-# to the script. If the parameter is missing, then the script uses the current working directory path
-# returned by pwd. 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is where the script (attempts to) get the path to roslog. This should
+# be given as a parameter to the script. If the parameter is missing, then
+# the script uses the current working directory path returned by pwd.
+
 MY_ROSLOG_PATH="$1"
 
 if [ -z "$1" ] ; then
@@ -20,55 +25,42 @@ if [ -z "$1" ] ; then
     MY_ROSLOG_PATH="`(pwd)`"
 fi
 
-# if the roslog path is a relative path, it should be converted to an absolute one. That's what's done
-# here.
-cd $MY_ROSLOG_PATH
-MY_ROSLOG_PATH="`(pwd)`"
-# undo side-effect of previous cd: we need pwd restored to its previous value for the next step to work.
-cd "$OLDPWD"
 
-echo "Using the following path to roslog files tf.json and logged_designators.json ..."
-echo "$MY_ROSLOG_PATH"
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_data 2>/dev/null)
 
-# this is where the script (attempts to) get the path to itself. This is needed to find the user_db 
-# in the docker package. We assume here that there is a fixed relationship between this script's path
-# and the path to user_db
-MY_PATH="`dirname \"$0\"`"
-MY_PATH="`(cd \"$MY_PATH\" && pwd)`"
-
-if [ -z "$MY_PATH" ] ; then
-    echo "ERROR: cannot access own path. Maybe a permission denied case."
-    exit 1
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No mongo_data container exists, creating a new one..."
+  docker run -d -v /data/db --name mongo_data busybox true
 fi
 
-echo "Current path for this script is ... "
-echo "$MY_PATH"
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_db is running or stopped and start otherwise
 
-# create data volume for user db
-cd $MY_PATH
-cd ../user_db
-docker build -t knowrob/user_db .
-docker run -d -v /var/lib/postgresql/data --name user_db knowrob/user_db true
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)
 
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No MongoDB container exists, creating a new one..."
+  docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
+fi
 
-# create data volume for MongoDB
-docker run -d -v /data/db --name mongo_data busybox true
-
-
-# pull and start MongoDB container
-docker pull mongo
-docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "MongoDB container exists, starting it..."
+  docker start mongo_db
+fi
 
 
-# execute the import procedure
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# import the files
+mongoimport --db roslog --collection tf "${MY_ROSLOG_PATH}/tf.json"
+mongoimport --db roslog --collection logged_designators "${MY_ROSLOG_PATH}/logged_designators.json"
 
-cd $MY_ROSLOG_PATH
-mongoimport --db roslog --collection tf tf.json
-mongoimport --db roslog --collection logged_designators logged_designators.json
 
-# set mongo indexes:
-cd $MY_PATH
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# set indexes in MongoDB
 mongo roslog --eval 'db.tf.ensureIndex( { __recorded : 1 } )'
 mongo roslog --eval 'db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )'
 mongo roslog --eval 'db.logged_designators.ensureIndex( { __recorded : 1 } )'
+
 

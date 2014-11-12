@@ -9,6 +9,15 @@ fi
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_data 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No mongo_data container exists, creating a new one..."
+  docker run -d -v /data/db --name mongo_data busybox true
+fi
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
 
 RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)

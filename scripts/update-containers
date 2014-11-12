@@ -1,5 +1,6 @@
 #!/bin/bash
-
+docker pull busybox
+docker pull mongo
 docker pull knowrob/hydro-knowrob-daemon
 docker pull knowrob/webrob
 docker pull knowrob/user_db
