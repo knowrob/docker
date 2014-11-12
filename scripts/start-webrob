@@ -7,6 +7,26 @@ then
 fi
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if knowrob_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" knowrob_data 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No knowrob_data container exists, creating a new one..."
+  docker run --name knowrob_data knowrob/knowrob_data:latest true
+fi
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if user_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" user_data 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No user_data container exists, creating a new one..."
+  docker run --name user_data knowrob/user_data true
+fi
+
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_data container exists and create otherwise
@@ -96,7 +116,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Web app container exists, creating a new one..."
-  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --link postgres_db:postgres -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python runserver.py
+  docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --volumes-from user_data --link postgres_db:postgres -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python runserver.py
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
