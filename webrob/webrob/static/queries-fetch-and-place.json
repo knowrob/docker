@@ -13,6 +13,10 @@
             "text": "Load dual-arm pick-and-place experiment"
         },
         {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/tablesetting/cram_log.owl').",
+            "text": "Load table setting experiment"
+        },
+        {
             "q": "",
             "text": ""
         },

@@ -88,8 +88,9 @@ PROLOG_INIT_TXT ="""%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def track_login(sender, user, **extra):
     session['user_container_name'] = user.username
     session['username'] = user.username
-    session['user_data_container_name'] = user.username + "_data"
+    session['user_data_container_name'] = "user_data"
     session['common_data_container_name'] = "knowrob_data"
+    session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
     if not 'pkg' in session: session['pkg'] = ''
@@ -113,8 +114,6 @@ def show_user_data():
     overlay = None
     if(session.get('show_loading_overlay') == True):
         overlay = True
-
-        print "set overlay"
         session.pop('show_loading_overlay')
 
     return render_template('show_user_data.html', overlay=overlay)

@@ -1,7 +1,8 @@
 import docker
+import os.path
 from docker.errors import *
 
-from flask import Flask, session, url_for, escape, request
+from flask import Flask, session, url_for, escape, request, flash
 from requests import ConnectionError
 from flask_user import current_user, login_required
 
@@ -83,7 +84,11 @@ def start_container():
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
                                                                  session['common_data_container_name']])
+            # create home directory if it does not exist yet
+            if not os.path.exists(session['user_home_dir']):
+                os.makedirs(session['user_home_dir'])
 
+                
     except APIError, e:
         if "Conflict" in str(e.message):
             flash("Name conflict: Container for this user already exists")
