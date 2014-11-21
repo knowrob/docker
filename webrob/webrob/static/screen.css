@@ -345,8 +345,22 @@ option {
     font-weight: normal;
 }
 
-
-
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
 
 /* *********************************************************************** */
 /* general classes */
@@ -1278,6 +1292,7 @@ div.div5 {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 .metanav       { height: 25px; font-size: 0.8em; padding: 5px 15px ; margin-bottom: 1em; background: #dadada; }
+.metanav_b     { height: 25px; font-size: 0.8em; padding: 5px 15px ; margin-bottom: 1em; background: #c9c9c9; }
 .metanav_left  { float: left; text-align: left;  }
 .metanav_right { float: right; text-align: right;  }
 .flash         { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
@@ -1288,3 +1303,69 @@ code           { font-family: Source Code Pro,Consolas,monospace; font-size:9pt;
 pre            { margin-left:20px; border:1px solid #cccccc; padding:5px;}
 div.show_code  { margin-top:-15px; margin-left:20px; margin-bottom:20px; }
 .ace_hidden-cursors {opacity:0}
+
+.menu_link        { cursor: pointer; color: #555555; font-weight: bold; }
+.menu_link.hover  { color: #FF00FF; }
+
+.fileButton {
+    background-image: url(images/file.png);
+    background-repeat: no-repeat;
+    background-position: left center;
+    border:0px;
+    color:#008800;
+}
+.directoryButton {
+    background-image: url(images/directory.png);
+    background-repeat: no-repeat;
+}
+
+.pkgSelect {
+    background: #dadada;
+    padding: 7px 7px;
+    border: 0 none;
+    color: #494d53;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3); 
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -moz-box-shadow: , 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -webkit-background-clip: padding-box;
+    width:100%;
+}
+
+#left{
+    background: #fcfcfc;
+    padding: 7px 7px;
+    border: 0 none;
+    color: #6a6f75;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3); 
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -moz-box-shadow: , 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -webkit-background-clip: padding-box;
+    width:20%;
+    height:94vh;
+    float:left;
+}
+
+#handle{
+    background:#c9c9c9;
+    float:left;
+    height:94vh;
+    width:8px;
+    margin-left:4px;
+}
+
+#editor{
+    width:78.5%;
+    height:94vh;
+    float:left;
+    border-color:#c9c9c9;
+    font-size:16px;
+}
+

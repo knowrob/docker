@@ -1,5 +1,5 @@
 
-from flask import Flask, session, url_for, escape, request, render_template, g, abort, flash, Markup, send_from_directory, current_app, redirect
+from flask import Flask, session, jsonify, url_for, escape, request, make_response, render_template, g, abort, flash, Markup, send_file, send_from_directory, current_app, redirect
 from flask_user import current_user, login_required
 from flask.ext.misaka import markdown
 from flask.ext.mail import Mail
@@ -7,14 +7,19 @@ from flask.ext.user import current_user, login_required, roles_required, SQLAlch
 from flask.ext.user.signals import user_logged_in
 from flask.ext.user.signals import user_logged_out
 from flask.ext.user.forms import RegisterForm
+from werkzeug import secure_filename
 
 import os
 import hashlib
+import json
 
 import random
 import string
 import time
+import sys
 import re
+import shutil
+import zipfile
 
 from wtforms import validators
 from wtforms import StringField
@@ -28,15 +33,66 @@ from webrob.user import knowrob_user
 from urlparse import urlparse
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Knowrob package templates
+    
+PACKAGE_XML_TXT ="""<package>
+  <name>{pkgName}</name>
+  
+  <version>1.0.0</version>
+  
+  <description>{pkgName} user package</description>
+  
+  <maintainer>{userName}</maintainer>
+  
+  <license>GPL</license>
+  
+  <url type="website">http://www.knowrob.org/</url>
+  
+  <author>{userName}</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>knowrob_common</build_depend>
+  
+  <run_depend>knowrob_common</run_depend>
+  
+</package>"""
+
+CMAKE_LIST_TXT ="""cmake_minimum_required(VERSION 2.8.3)
+
+project({pkgName})
+
+find_package(catkin REQUIRED COMPONENTS knowrob_common)
+
+catkin_package(
+    DEPENDS knowrob_common
+)"""
+
+PROLOG_INIT_TXT ="""%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dependencies
+:- register_ros_package(knowrob_common).
+:- register_ros_package(knowrob_srdl).
+:- register_ros_package(knowrob_cram).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parse OWL files, register name spaces
+
+% :- owl_parser:owl_parse('package://{pkgName}/owl/dummy.owl').
+% :- rdf_db:rdf_register_ns(dummy, 'http://knowrob.org/kb/dummy.owl#', [keep(true)])."""
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
 @user_logged_in.connect_via(app)
 def track_login(sender, user, **extra):
     session['user_container_name'] = user.username
+    session['username'] = user.username
     session['user_data_container_name'] = user.username + "_data"
     session['common_data_container_name'] = "knowrob_data"
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
+    if not 'pkg' in session: session['pkg'] = ''
     knowrob_docker.start_container()
     #sender.logger.info('user logged in')
 
@@ -90,6 +146,7 @@ def login():
             if is_valid_user(request.form['username'], request.form['password']):
 
                 session['username'] = request.form['username']
+                session['pkg'] = ""
 
                 session['user_container_name'] = session['username']
                 session['user_data_container_name'] = session['username'] + "_data"
@@ -198,32 +255,195 @@ def knowrob(exp_id=None):
         exp_query_file='queries-' + exp_id + '.json'
 
     return render_template('knowrob_simple.html', **locals())
-
-
-
+    
+###########################
+############# Editor Begin
+###########################
+    
 @app.route('/editor')
-@app.route('/editor/<filename>/')
 @login_required
 def editor(filename=""):
-    #if not session.get('logged_in'):
-    #    return redirect(url_for('login'))
+    return render_template('editor.html')
 
-    error=""
-    sandbox = '/home/tenorth/sandbox/'
-    glob = sandbox + filename
+@app.route('/pkg_new', methods=['POST'])
+@login_required
+def pkg_new():
+    packageName = json.loads(request.data)['packageName'];
+    pkgPath = os.path.join(getUserDir(), packageName)
+    
+    # Create package root directory
+    if os.path.exists(pkgPath):
+        sys.stderr.write("Package already exists.\n")
+        return None
+    os.makedirs(pkgPath)
+    
+    session['pkg'] = packageName
+    
+    # Create package.xml
+    pkgXml = PACKAGE_XML_TXT.format(
+        pkgName= packageName,
+        userName= session['user_container_name']
+    )
+    pkgXmlFile = os.path.join(pkgPath, 'package.xml')
+    writeTextFile(pkgXmlFile, pkgXml)
+    
+    # Create CMakeList
+    cmakeList = CMAKE_LIST_TXT.format(
+        pkgName= packageName
+    )
+    cmakeListFile = os.path.join(pkgPath, 'CMakeLists.txt')
+    writeTextFile(cmakeListFile, cmakeList)
+    
+    prologDir = os.path.join(pkgPath, 'prolog')
+    # Create prolog/owl directories
+    os.makedirs(prologDir)
+    os.makedirs(os.path.join(pkgPath, 'owl'))
+    
+    # Create prolog init file
+    prologInit = PROLOG_INIT_TXT.format(
+        pkgName= packageName
+    )
+    prologInitFile = os.path.join(prologDir, 'init.pl')
+    writeTextFile(prologInitFile, prologInit)
+    
+    return jsonify(result=None)
 
-    # check if still in sandbox
-    if not str(os.path.abspath(glob)).startswith(sandbox):
-        error = "Access denied to folders outside of sandbox"
-        filename = ""
+@app.route('/pkg_del', methods=['POST'])
+@login_required
+def pkg_del():
+    shutil.rmtree(os.path.join(getUserDir(), session['pkg']))
+    return jsonify(result=None)
 
-    files = os.listdir(glob)
+@app.route('/pkg_set', methods=['POST'])
+@login_required
+def pkg_set():
+    # Update package name
+    data = json.loads(request.data)
+    if 'packageName' in data and len(data['packageName'])>0:
+        session['pkg'] = data['packageName']
+    return getPkgTree()
 
+@app.route('/pkg_list', methods=['POST'])
+@login_required
+def pkg_list():
+    # Return list of packages
+    files = filter(lambda f: os.path.isdir(os.path.join(getUserDir(), f)), os.listdir(getUserDir()))
+    return jsonify(result=files)
 
-    #poem = open("ad_lesbiam.txt").read()
-    return render_template('editor.html', error=error, files=files)
+@app.route('/pkg_read', methods=['POST'])
+@login_required
+def pkg_read():
+    path = getFilePath(json.loads(request.data)['file'])
+    
+    # Read the file
+    f = open(path, 'r')
+    content = f.readlines()
+    f.close()
+    
+    return jsonify(result=content)
 
+@app.route('/pkg_down', methods=['POST'])
+@login_required
+def pkg_down():
+    path = os.path.join(getUserDir(), session['pkg'])
+    
+    zipName = session['pkg'] + '.zip'
+    zipPath = os.path.join(getUserDir(), zipName)
+    zipf = zipfile.ZipFile(zipPath, 'w')
+    zipdir(path, getUserDir(), zipf)
+    zipf.close()
+    # FIXME: zip file never removed!
+    
+    return send_file(zipPath, 
+         mimetype="application/zip", 
+         as_attachment=True, 
+         attachment_filename=zipName)
 
+@app.route('/file_write', methods=['POST'])
+@login_required
+def file_write():
+    data = json.loads(request.data)
+    path = getFilePath(data['file'])
+    
+    writeTextFile(path, data['content'])
+    
+    return jsonify(result=None)
+   
+@app.route('/file_del', methods=['POST'])
+@login_required 
+def file_del():
+    path = getFilePath(json.loads(request.data)['file'])
+    
+    if(os.path.isfile(path)):
+        os.remove(path)
+    
+    return getPkgTree()
+    
+###########################
+############# Editor End
+###########################
+    
+###########################
+############# Utility Begin
+###########################
+
+def getUserDir():
+    userDir = "/home/ros/user_data/" + session['user_container_name']
+    if not os.path.exists(userDir):
+        print("Creating user directory at " + userDir)
+        os.makedirs(userDir)
+    return userDir
+
+def writeTextFile(path, content):
+    f = open(path, "w")
+    f.write(content)
+    f.close()
+
+def getFilePath(fileName):
+    path = os.path.join(getUserDir(), session['pkg'])
+    (_, ext) = os.path.splitext(fileName)
+    if(ext == ".pl"):
+        path = os.path.join(path, "prolog")
+    elif(ext == ".owl"):
+        path = os.path.join(path, "owl")
+    return os.path.join(path, fileName)
+ 
+def getPkgTree():
+    # List files in package dir
+    pkgPath = os.path.join(getUserDir(), session['pkg'])
+    rootFiles = listPkgFiles(session['pkg'], pkgPath)['children']
+    # Return list of files
+    return jsonify(result=rootFiles)
+
+def getPackageFiles():
+    if not 'pkg' in session.keys(): return []
+    
+    packageName = session['pkg'];
+    pkgPath = os.path.join(getUserDir(), packageName)
+    
+    files = []
+    for root, _, x in os.walk(pkgPath):
+        for f in x:
+            p = os.path.join(root, f)
+            files.append(p[p.find('/'+packageName):])
+    return files
+    
+def listPkgFiles(name, root):
+    out = []
+    
+    if os.path.isdir(root):
+        for child in os.listdir(root):
+            out.append(listPkgFiles(child, os.path.join(root,child)))
+    
+    return {'name': name, 'children': out, 'isdir': os.path.isdir(root)}
+
+def zipdir(path, pathPrefix, zipFile):
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            abs_p = os.path.join(root, f)
+            rel_p = os.path.relpath(abs_p, pathPrefix)
+            zipFile.write(abs_p, rel_p)
+    
 def generate_mac():
 
     secret = "RW6WZ2yp67ETMdj2"
@@ -239,4 +459,8 @@ def generate_mac():
     mac = hashlib.sha512(secret + client + dest + rand + str(t) + level + str(end) ).hexdigest()
 
     return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + str(t) + ", " + level + ", " + str(end) + ")"
+    
+###########################
+############# Utility End
+###########################
 
