@@ -17,6 +17,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='ros/json_prolog.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='ros/MarkerClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='ros/MarkerArrayClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='ros/KeepAlivePublisher.js') }}"></script>
 
   <script type="text/javascript" src="{{ url_for('static', filename='d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='d3/d3-tip.js') }}"></script>
@@ -59,7 +60,13 @@
       });
 
       viewer.addObject(new ROS3D.Grid());
-
+      
+      // Setup publisher that sends a dummy message in order to keep alive the socket connection
+      new KeepAlivePublisher({
+        ros : ros,
+        interval : 30000
+      });
+      
       // Setup a client to listen to TFs.
       var tfClient = new ROSLIB.TFClient({
         ros : ros,
