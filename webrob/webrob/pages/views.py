@@ -90,6 +90,7 @@ def track_login(sender, user, **extra):
     session['username'] = user.username
     session['user_data_container_name'] = "user_data"
     session['common_data_container_name'] = "knowrob_data"
+    session['exp'] = None
     session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
@@ -146,6 +147,7 @@ def login():
 
                 session['username'] = request.form['username']
                 session['pkg'] = ""
+                session['exp'] = None
 
                 session['user_container_name'] = session['username']
                 session['user_data_container_name'] = session['username'] + "_data"
@@ -250,9 +252,13 @@ def knowrob(exp_id=None):
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
 
+    # Remember experiment selection
+    if exp_id is not None: session['exp'] = exp_id
+    # Select a query file
     exp_query_file = None
-    if exp_id is not None:
-        exp_query_file='queries-' + exp_id + '.json'
+    if 'exp' in session:
+        exp = session['exp']
+        if exp is not None: exp_query_file = 'queries-' + exp + '.json'
 
     return render_template('knowrob_simple.html', **locals())
     
