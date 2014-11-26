@@ -250,7 +250,8 @@ def knowrob(exp_id=None):
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
 
-    if exp_id is not None and os.path.isfile('static/queries-' + exp_id + '.json'):
+    exp_query_file = None
+    if exp_id is not None:
         exp_query_file='queries-' + exp_id + '.json'
 
     return render_template('knowrob_simple.html', **locals())

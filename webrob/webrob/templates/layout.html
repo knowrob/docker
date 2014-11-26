@@ -20,8 +20,8 @@
 <body{% block bodyargs %}{% endblock %}>
   <div class="metanav">
     <div class="metanav_left">
-      <a href="{{ url_for('knowrob') }}" id="loading">Query Interface</a> &nbsp;&nbsp;
-      <a href="{{ url_for('editor') }}" id="loading">Editor Interface</a> &nbsp;&nbsp;
+      <a href="{{ url_for('knowrob') }}" id="loading">Knowledge Base</a> &nbsp;&nbsp;
+      <a href="{{ url_for('editor') }}" id="loading">Editor</a> &nbsp;&nbsp;
 <!--       <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp; -->
 <!--       <a href="{{ url_for('tutorials') }}">Tutorials</a> -->
     </div>
@@ -35,7 +35,7 @@
     </div>
   </div>
   
-  <div style="padding-left:15px;">
+  <div id="layout_placeholder" style="padding-left:15px;">
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
