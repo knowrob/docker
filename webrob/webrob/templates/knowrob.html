@@ -267,6 +267,14 @@
             },
             readOnly: false
         });
+        user_query.commands.addCommand({
+            name: 'next_result',
+            bindKey: {win: 'Ctrl-n',  mac: 'Command-n'},
+            exec: function(editor) {
+                nextQueryProlog();
+            },
+            readOnly: false
+        });
 
         return user_query;
     }
