@@ -7,7 +7,6 @@ function KeepAlivePublisher(options){
   var ros = options.ros;
   var interval = options.interval || 30000;
   
-  console.log(ros);
   // The topic dedicated to keep alive messages
   var keepAliveTopic = new ROSLIB.Topic({
     ros : ros,

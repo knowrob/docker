@@ -2,11 +2,19 @@
     "query": [
         {
             "q": "",
-            "text": "----- init -----"
+            "text": "----- Initialize Setup -----"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/...').",
-            "text": "Load ..."
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/pancakemaking_sim.owl').",
+            "text": "Load full pancake-making simulation data from library"
+        },
+        {
+            "q": "owl_parse('package://knowrob_sim/owl/simulation_map.owl').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
+            "text": "Visualize semantic map"
         },
         {
             "q": "",
@@ -14,11 +22,59 @@
         },
         {
             "q": "",
-            "text": "----- AsdF -----"
+            "text": "----- Queries on Simulation Data -----"
         },
         {
-            "q": "asdf().",
-            "text": "ASDF?"
+            "q": "simact_contact(T, knowrob_sim:'TouchingSituation', knowrob:'Cup', Obj), simact_start(T,Start), simact_end(T, End).",
+            "text": "In which contact intervals was the Cup involved?"
+        },
+        {
+            "q": "simlift_liftonly(knowrob:'Cup', Start, End), add_trajectory('Cup', Start, End, 0.5,3).",
+            "text": "When was the Cup lifted from the KitchenTable? Visualize trajectory."
+        },
+        {
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased).",
+            "text": "Did flipping occur in this episode?"
+        },
+        {
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.5,3).",
+            "text": "Show the trajectory of the Spatula for the flipping interval"
+        },
+        {
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ToolContactObject, ObjectFlipped, 'ff0000').",
+            "text": "Highlight the trajectory of the Spatula while it's in contact with the Pancake "
+        },
+        {
+            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ObjectFlipped, ToolReleased, 'ff8000').",
+            "text": "Highlight the trajectory of the Spatula after flipping the Pancake "
+        },
+        {
+            "q": "simlift_liftonly(knowrob:'Cup', Start, End), highlight_trajectory('Cup', Start, End, '0080ff'), remove_highlight('Spatula').",
+            "text": "Highlight the trajectory of the cup and remove highlighting of the spatula"
+        },
+        {
+            "q": "simflip_full(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), add_trajectory('LiquidTangibleThing', Start, End, 0.5,2).",
+            "text": "Visualize trajectory of the Pancake for the flipping interval"
+        },
+        {
+            "q": "simflip_fliponly(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), highlight_trajectory('LiquidTangibleThing', Start, End, '00FF00').",
+            "text": "Highlight trajectory of the Pancake while it's on the Spatula"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Logfile Statistics -----"
+        },
+        {
+            "q": "diagram_canvas.",
+            "text": "Initialize diagram canvas"
+        },
+        {
+            "q": "rdf_has(_, knowrob:'experimentName', literal(type(_, Expname))), string_concat(Expname, ' Timeline', Title), findall(Type, (simact(T), rdf_split_url(_,Type,T)), X), sim_timeline_val(X, Times), add_diagram(diagram_id2, 'Title', timeline, 'Time', 'Events', 300, 300, '12px', [[['X'],['Times']]]).",
+            "text": "Show event timeline in the chart"
         }
     ]
 }
