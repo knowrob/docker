@@ -145,11 +145,11 @@
 
         
         history.setValue(history.getValue() + "\n\n?- " + q +  ".\n", -1);
-        history.gotoLine(history.getSession().getLength(), 0);
+        history.navigateFileEnd();
 
         prolog.jsonQuery(q, function(result) {
             history.setValue(history.getValue() + result, -1);
-            history.gotoLine(history.getSession().getLength(), 0);
+            history.navigateFileEnd();
         });
         
         query.setValue("");
@@ -166,7 +166,7 @@
       var history = ace.edit("history");
       prolog.nextQuery(function(result) {
             history.setValue(history.getValue() + result, -1);
-            history.gotoLine(history.getSession().getLength(), 0);
+            history.navigateFileEnd();
         });
 
       user_query.focus();
@@ -207,9 +207,7 @@
     function setQueryValue(val){
       user_query.setValue(val, -1);
       user_query.focus();
-      session = user_query.getSession();
-      count = session.getLength();
-      user_query.gotoLine(count, session.getLine(count-1).length);
+      user_query.navigateFileEnd();
     }
 
     // hook for links of class "show_code" that pastes the content of the
