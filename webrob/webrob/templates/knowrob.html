@@ -39,6 +39,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/interaction/MouseHandler.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/interaction/OrbitControls.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/json_prolog.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/KeepAlivePublisher.js') }}"></script>
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
@@ -110,6 +111,7 @@
         ros : ros,
         tfClient : tfClient,
         topic : '/visualization_marker_array',
+        rootObject : viewer.scene,
         markerClient : markerClient
       });
 
