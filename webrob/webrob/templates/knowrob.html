@@ -5,33 +5,55 @@
 
 
 {% block head %}
-  <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}"></script>
-
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/three.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/eventemitter2.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/ColladaLoader2.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/roslib.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/mjpegcanvas.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/ros3d.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/json_prolog.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/MarkerClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/MarkerArrayClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='ros/KeepAlivePublisher.js') }}"></script>
-
-  <script type="text/javascript" src="{{ url_for('static', filename='d3/d3.v3.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='d3/d3-tip.js') }}"></script>
-
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/google-jsapi.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/DonutChart.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/BarChart.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/TreeDiagram.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/Timeline.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/DataVisClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/array-nonstandard.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='chart/Control.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/threejs/three.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/threejs/ColladaLoader.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/threejs/STLLoader.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/ColladaAnimationCompress/ColladaLoader2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/depthcloud/DepthCloud.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/models/Arrow.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/models/Axes.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/models/Grid.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/models/MeshResource.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/models/TriangleList.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/interactivemarkers/InteractiveMarkerClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/interactivemarkers/InteractiveMarkerControl.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/interactivemarkers/InteractiveMarkerHandle.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/interactivemarkers/InteractiveMarker.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/interactivemarkers/InteractiveMarkerMenu.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/maps/OccupancyGridClient.js') }}') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/maps/OccupancyGrid.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/markers/MarkerArrayClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/markers/MarkerClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/markers/Marker.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/urdf/UrdfClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/urdf/Urdf.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/Viewer.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/SceneNode.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/interaction/Highlighter.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/interaction/MouseHandler.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/visualization/interaction/OrbitControls.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/json_prolog.js') }}"></script>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='designator/desig.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/BarChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Timeline.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DataVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/designator/desig.js') }}"></script>
 
   
   <script type="text/javascript">
