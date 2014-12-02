@@ -3,7 +3,7 @@
 {% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
 
 {% block head %}
-  <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
 
   <script type="text/javascript">
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
