@@ -392,6 +392,26 @@ def file_del():
 ###########################
     
 ###########################
+############# Logging Begin
+###########################
+
+@app.route('/log')
+def log():
+  c = knowrob_docker.docker_connect()
+  container_id = session['user_container_name']
+  logger = c.logs(container_id, stdout=True, stderr=True, stream=False, timestamps=False)
+  
+  logStr = ""
+  for c in logger: logStr += c
+  
+  return render_template('log.html', log=logStr)
+
+###########################
+############# Logging End
+###########################
+  
+    
+###########################
 ############# Utility Begin
 ###########################
 

@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
+
+{% block head %}
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+
+  <script id="entity_body" type="text/pain">{{log}}</script>
+  <script type="text/javascript">
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    
+    var activeFile;
+    var ignoreChanges = false;
+    var hasChanges = false;
+    
+    ////////////////////////////////
+    /////////// Editor view
+    ////////////////////////////////
+    
+    /**
+     * Initially set up editor view.
+     **/
+    function update_editor() {
+        var edit = ace.edit("editor-full-width");
+        edit.resize(true);
+        edit.setTheme("ace/theme/solarized_light");
+        //edit.getSession().setMode("ace/mode/prolog");
+        edit.getSession().setUseWrapMode(true);
+        edit.setOptions({
+            showGutter: true,
+            printMarginColumn: true,
+            highlightActiveLine: true,
+            highlightGutterLine: true,
+            readOnly: true
+        });
+        edit.setValue(document.getElementById('entity_body').innerHTML, -1);
+    }
+    
+    function update_log() {
+      window.location.reload();
+    }
+    
+  </script>
+{% endblock %}
+
+{% block content %}
+
+  <!-- menu bar -->
+  <div class="metanav_b" style="margin: -0.3cm 0.0cm 0.5cm -0.5cm;">
+    <div class="metanav_left">&nbsp;
+      <a onclick="update_log();" class="menu_link">Update</a>
+    </div>
+  </div>
+  
+  <div id="editor-full-width" class="black_border"></div>
+
+  <script>
+      // Initialization of widgets on reload
+      update_editor();
+  </script>
+  
+{% endblock %}

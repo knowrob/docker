@@ -108,7 +108,6 @@ def start_container():
         flash("Error: Connection to your KnowRob instance failed.")
         return None
 
-
 def stop_container():
 
     try:

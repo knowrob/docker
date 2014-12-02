@@ -1369,3 +1369,10 @@ div.show_code  { margin-top:-15px; margin-left:20px; margin-bottom:20px; }
     font-size:16px;
 }
 
+#editor-full-width{
+    width:98%;
+    height:93vh;
+    float:left;
+    border-color:#c9c9c9;
+    font-size:16px;
+}
