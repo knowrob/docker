@@ -60,10 +60,19 @@ def start_container():
             # Create containers if they do not exist yet
             if not user_cont_exists:
                 print('Creating container for ' + current_user.username)
+                env = {}
+                env["VIRTUAL_HOST"] = session['user_container_name']
+                env["VIRTUAL_PORT"] = '9090'  # for nginx reverse proxy
+                env["ROS_PACKAGE_PATH"] = ":".join([
+                    "/home/ros/src",
+                    "/opt/ros/hydro/share",
+                    "/opt/ros/hydro/stacks",
+                    "/home/ros/user_data/" + session['user_container_name']
+                ])
                 c.create_container('knowrob/hydro-knowrob-daemon',
                                     detach=True,
                                     tty=True,
-                                    environment={"VIRTUAL_HOST" : session['user_container_name'], "VIRTUAL_PORT" : "9090"}, # for nginx reverse proxy
+                                    environment=env,
                                     name=session['user_container_name'])
 
             if not user_data_cont_exists:

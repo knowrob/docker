@@ -74,10 +74,12 @@ PROLOG_INIT_TXT ="""%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- register_ros_package(knowrob_srdl).
 :- register_ros_package(knowrob_cram).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Include source files
+%:- use_module(library('test')).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parse OWL files, register name spaces
-
 % :- owl_parser:owl_parse('package://{pkgName}/owl/dummy.owl').
 % :- rdf_db:rdf_register_ns(dummy, 'http://knowrob.org/kb/dummy.owl#', [keep(true)])."""
 
