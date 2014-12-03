@@ -5,8 +5,20 @@
             "text": "----- Initialize Setup -----"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/pancakemaking_sim.owl').",
-            "text": "Load full pancake-making simulation data from library"
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/sim_exp1.owl').",
+            "text": "Load data from one pancake-making simulation from library"
+        },
+        {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/sim_exp2.owl').",
+            "text": "Load data from Experiment 2"
+        },
+         {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/sim_exp3.owl').",
+            "text": "Load data from Experiment 3"
+        },
+         {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/sim_exp4.owl').",
+            "text": "Load data from Experiment 4"
         },
         {
             "q": "owl_parse('package://knowrob_sim/owl/simulation_map.owl').",
@@ -25,40 +37,48 @@
             "text": "----- Queries on Simulation Data -----"
         },
         {
-            "q": "simact_contact(T, knowrob_sim:'TouchingSituation', knowrob:'Cup', Obj), simact_start(T,Start), simact_end(T, End).",
-            "text": "In which contact intervals was the Cup involved?"
+            "q": "simact_contact('Pancake1', Event, knowrob:'Cup', Obj), simact_start(Exp, Event,Start), simact_end(Exp, Event, End).",
+            "text": "In which contact intervals was the Cup involved during experiment 1?"
         },
         {
-            "q": "simlift_liftonly(knowrob:'Cup', Start, End), add_trajectory('Cup', Start, End, 0.5,3).",
-            "text": "When was the Cup lifted from the KitchenTable? Visualize trajectory."
+            "q": "nb_setval(counter,0x0000ff), simlift_liftonly(Exp, knowrob:'Cup', Start, End), add_count(0x404000), add_trajectory('Cup', Start, End, 0.5,3), nb_getval(counter,Val), highlight_trajectory('Cup', Start, End, Val).",
+            "text": "Which instances of Cups being lifted are available?"
         },
         {
-            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased).",
-            "text": "Did flipping occur in this episode?"
+            "q": "nb_setval(counter,0x0000ff), simlift_liftonly(Exp, knowrob:'Cup', Start, End), add_count(0x404000), add_trajectory('Cup', Start, End, 0.5,3), nb_getval(counter,Val), highlight_trajectory('Cup', Start, End, Val).",
+            "text": "Show the trajectories of Cups being lifted for all available experiments"
         },
         {
-            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.5,3).",
-            "text": "Show the trajectory of the Spatula for the flipping interval"
+            "q": "simflipping(Exp, Object,Tool,Target,_,_,_,_,_).",
+            "text": "In which experiments did flipping occur?"
         },
         {
-            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ToolContactObject, ObjectFlipped, 'ff0000').",
+            "q": "simflipping('Pancake1', Object,Tool,Target,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.5,3).",
+            "text": "Show the trajectory of the Spatula for the flipping interval during experiment 1"
+        },
+        {
+            "q": "simflipping('Pancake1',_,_,_,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ToolContactObject, ObjectFlipped, 'ff0000').",
             "text": "Highlight the trajectory of the Spatula while it's in contact with the Pancake "
         },
         {
-            "q": "simflipping(O,T,S,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ObjectFlipped, ToolReleased, 'ff8000').",
+            "q": "simflipping('Pancake1',_,_,_,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), highlight_trajectory('Spatula', ObjectFlipped, ToolReleased, 'ff8000').",
             "text": "Highlight the trajectory of the Spatula after flipping the Pancake "
         },
         {
-            "q": "simlift_liftonly(knowrob:'Cup', Start, End), highlight_trajectory('Cup', Start, End, '0080ff'), remove_highlight('Spatula').",
-            "text": "Highlight the trajectory of the cup and remove highlighting of the spatula"
+            "q": "remove_highlight('Spatula'), remove_highlight('Cup'), simlift_liftonly('Pancake4', knowrob:'Cup', Start, End), highlight_trajectory('Cup', Start, End, '0080ff').",
+            "text": "Highlight the trajectory of the Cup in experiment 4 and remove highlighting of the Spatula"
         },
         {
-            "q": "simflip_full(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), add_trajectory('LiquidTangibleThing', Start, End, 0.5,2).",
-            "text": "Visualize trajectory of the Pancake for the flipping interval"
+            "q": "simflip_full('Pancake1', knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), add_trajectory('LiquidTangibleThing', Start, End, 0.2,2).",
+            "text": "Visualize trajectory of the Pancake during flipping in experiment 1"
         },
         {
-            "q": "simflip_fliponly(knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), highlight_trajectory('LiquidTangibleThing', Start, End, '00FF00').",
-            "text": "Highlight trajectory of the Pancake while it's on the Spatula"
+            "q": "simflip_fliponly('Pancake1', knowrob:'LiquidTangibleThing', knowrob:'Spatula', knowrob:'PancakeMaker', Start, End, _, _, _), highlight_trajectory('LiquidTangibleThing', Start, End, '00FF00').",
+            "text": "Highlight trajectory of the Pancake while it's on the Spatula in experiment 1"
+        },
+        {
+            "q": "clear_canvas.",
+            "text": "Clear canvas"
         },
         {
             "q": "",
