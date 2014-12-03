@@ -409,7 +409,68 @@ def log():
 ###########################
 ############# Logging End
 ###########################
+    
+###########################
+############# History Begin
+###########################
+
+MAX_HISTORY_LINES = 50
+
+def getHistoryFile():
+  userDir = getUserDir()
+  return os.path.join(getUserDir(), "query.history")
+
+@app.route('/add_history_item', methods=['POST'])
+def add_history_item():
+  query = json.loads(request.data)['query']
+  hfile = getHistoryFile()
   
+  # Read history
+  lines = []
+  if os.path.isfile(hfile):
+    f = open(hfile)
+    lines = f.readlines()
+    f.close()
+  # Append the last query
+  lines.append(query+".\n")
+  # Remove old history items
+  numLines = len(lines)
+  lines = lines[max(0, numLines-MAX_HISTORY_LINES):numLines]
+  
+  with open(hfile, "w") as f:
+    f.writelines(lines)
+  
+  return jsonify(result=None)
+
+@app.route('/get_history_item', methods=['POST'])
+def get_history_item():
+  index = json.loads(request.data)['index']
+  
+  if index<0:
+    return jsonify(item="", index=-1)
+  
+  hfile = getHistoryFile()
+  if os.path.isfile(hfile):
+    # Read file content
+    f = open(hfile)
+    lines = f.readlines()
+    f.close()
+    
+    # Clamp index
+    if index<0: index=0
+    if index>=len(lines): index=len(lines)-1
+    
+    item = lines[len(lines)-index-1]
+    item = item[:len(item)-1]
+    
+    return jsonify(item=item, index=index)
+  
+  else:
+    return jsonify(item="", index=-1)
+    
+###########################
+############# History End
+###########################
     
 ###########################
 ############# Utility Begin
