@@ -41,7 +41,7 @@
             "text": "In which contact intervals was the Cup involved during experiment 1?"
         },
         {
-            "q": "nb_setval(counter,0x0000ff), simlift_liftonly(Exp, knowrob:'Cup', Start, End), add_count(0x404000), add_trajectory('Cup', Start, End, 0.5,3), nb_getval(counter,Val), highlight_trajectory('Cup', Start, End, Val).",
+            "q": "simlift_liftonly(Exp, knowrob:'Cup', Start, End).",
             "text": "Which instances of Cups being lifted are available?"
         },
         {
