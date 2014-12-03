@@ -6,6 +6,7 @@
 
 {% block head %}
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/threejs/three.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/threejs/ColladaLoader.js') }}"></script>
@@ -62,6 +63,9 @@
     // The index to the currently active history item
     // history items are saved on the server and queried using AJAX
     var historyIndex = -1;
+    
+    // Names of prolog predicates and modules for auto completion
+    var prologNames = [];
 
     // global ROS handle
     var ros;
@@ -154,7 +158,8 @@
         else
           %}{{ url_for('static', filename='queries.json') }}{%
         endif %}");
-
+      
+      updatePrologNames();
     };
 
     function queryProlog(query) {
@@ -300,7 +305,6 @@
     }
 
     function setupQueryField() {
-
         var user_query = ace.edit("user_query");
         user_query.resize(true);
         user_query.setTheme("ace/theme/solarized_light");
@@ -310,8 +314,19 @@
             showGutter: false,
             printMarginColumn: false,
             highlightActiveLine: false,
-            highlightGutterLine: false
+            highlightGutterLine: false,
+            enableBasicAutocompletion: true
         });
+        
+        // Add completer for prolog code
+        ace.require("ace/ext/language_tools").addCompleter({
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                callback(null, getPrologNames().map(function(x) {
+                    return {name: x, value: x, score: 100, meta: "pl"};
+                }));
+            }
+        });
+        
         user_query.commands.addCommand({
             name: 'send_query',
             bindKey: {win: 'Enter',  mac: 'Enter'},
@@ -354,6 +369,30 @@
         });
 
         return user_query;
+    }
+    
+    function updatePrologNames() {
+        var pl = new JsonProlog(ros, {});
+        
+        prologNames.length = 0;
+        
+        // Query for predicates/modules and collect all results
+        pl.jsonQuery("findall(X, current_predicate(X/_);current_module(X), L)", function(x) {
+          // Parse each value
+          var lines = x.split("\n");
+          for(i=1; i<lines.length-1; ++i) {
+            var tmp = lines[i].split(" = ");
+            if(tmp.length==2) {
+              prologNames.push(tmp[1].trim());
+            }
+          }
+          
+          prologNames.sort();
+        });
+    }
+    
+    function getPrologNames() {
+        return prologNames;
     }
 </script>
 {% endblock %}
