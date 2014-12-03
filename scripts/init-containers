@@ -1,38 +1,66 @@
+#!/bin/bash
 #
+# This script initializes a MongoDB container and fills it with test data.
+# By default, it imports the files tf.json and logged_designators.json from
+# the local folder or from the directory given as argument.
 #
-# The following commands need to be executed once to set up the MongoDB
-# container and fill it with test data
-#
-#
-# IMPORTANT: THIS IS NOT AN EXECUTABLE SCRIPT! Some of the commands have
-#            to be performed in the mongodb shell, not in bash, so they
-#            have to be performed one after another by hand for now.
-#
+# Usage:
+# init-containers
+# init-containers <dirname>
+# 
+# (with the MongoDB .json files being in the same folder)
+# 
 
 
-# create data volume for user db
-cd ~/docker/user_db
-docker build -t knowrob/user_db .
-docker run -d -v /opt/webapp/db --name user_db knowrob/user_db true
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is where the script (attempts to) get the path to roslog. This should
+# be given as a parameter to the script. If the parameter is missing, then
+# the script uses the current working directory path returned by pwd.
+
+MY_ROSLOG_PATH="$1"
+
+if [ -z "$1" ] ; then
+    # if no parameter given to the script, use the default (path to working directory)
+    # for MY_ROSLOG_PATH
+    MY_ROSLOG_PATH="`(pwd)`"
+fi
 
 
-# create data volume for MongoDB
-docker run -d -v /data/db --name mongo_data busybox true
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_data 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No mongo_data container exists, creating a new one..."
+  docker run -d -v /data/db --name mongo_data busybox true
+fi
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_db is running or stopped and start otherwise
+
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No MongoDB container exists, creating a new one..."
+  docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
+fi
+
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "MongoDB container exists, starting it..."
+  docker start mongo_db
+fi
 
 
-# pull and start MongoDB container
-docker pull mongo
-docker run -d -p 27017:27017 --volumes-from mongo_data --name mongo_db mongo
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# import the files
+mongoimport --db roslog --collection tf "${MY_ROSLOG_PATH}/tf.json"
+mongoimport --db roslog --collection logged_designators "${MY_ROSLOG_PATH}/logged_designators.json"
 
 
-# execute the import procedure
-cd /var/roslog
-mongoimport --db roslog --collection tf tf.json
-mongoimport --db roslog --collection logged_designators logged_designators.json
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# set indexes in MongoDB
+mongo roslog --eval 'db.tf.ensureIndex( { __recorded : 1 } )'
+mongo roslog --eval 'db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )'
+mongo roslog --eval 'db.logged_designators.ensureIndex( { __recorded : 1 } )'
 
-# set mongo indexes:
-mongo roslog
-db.tf.ensureIndex( { __recorded : 1 } )
-db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )
-db.logged_designators.ensureIndex( { __recorded : 1 } )
-exit
+

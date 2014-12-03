@@ -1,11 +1,9 @@
-FROM ubuntu:12.04
+FROM busybox
 MAINTAINER Moritz Tenorth <knowrob@tenorth.de>
 
 # Create data directory
-RUN mkdir -p /opt/webapp/db
-
-# copy initial DB to the container
-ADD ./webrob.db /opt/webapp/db/
+RUN mkdir -p /var/lib/postgresql/data
 
 # Create data volume
-VOLUME /opt/ros/webapp/db
+VOLUME /var/lib/postgresql/data
+
