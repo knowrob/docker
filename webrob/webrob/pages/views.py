@@ -97,6 +97,9 @@ def track_login(sender, user, **extra):
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
     if not 'pkg' in session: session['pkg'] = ''
+    # Empty the history file
+    clearHistoryFile()
+    
     knowrob_docker.start_container()
     #sender.logger.info('user logged in')
 
@@ -419,6 +422,11 @@ MAX_HISTORY_LINES = 50
 def getHistoryFile():
   userDir = getUserDir()
   return os.path.join(getUserDir(), "query.history")
+
+def clearHistoryFile():
+  f = open(getHistoryFile(), "w")
+  f.write("")
+  f.close()
 
 @app.route('/add_history_item', methods=['POST'])
 def add_history_item():
