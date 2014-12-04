@@ -40,6 +40,9 @@ def init_app(app, db, extra_config_settings={}):
 
     # Load all views.py files to register @app.routes() with Flask
     from webrob.pages import views
+    from webrob.pages import editor
+    from webrob.pages import log
+    from webrob.pages import login
 
     init_db(app, db)
 
