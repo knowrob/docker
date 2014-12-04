@@ -5,6 +5,8 @@ from flask import Flask, session, url_for, escape, request
 from requests import ConnectionError
 from flask_user import current_user, login_required
 
+from webrob.models.tutorials import TutorialPage
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # DB stuff
 

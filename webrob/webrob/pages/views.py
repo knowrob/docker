@@ -9,6 +9,8 @@ import json
 from urlparse import urlparse
 
 from webrob.app_and_db import app, db
+from webrob.user.knowrob_user import read_tutorial_page
+
 from utility import *
 
 MAX_HISTORY_LINES = 50
