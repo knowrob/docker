@@ -164,6 +164,7 @@
             alert("No package selected.");
             return;
         }
+        save_editor_file_if_changed();
         
         var pl = new JsonProlog(ros, {});
         // Assert package in prolog
