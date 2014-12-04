@@ -69,6 +69,8 @@ def knowrob(exp_id=None):
 def add_history_item():
   query = json.loads(request.data)['query']
   hfile = get_history_file()
+  # Remove newline characters
+  query.replace("\n", " ")
   
   # Read history
   lines = []

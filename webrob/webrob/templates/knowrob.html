@@ -336,6 +336,14 @@
             readOnly: false
         });
         user_query.commands.addCommand({
+            name: 'new_line',
+            bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+            exec: function(editor) {
+                setQueryValue(user_query.getValue()+"\n");
+            },
+            readOnly: false
+        });
+        user_query.commands.addCommand({
             name: 'next_result',
             bindKey: {win: 'Ctrl-;',  mac: 'Command-;'},
             exec: function(editor) {
