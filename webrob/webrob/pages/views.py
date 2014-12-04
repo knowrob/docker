@@ -33,57 +33,6 @@ from webrob.user import knowrob_user
 from urlparse import urlparse
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Knowrob package templates
-    
-PACKAGE_XML_TXT ="""<package>
-  <name>{pkgName}</name>
-  
-  <version>1.0.0</version>
-  
-  <description>{pkgName} user package</description>
-  
-  <maintainer>{userName}</maintainer>
-  
-  <license>GPL</license>
-  
-  <url type="website">http://www.knowrob.org/</url>
-  
-  <author>{userName}</author>
-  
-  <buildtool_depend>catkin</buildtool_depend>
-  
-  <build_depend>knowrob_common</build_depend>
-  
-  <run_depend>knowrob_common</run_depend>
-  
-</package>"""
-
-CMAKE_LIST_TXT ="""cmake_minimum_required(VERSION 2.8.3)
-
-project({pkgName})
-
-find_package(catkin REQUIRED COMPONENTS knowrob_common)
-
-catkin_package(
-    DEPENDS knowrob_common
-)"""
-
-PROLOG_INIT_TXT ="""%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% dependencies
-:- register_ros_package(knowrob_common).
-:- register_ros_package(knowrob_srdl).
-:- register_ros_package(knowrob_cram).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Include source files
-%:- use_module(library('test')).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parse OWL files, register name spaces
-% :- owl_parser:owl_parse('package://{pkgName}/owl/dummy.owl').
-% :- rdf_db:rdf_register_ns(dummy, 'http://knowrob.org/kb/dummy.owl#', [keep(true)])."""
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Web stuff
 
 @user_logged_in.connect_via(app)
@@ -285,44 +234,40 @@ def pkg_new():
     # Create package root directory
     if os.path.exists(pkgPath):
         sys.stderr.write("Package already exists.\n")
-        return None
-    os.makedirs(pkgPath)
+        return jsonify(result=None) # TODO: send error
     
-    session['pkg'] = packageName
+    # Make sure templates are available
+    templatePath = os.path.abspath('webrob/templates/package')
+    if not os.path.exists(templatePath):
+        sys.stderr.write("Package templates missing at " + templatePath + ".\n")
+        return jsonify(result=None) # TODO: send error
     
-    # Create package.xml
-    pkgXml = PACKAGE_XML_TXT.format(
-        pkgName= packageName,
-        userName= session['user_container_name']
-    )
-    pkgXmlFile = os.path.join(pkgPath, 'package.xml')
-    writeTextFile(pkgXmlFile, pkgXml)
-    
-    # Create CMakeList
-    cmakeList = CMAKE_LIST_TXT.format(
-        pkgName= packageName
-    )
-    cmakeListFile = os.path.join(pkgPath, 'CMakeLists.txt')
-    writeTextFile(cmakeListFile, cmakeList)
-    
-    prologDir = os.path.join(pkgPath, 'prolog')
-    # Create prolog/owl directories
-    os.makedirs(prologDir)
-    os.makedirs(os.path.join(pkgPath, 'owl'))
-    
-    # Create prolog init file
-    prologInit = PROLOG_INIT_TXT.format(
-        pkgName= packageName
-    )
-    prologInitFile = os.path.join(prologDir, 'init.pl')
-    writeTextFile(prologInitFile, prologInit)
+    try:
+      os.makedirs(pkgPath)
+      
+      # Copy package template to user_data container while replacing some keywords
+      for root, dirs, files in os.walk(templatePath):
+          for f in files:
+              abs_p = os.path.join(root, f)
+              rel_p = os.path.relpath(abs_p, templatePath)
+              user_p = os.path.join(pkgPath, rel_p)
+              copyTemplateFile(abs_p, user_p, {
+                "pkgName":packageName,
+                "userName":session['user_container_name']
+              })
+    except: # catch *all* exceptions
+        sys.stderr.write(str(sys.exc_info()[0]))
+        pkg_del(packageName)
     
     return jsonify(result=None)
 
 @app.route('/pkg_del', methods=['POST'])
 @login_required
-def pkg_del():
-    shutil.rmtree(os.path.join(getUserDir(), session['pkg']))
+def pkg_del(packageName=None):
+    pkgName = packageName
+    if pkgName==None: pkgName = session['pkg']
+    
+    shutil.rmtree(os.path.join(getUserDir(), pkgName))
     return jsonify(result=None)
 
 @app.route('/pkg_set', methods=['POST'])
@@ -495,6 +440,19 @@ def writeTextFile(path, content):
     f = open(path, "w")
     f.write(content)
     f.close()
+
+def copyTemplateFile(src, dst, args):
+    # Read the template file
+    src_f = open(src, 'r')
+    template = src_f.read()
+    src_f.close()
+    # Create the parent dir in user_data container
+    parent = os.path.dirname(dst)
+    if not os.path.exists(parent):  os.makedirs(parent)
+    # Copy template to user directory while replacing some keywords
+    dst_f = open(dst, 'w')
+    dst_f.write(template % args)
+    dst_f.close()
 
 def getFilePath(fileName):
     path = os.path.join(getUserDir(), session['pkg'])
