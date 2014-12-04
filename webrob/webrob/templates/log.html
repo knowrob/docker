@@ -21,7 +21,7 @@
      * Initially set up editor view.
      **/
     function update_editor() {
-        var edit = ace.edit("editor-full-width");
+        var edit = ace.edit("editor-full-size");
         edit.resize(true);
         edit.setTheme("ace/theme/solarized_light");
         //edit.getSession().setMode("ace/mode/prolog");
@@ -52,11 +52,31 @@
     </div>
   </div>
   
-  <div id="editor-full-width" class="black_border"></div>
+  <div id="editor-full-container">
+    <div id="editor-full-size" class="black_border"></div>
+  </div>
 
   <script>
       // Initialization of widgets on reload
       update_editor();
+  </script>
+  <script>
+      /**
+       * Handle resizing.
+       **/
+      var x = $('#editor-full-size');
+      var edit = ace.edit("editor-full-size");
+      
+      function update_height() {
+        var height = edit.getSession().getDocument().getLength() *
+            edit.renderer.lineHeight + edit.renderer.scrollBar.getWidth();
+        x.css('height', height);
+      }
+      update_height();
+      
+      window.onresize = function(event) {
+        update_height();
+      };
   </script>
   
 {% endblock %}
