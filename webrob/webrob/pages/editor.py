@@ -6,6 +6,8 @@ import os, sys, shutil
 import json
 import zipfile
 
+from urlparse import urlparse
+
 from flask import session, request, render_template, jsonify, send_file
 from flask_user import login_required
 
@@ -18,7 +20,13 @@ from utility import *
 @app.route('/editor')
 @login_required
 def editor(filename=""):
-    return render_template('editor.html')
+    error=""
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    container_name = session['user_container_name']
+    
+    return render_template('editor.html', **locals())
 
 @app.route('/pkg_new', methods=['POST'])
 @login_required

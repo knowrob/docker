@@ -107,6 +107,7 @@ def get_history_item():
     # Clamp index
     if index<0: index=0
     if index>=len(lines): index=len(lines)-1
+    if index<0: return jsonify(item="", index=-1)
     
     item = lines[len(lines)-index-1]
     item = item[:len(item)-1]
@@ -120,8 +121,3 @@ def get_history_item():
 def get_history_file():
   userDir = get_user_dir()
   return os.path.join(get_user_dir(), "query.history")
-
-def clear_query_history():
-  f = open(get_history_file(), "w")
-  f.write("")
-  f.close()

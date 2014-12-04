@@ -13,6 +13,8 @@ def log():
   container_id = session['user_container_name']
   logger = c.logs(container_id, stdout=True, stderr=True, stream=False, timestamps=False)
   
+  # TODO: limit number of lines!
+  # It seems for a long living container the log gets to huge.
   logStr = ""
   for c in logger: logStr += c
   

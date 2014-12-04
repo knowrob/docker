@@ -4,13 +4,38 @@
 
 {% block head %}
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/json_prolog.js') }}"></script>
 
   <script type="text/javascript">
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    // global ROS handle
+    var ros;
     
     var activeFile;
     var ignoreChanges = false;
     var hasChanges = false;
+
+    //global jsonprolog handle
+    var prolog;
+
+    function init() {
+      // Connect to ROS.
+      ros = new ROSLIB.Ros({
+        url : 'ws://{{ host_url }}/ws/{{ container_name }}/'
+      });
+      
+      // 'change' event is triggered whenever the editor content changes
+      ace.edit("editor").getSession().on('change', on_editor_changed);
+      
+      // Initialization of widgets on reload
+      update_editor();
+      update_pkg_list(true);
+    }
     
     ////////////////////////////////
     /////////// Editor view
@@ -131,6 +156,18 @@
                 }
             }).done( function (request) {})
         }
+    }
+    
+    function consult_pkg() {
+        var pkg = get_active_pkg();
+        if(!pkg) {
+            alert("No package selected.");
+            return;
+        }
+        
+        var pl = new JsonProlog(ros, {});
+        // Assert package in prolog
+        pl.jsonQuery("(ros_package_initialized("+pkg+"), make) ; register_ros_package("+pkg+")", function(x) {});
     }
     
     /**
@@ -483,7 +520,8 @@
       <a onclick="new_pkg();" class="menu_link">New Package</a> &nbsp;&nbsp;
       <a onclick="upload_pkg();" class="menu_link">Upload Package</a> &nbsp;&nbsp;
       <a onclick="download_pkg();" class="menu_link">Download Package</a> &nbsp;&nbsp;
-      <a onclick="delete_pkg();" class="menu_link">Delete Package</a> 
+      <a onclick="delete_pkg();" class="menu_link">Delete Package</a> &nbsp;&nbsp;
+      <a onclick="consult_pkg();" class="menu_link">Consult Package</a> 
     </div>
     <div class="metanav_right">
       <a onclick="new_file();" class="menu_link">New File</a> &nbsp;&nbsp;
@@ -510,13 +548,7 @@
   <div id="editor" class="black_border"></div>
 
   <script>
-      // 'change' event is triggered whenever the editor content changes
-      ace.edit("editor").getSession().on('change', on_editor_changed);
-      // Initialization of widgets on reload
-      update_editor();
-      update_pkg_list(true);
-  </script>
-  <script>
+      init();
       /**
        * Handle resizing. The user is allowed to drag $('#handle') in order to resize
        * $('#left') and $('#editor').

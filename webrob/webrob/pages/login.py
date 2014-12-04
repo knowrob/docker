@@ -9,7 +9,6 @@ from flask_user import current_user
 from webrob.app_and_db import app
 from webrob.docker import knowrob_docker
 
-from views import clear_query_history
 from utility import generate_mac
 
 @user_logged_in.connect_via(app)
@@ -23,8 +22,6 @@ def track_login(sender, user, **extra):
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
     if not 'pkg' in session: session['pkg'] = ''
-    # Empty the history file
-    clear_query_history()
     
     knowrob_docker.start_container()
     #sender.logger.info('user logged in')
