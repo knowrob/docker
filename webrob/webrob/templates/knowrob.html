@@ -183,7 +183,7 @@
         prolog.jsonQuery(q, function(result) {
             history.setValue(history.getValue() + result, -1);
             history.navigateFileEnd();
-        });
+        }, mode=1);
         
         query.setValue("");
         
