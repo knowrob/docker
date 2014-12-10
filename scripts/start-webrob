@@ -124,7 +124,7 @@ if [ "$RUNNING" == 'true' ]; then # container exists, and is running
   echo "Web app container is running, stopping and removing it..."
   docker stop webrob && docker rm webrob
 elif [ "$RUNNING" == 'false' ]; then # container exist
-  echo "Web app container is exists, removing it..."
+  echo "Web app container exists, removing it..."
   docker rm webrob
 fi
 
