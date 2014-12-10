@@ -36,13 +36,13 @@ def pkg_new():
     
     # Create package root directory
     if os.path.exists(pkgPath):
-        app.logger.warning("Package already exists.\n")
+        app.logger.warning("Package already exists.")
         return jsonify(result=None)
     
     # Make sure templates are available
     templatePath = os.path.abspath('webrob/templates/package')
     if not os.path.exists(templatePath):
-        app.logger.warning("Package templates missing at " + templatePath + ".\n")
+        app.logger.warning("Package templates missing at " + templatePath + ".")
         return jsonify(result=None)
     
     try:

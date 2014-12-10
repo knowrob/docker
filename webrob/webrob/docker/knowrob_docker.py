@@ -1,10 +1,12 @@
 import docker
 import os.path
+import traceback
 from docker.errors import *
 
 from flask import Flask, session, url_for, escape, request, flash
 from requests import ConnectionError
 from flask_user import current_user, login_required
+from webrob.app_and_db import app
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -34,7 +36,9 @@ def docker_connect():
 def start_container():
 
     try:
+        app.logger.info("Connecting to docker...")
         c = docker_connect()
+        app.logger.info("Connected to docker.")
 
         if(c is not None):
 
@@ -59,7 +63,7 @@ def start_container():
 
             # Create containers if they do not exist yet
             if not user_cont_exists:
-                print('Creating container for ' + current_user.username)
+                app.logger.info("Creating container for " + current_user.username)
                 env = {}
                 env["VIRTUAL_HOST"] = session['user_container_name']
                 env["VIRTUAL_PORT"] = '9090'  # for nginx reverse proxy
@@ -76,23 +80,28 @@ def start_container():
                                     name=session['user_container_name'])
 
             if not user_data_cont_exists:
+                app.logger.info("Creating user_data container.")
                 c.create_container('knowrob/user_data', detach=True, tty=True, name=session['user_data_container_name'], entrypoint='true')
                 c.start(session['user_data_container_name'])
 
             if not common_data_exists:
+                app.logger.info("Creating knowrob_data container.")
                 c.create_container('knowrob/knowrob_data', detach=True, name=session['common_data_container_name'], entrypoint='true')
                 c.start(name=session['common_data_container_name'])
 
             if not mongo_cont_exists:
+                app.logger.info("Creating mongo container.")
                 c.create_container('busybox', detach=True, name='mongo_data', volumes=['/data/db'], entrypoint='true')
                 c.create_container('mongo',   detach=True,ports=[27017], name='mongo_db')
                 c.start('mongo', port_bindings={27017:27017}, volumes_from=['mongo_data'])
 
+            app.logger.info("Starting user container for " + current_user.username)
             current_user.container_id = c.start(session['user_container_name'],
                                                    publish_all_ports=True,
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
-                                                                 session['common_data_container_name']])
+								 session['common_data_container_name']])
+            
             # create home directory if it does not exist yet
             if not os.path.exists(session['user_home_dir']):
                 os.makedirs(session['user_home_dir'])
@@ -103,9 +112,13 @@ def start_container():
             flash("Name conflict: Container for this user already exists")
         else:
             flash(e.message)
+        app.logger.error("APIError:" + str(e.message) + "\n")
+        traceback.print_exc()
         return None
-    except ConnectionError:
+    except ConnectionError, e:
         flash("Error: Connection to your KnowRob instance failed.")
+        app.logger.error("ConnectionError:" + str(e.message) + "\n")
+        traceback.print_exc()
         return None
 
 def stop_container():
@@ -125,10 +138,10 @@ def stop_container():
 
             if user_cont_exists:
 
-                print("Stopping container " + session['user_container_name'] + "...\n")
+                app.logger.info("Stopping container " + session['user_container_name'] + "...\n")
                 c.stop(session['user_container_name'], timeout=5)
 
-                print("Removing container " + session['user_container_name'] + "...\n")
+                app.logger.info("Removing container " + session['user_container_name'] + "...\n")
                 c.remove_container(session['user_container_name'])
 
 
@@ -136,5 +149,7 @@ def stop_container():
 
     except ConnectionError:
         flash("Error: Connection to your KnowRob instance failed.")
+        app.logger.error("ConnectionError:" + str(e.message) + "\n")
+        traceback.print_exc()
         return None
 

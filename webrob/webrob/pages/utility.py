@@ -5,11 +5,12 @@
 import os, random, string, time, hashlib
 
 from flask import session, request
+from webrob.app_and_db import app
 
 def get_user_dir():
     userDir = "/home/ros/user_data/" + session['user_container_name']
     if not os.path.exists(userDir):
-        print("Creating user directory at " + userDir)
+        app.logger.info("Creating user directory at " + userDir)
         os.makedirs(userDir)
     return userDir
 
