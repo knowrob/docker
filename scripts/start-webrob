@@ -86,7 +86,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" postgres_db 2>/dev/null
 
 if [ $? -eq 1 ]; then # container does not exist
   echo "No Postgres container exists, creating a new one..."
-  docker run -d --volumes-from user_db --name postgres_db knowrob/postgres
+  docker run -d -e "POSTGRES_USER=docker" --volumes-from user_db --name postgres_db knowrob/postgres
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
