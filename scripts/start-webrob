@@ -116,7 +116,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
 
 if [ "$RUNNING" == 'true' ]; then # container exists, and is running
   echo "Web app container is running, stopping it..."
-  docker stop webrob
+  docker stop webrob && docker rm webrob
 fi
 
 echo "Creating web app container..."
