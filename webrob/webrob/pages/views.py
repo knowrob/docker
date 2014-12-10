@@ -66,6 +66,25 @@ def knowrob(exp_id=None):
 
     return render_template('knowrob_simple.html', **locals())
 
+@app.route('/exp_list', methods=['POST'])
+@login_required
+def exp_list():
+    expList = []
+    exp_file = None
+    if 'exp' in session:
+        exp_file = session['exp']
+    for f in os.listdir(os.path.join(app.root_path, "static")):
+        if f.endswith(".json") and f.startswith("queries-"):
+            expList.append( f[len("queries-"):len(f)-len(".json")] )
+    return jsonify(result=expList, selection=exp_file)
+
+@app.route('/exp_set', methods=['POST'])
+@login_required
+def exp_set():
+    expName = json.loads(request.data)['experimentName']
+    session['exp'] = expName
+    return jsonify(result=None)
+
 @app.route('/add_history_item', methods=['POST'])
 @login_required
 def add_history_item():

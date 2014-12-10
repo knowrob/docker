@@ -23,6 +23,11 @@
       <a href="{{ url_for('knowrob') }}" id="loading">Knowledge Base</a> &nbsp;&nbsp;
       <a href="{{ url_for('editor') }}" id="loading">Editor</a> &nbsp;&nbsp;
       <a href="{{ url_for('log') }}" id="loading">Log</a> &nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span style="color: #606060;">Experiment:</span>&nbsp;
+      <select class='expSelect' id="exp-selection"></select> &nbsp;&nbsp;
+      
+<!--      <a onClick="select_experiment()" id="loading">Experiment</a> &nbsp;&nbsp; -->
 <!--       <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp; -->
 <!--       <a href="{{ url_for('tutorials') }}">Tutorials</a> -->
     </div>
@@ -53,7 +58,42 @@
 
 
   {% block spinner %}{% endblock %}
-
+  
+  <script type="text/javascript">
+      // Request available experiments
+      $.ajax({
+          url: "/exp_list",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({}),  
+          dataType: "json",
+          success: function (data) {
+              $.each(data.result, function(j, experiment) {
+                  document.getElementById("exp-selection").options.add(new Option(experiment,experiment));
+                  if(experiment === data.selection) {
+                      document.getElementById("exp-selection").selectedIndex = j;
+                  }
+              });
+            }
+      }).done( function (request) {})
+      
+      $(document).ready(function() {
+          $("#exp-selection").change(function() {
+              $.ajax({
+                 url: "/exp_set",
+                 type: "POST",
+                 contentType: "application/json",
+                 data: JSON.stringify({
+                     experimentName: $("#exp-selection option:selected").val()
+                 }),
+                 dataType: "json",
+                 success: function (data) {
+                     window.location.reload();
+                 }
+               }).done( function (request) {});
+          });
+      });
+  </script>
 
 </body>
 </html>

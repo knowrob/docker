@@ -1335,6 +1335,14 @@ div.show_code  { margin-top:-15px; margin-left:20px; margin-bottom:20px; }
     width:100%;
 }
 
+.expSelect {
+    background: transparent;
+    border:none;
+    height: 25px;
+    width: 120px;
+    margin-top: -5px;
+}
+
 #left{
     background: #fcfcfc;
     padding: 7px 7px;
@@ -1378,3 +1386,4 @@ div.show_code  { margin-top:-15px; margin-left:20px; margin-bottom:20px; }
     font-size:16px;
     border: 0 none;
 }
+
