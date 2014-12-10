@@ -117,7 +117,7 @@ def start_container():
         return None
     except ConnectionError, e:
         flash("Error: Connection to your KnowRob instance failed.")
-        app.logger.error("ConnectionError:" + str(e.message) + "\n")
+        app.logger.error("ConnectionError during connect:" + str(e.message) + "\n")
         traceback.print_exc()
         return None
 
@@ -147,9 +147,9 @@ def stop_container():
 
             session.pop('user_container_name')
 
-    except ConnectionError:
+    except ConnectionError, e:
         flash("Error: Connection to your KnowRob instance failed.")
-        app.logger.error("ConnectionError:" + str(e.message) + "\n")
+        app.logger.error("ConnectionError during disconnect:" + str(e.message) + "\n")
         traceback.print_exc()
         return None
 
