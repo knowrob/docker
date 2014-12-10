@@ -7,7 +7,6 @@ ENV HOME /home/ros
 
 
 # install helper packages for ROS
-
 RUN apt-get -y update
 RUN apt-get -y install python-yaml python-catkin-pkg python-rospkg emacs swi-prolog-java ros-hydro-catkin
 RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server ros-hydro-pr2-description
@@ -42,10 +41,10 @@ RUN echo "Cloning repositories..."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 
 # dummy 'add' command to always check out the repositories
-ADD ./Dockerfile /home/ros/src/
+#ADD ./Dockerfile /
 RUN git clone --recursive https://github.com/knowrob/knowrob.git -b indigo-devel
 RUN git clone --recursive https://github.com/knowrob/knowrob_addons.git -b indigo-devel
-RUN git clone --recursive https://github.com/code-iai/knowrob_dev.git -b indigo-devel
+RUN git clone --recursive https://github.com/code-iai/knowrob_dev.git
 RUN git clone https://github.com/code-iai/iai_maps.git
 RUN git clone https://github.com/code-iai/iai_common_msgs.git
 RUN git clone https://github.com/code-iai/iai_cad_tools.git
