@@ -1,0 +1,54 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "load_experiment('/home/ros/knowrob_data/logs/chemlab/dna_extraction_0/cram_log.owl').",
+            "text": "Load DNA Extraction Logs from 'knowrob_data' library"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the semantic map -----"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
+            "text": "Visualize semantic map"
+        },
+        {
+            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
+            "text": "What is the storage place for perishable items?"
+        },
+        {
+            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice'), highlight_object_with_children(Obj).",
+            "text": "Which are electrical devices?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the robot's logged belief state -----"
+        },
+        {
+            "q": "owl_parse('package://knowrob_srdl/owl/PR2.owl').",
+            "text": "Load PR2 robot model"
+        },
+        {   "q": "task(T), task_goal(T, 'GOAL-DUAL-ARM-MOVED-AT-LOCATIONS'), task_start(T, S), task_end(~
+            "text": "Display the trajectory of r_gripper_tool_frame ..."
+        },
+        {   "q": "task(T), task_goal(T, 'GOAL-SINGULAR-ARM-MOVED-AT-LOCATION'), task_start(T, S), task_~
+            "text": "Display the trajectory of l_gripper_tool_frame ..."
+        }
+    ]
+}
