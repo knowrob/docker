@@ -181,27 +181,23 @@
     };
 
     function queryProlog(query) {
-    
       var history = ace.edit("history");
       var q = query.getValue().trim();
     
       if (q.substr(q.length - 1) == ".") {
         q = q.substr(0, q.length - 1);
-
-        if (prolog != null && prolog.finished == false) {
-          prolog.finishClient();
-        }
-
-        prolog = new JsonProlog(ros, {});
-
         
         history.setValue(history.getValue() + "\n\n?- " + q +  ".\n", -1);
         history.navigateFileEnd();
-
+        
+        if (prolog != null && prolog.finished == false) {
+          prolog.finishClient();
+        }
+        prolog = new JsonProlog(ros, {});
         prolog.jsonQuery(q, function(result) {
-            history.setValue(history.getValue() + result, -1);
+            history.setValue(history.getValue() + prolog.format(result), -1);
             history.navigateFileEnd();
-        }, mode=1);
+        }, mode=1); // incremental mode
         
         query.setValue("");
         
@@ -216,13 +212,11 @@
     };
 
     function nextQueryProlog() {
-    
       var history = ace.edit("history");
       prolog.nextQuery(function(result) {
-            history.setValue(history.getValue() + result, -1);
+            history.setValue(history.getValue() + prolog.format(result), -1);
             history.navigateFileEnd();
-        });
-
+      });
       user_query.focus();
     };
 
@@ -405,16 +399,17 @@
         
         // Query for predicates/modules and collect all results
         pl.jsonQuery("findall(X, current_predicate(X/_);current_module(X), L)", function(x) {
-          // Parse each value
-          var lines = x.split("\n");
-          for(i=1; i<lines.length-1; ++i) {
-            var tmp = lines[i].split(" = ");
-            if(tmp.length==2) {
-              prologNames.push(tmp[1].trim());
+          if (x.value) {
+            // Parse each value
+            var lines = x.value.split("\n");
+            for(i=1; i<lines.length-1; ++i) {
+              var tmp = lines[i].split(" = ");
+              if(tmp.length==2) {
+                prologNames.push(tmp[1].trim());
+              }
             }
+            prologNames.sort();
           }
-          
-          prologNames.sort();
         });
     }
     
