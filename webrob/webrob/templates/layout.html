@@ -6,13 +6,16 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='screen.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='overlay/iosOverlay.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='overlay/prettify.css') }}"/>
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='user.css') }}"/>
 
   <script type="text/javascript" src="{{ url_for('static', filename='overlay/iosOverlay.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='overlay/spin.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='overlay/prettify.js') }}"></script>
   
   <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
   {% block head %}{% endblock %}
 </head>
 
@@ -20,46 +23,62 @@
 <body{% block bodyargs %}{% endblock %}>
   <div class="metanav">
     <div class="metanav_left">
-      <a href="{{ url_for('knowrob') }}" id="loading">Knowledge Base</a> &nbsp;&nbsp;
-      <a href="{{ url_for('editor') }}" id="loading">Editor</a> &nbsp;&nbsp;
-      <a href="{{ url_for('log') }}" id="loading">Log</a> &nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="color: #606060;">Experiment:</span>&nbsp;
-      <select class='expSelect' id="exp-selection"></select> &nbsp;&nbsp;
-      
-<!--      <a onClick="select_experiment()" id="loading">Experiment</a> &nbsp;&nbsp; -->
-<!--       <a href="{{ url_for('knowrob') }}">Log Data Analysis</a> &nbsp;&nbsp; -->
-<!--       <a href="{{ url_for('tutorials') }}">Tutorials</a> -->
+      <ul class="menu">
+        <li><a href="{{ url_for('knowrob') }}" style="padding-left: 0px;">Knowledge Base</a></li>
+        <li><a href="{{ url_for('editor') }}">Editor</a></li>
+        {% block menu %}{% endblock %}
+        <li><a>Help</a><ul>
+          <li><a href="{{ url_for('log') }}">Log</a></li>
+        </ul></li>
+      </ul>
     </div>
     <div class="metanav_right">
       {% if not current_user.is_authenticated() %}
 	<a href="{{ url_for('user.login') }}">log in</a>
       {% else %}
-	Logged in as <a href="{{ url_for('show_user_data') }}">{{ current_user.username }}</a> &nbsp;
-	<a href="{{ url_for('user.logout') }}">log out</a>
+        <ul class="menu" style="float: right;">
+          <li><a id="exp-value">Experiment</a><ul id="exp-menu"></ul></li>
+          <li><a href="{{ url_for('user.logout') }}">Logout {{ current_user.username }}</a></li>
+        </ul>
       {% endif %}
     </div>
   </div>
   
-  <div id="layout_placeholder" style="padding-left:15px;">
-
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-  {% endwith %}
-
-  {% block content %}{% endblock %}
+  <div class="container" id="container" style="padding-left:15px; margin-top: 9px;">
+    {% block content %}{% endblock %}
+  
+    <div class="pane ui-layout-south">
+      {% with messages = get_flashed_messages() %}
+	{% if messages %}
+	    <ul class=flashes>
+	    {% for message in messages %}
+	      <li>{{ message }}</li>
+	    {% endfor %}
+	    </ul>
+	{% endif %}
+      {% endwith %}
+    </div>
   </div>
-
 
   {% block spinner %}{% endblock %}
   
   <script type="text/javascript">
+    function set_exp(exp) {
+      $.ajax({
+         url: "/exp_set",
+         type: "POST",
+         contentType: "application/json",
+         data: JSON.stringify({
+             experimentName: exp
+         }),
+         dataType: "json",
+         success: function (data) {
+             window.location.reload();
+         }
+       }).done( function (request) {});
+    }
+      
+    $(document).ready(function () {
       // Request available experiments
       $.ajax({
           url: "/exp_list",
@@ -68,31 +87,22 @@
           data: JSON.stringify({}),  
           dataType: "json",
           success: function (data) {
-              $.each(data.result, function(j, experiment) {
-                  document.getElementById("exp-selection").options.add(new Option(experiment,experiment));
-                  if(experiment === data.selection) {
-                      document.getElementById("exp-selection").selectedIndex = j;
-                  }
+              $('#exp-menu').empty();
+              $.each(data.result, function(j, exp) {
+                  var li = document.createElement("li");
+                  var item = document.createElement("a");
+                  item.href = "#";
+                  item.onclick = function() { set_exp(exp); };
+                  item.appendChild(document.createTextNode(exp));
+                  li.appendChild(item);
+                  document.getElementById("exp-menu").appendChild(li);
               });
+              if(data.selection) {
+                document.getElementById("exp-value").innerHTML = data.selection;
+              }
             }
       }).done( function (request) {})
-      
-      $(document).ready(function() {
-          $("#exp-selection").change(function() {
-              $.ajax({
-                 url: "/exp_set",
-                 type: "POST",
-                 contentType: "application/json",
-                 data: JSON.stringify({
-                     experimentName: $("#exp-selection option:selected").val()
-                 }),
-                 dataType: "json",
-                 success: function (data) {
-                     window.location.reload();
-                 }
-               }).done( function (request) {});
-          });
-      });
+    });
   </script>
 
 </body>

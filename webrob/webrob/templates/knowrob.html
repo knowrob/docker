@@ -72,16 +72,32 @@
 
     //global jsonprolog handle
     var prolog;
+    
+    // the 3d canvas
+    var ros_viewer;
+    
+    function get_ros_viewer() {
+      return ros_viewer;
+    }
+    
+    function resize_canvas() {
+      var w = $('#markers').width()-8.0;
+      var h = $('#markers').height()-8.0;
+      var viewer = get_ros_viewer();
+      
+      viewer.renderer.setSize(w, h);
+      viewer.camera.aspect = w/h;
+      viewer.camera.updateProjectionMatrix();
+    }
 
     function init() {
-
       // Connect to ROS.
       ros = new ROSLIB.Ros({
         url : 'ws://{{ host_url }}/ws/{{ container_name }}/'
       });
 
       // Create the main viewer.
-      var viewer = new ROS3D.Viewer({
+      ros_viewer = new ROS3D.Viewer({
         divID : 'markers',
         width : 820,
         height : 460,
@@ -89,7 +105,7 @@
         background : '#ffffff'
       });
 
-      viewer.addObject(new ROS3D.Grid());
+      ros_viewer.addObject(new ROS3D.Grid());
       
       // Setup publisher that sends a dummy message in order to keep alive the socket connection
       new KeepAlivePublisher({
@@ -111,7 +127,7 @@
         ros : ros,
         tfClient : tfClient,
         topic : '/visualization_marker',
-        rootObject : viewer.scene
+        rootObject : ros_viewer.scene
       });
 
       // Setup the marker array client.
@@ -119,7 +135,7 @@
         ros : ros,
         tfClient : tfClient,
         topic : '/visualization_marker_array',
-        rootObject : viewer.scene,
+        rootObject : ros_viewer.scene,
         markerClient : markerClient
       });
 
@@ -140,7 +156,7 @@
       });
 
       img_listener.subscribe(function(message) {
-        document.getElementById("mjpeg").innerHTML='<img src="/'+message.data+'" width="300" height="240"/>';
+        document.getElementById("mjpeg").innerHTML='<img class="picture" src="/'+message.data+'" width="300" height="240"/>';
       });
       
       var options = {
@@ -151,6 +167,8 @@
         //height: 500//210
       };
       var dataVisClient = new DataVisClient(options);
+      
+      resize_canvas();
       
       // fill example query select
       populateQuerySelect('examplequery', "{% if exp_query_file
@@ -273,6 +291,7 @@
 
     // set the value of the query editor and move the cursor to the end
     function setQueryValue(val){
+      var user_query = ace.edit("user_query");
       user_query.setValue(val, -1);
       user_query.focus();
       user_query.navigateFileEnd();

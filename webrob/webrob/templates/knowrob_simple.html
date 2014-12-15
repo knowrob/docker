@@ -2,35 +2,90 @@
 
 
 {% block content %}
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <script type="text/javascript">
 
-  <div id="content">
-	<div id="block0">
-		<div id="console" class="black_border" style="position:absolute; top:50px; width:495px; height:460px;">
-			<div id="history" style="position:relative; top:0px; height:330px; padding:5px;"></div>
-			<script>
-			var history = setupHistoryField();
-			</script>
+    $(document).ready(function () {
+      var history = setupHistoryField();
+      var user_query = setupQueryField();
+      $('#container').layout({
+        south: {
+          minSize: 75
+        },
+        west: {
+          minSize: 250,
+          maxSize: 750,
+          size: 500,
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#console",
+              onresize: function() {
+                ace.edit("history").resize(true);
+                ace.edit("user_query").resize(true);
+              },
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#library",
+              minSize: 250
+            }
+          }
+        },
+        center: {
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#markers",
+              onresize: resize_canvas,
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#chart",
+              minSize: 250
+            }
+          }
+        },
+        east: {
+          minSize: 250,
+          maxSize: 750,
+          size: 500,
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#designator",
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#mjpeg",
+              minSize: 250
+            }
+          }
+        }
+      });
+    });
+  </script>
 
-			<div id="user_query" style="position:relative; top:0px; height:115px; border-top:1px solid black;">member(A, [a,b,c]).</div>
-			<script>
-			var user_query = setupQueryField();
-			</script>
-		</div>
-		
-		<div id="markers" class="black_border" style="position:absolute; left:520px; top:50px; width:820px; height:460px;"></div>
-		
-		<div id="designator" style="position:absolute; left:1350px; top:50px; width:400px; height:544px; border: 1px black solid; position:absolute; overflow:auto;"></div>
-	</div>
-	
-	<div id="block1">
-		<div id="library" class="black_border" style="position:absolute;  top:520px; width:495px; height:324px;">
-			<select onclick="addSelectedToQueryform('examplequery')" class="code" size="20" name="examplequery" id="examplequery" style="width:495px; border:none;"><option value=0></option></select>
-		</div>
-		
-		<div id="chart" class="black_border" style="position:absolute; left:520px; top:520px; width:820px; height:324px;"></div>
-		
-		<div id="mjpeg" style="position:absolute; left:1350px; top:604px; width:400px; height:240px; border: 1px black solid; text-align:center;"></div>
-	</div>
+  <div class="ui-layout-center" id="editor-container">
+    <div id="markers"></div>
+    <div id="chart"></div>	
+  </div>
+
+  <div class="ui-layout-west">
+    <div id="console">
+      <div id="history"></div>
+      <div id="user_query">member(A, [a,b,c]).</div>
+    </div>
+    <div id="library">
+      <select onclick="addSelectedToQueryform('examplequery')" 
+        size="20" name="examplequery" id="examplequery"><option value=0></option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="ui-layout-east">
+    <div id="designator"></div>
+    <div id="mjpeg"></div>
   </div>
   
 {% endblock %}

@@ -24,16 +24,16 @@
 html,
 body {
     padding: 0;
+    margin: 0;
     color: __text__;
+    height: 100%;
 }
 html {
-    margin: 0;
     overflow-x: hidden;
 /*     overflow-y: scroll; */
     background-color: transparent;
 }
 body {
-    margin: 0 auto;
     font: normal 100%/1.4em 'Open Sans',Arial,Helvetica,sans-serif;
     /* same font stack should be used for ".dokuwiki div.toc" */
 }
@@ -1292,7 +1292,6 @@ div.div5 {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 .metanav       { height: 25px; font-size: 0.8em; padding: 5px 15px ; margin-bottom: 1em; background: #dadada; }
-.metanav_b     { height: 25px; font-size: 0.8em; padding: 5px 15px ; margin-bottom: 1em; background: #c9c9c9; }
 .metanav_left  { float: left; text-align: left;  }
 .metanav_right { float: right; text-align: right;  }
 .flash         { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
@@ -1318,72 +1317,3 @@ div.show_code  { margin-top:-15px; margin-left:20px; margin-bottom:20px; }
     background-image: url(images/directory.png);
     background-repeat: no-repeat;
 }
-
-.pkgSelect {
-    background: #dadada;
-    padding: 7px 7px;
-    border: 0 none;
-    color: #494d53;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3); 
-    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    -moz-box-shadow: , 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    -webkit-background-clip: padding-box;
-    width:100%;
-}
-
-.expSelect {
-    background: transparent;
-    border:none;
-    height: 25px;
-    width: 120px;
-    margin-top: -5px;
-}
-
-#left{
-    background: #fcfcfc;
-    padding: 7px 7px;
-    border: 0 none;
-    color: #6a6f75;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3); 
-    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    -moz-box-shadow: , 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-    -webkit-background-clip: padding-box;
-    width:20%;
-    height:93vh;
-    float:left;
-}
-
-#handle{
-    background:#c9c9c9;
-    float:left;
-    height:93vh;
-    width:8px;
-    margin-left:4px;
-}
-
-#editor{
-    width:78.5%;
-    height:93vh;
-    float:left;
-    border-color:#c9c9c9;
-    font-size:16px;
-}
-
-#editor-full-container{
-    margin-left:-15px;
-    margin-top:-18px;
-}
-#editor-full-size{
-    width:100%;
-    font-size:16px;
-    border: 0 none;
-}
-
