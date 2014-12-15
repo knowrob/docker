@@ -44,10 +44,10 @@
             "q": "owl_parse('package://knowrob_srdl/owl/PR2.owl').",
             "text": "Load PR2 robot model"
         },
-        {   "q": "task(T), task_goal(T, 'GOAL-DUAL-ARM-MOVED-AT-LOCATIONS'), task_start(T, S), task_end(~
+        {   "q": "task(T), task_goal(T, 'GOAL-DUAL-ARM-MOVED-AT-LOCATIONS'), task_start(T, S), task_end(T, E), add_trajectory('/r_gripper_tool_frame', S, E, 0.2).",
             "text": "Display the trajectory of r_gripper_tool_frame ..."
         },
-        {   "q": "task(T), task_goal(T, 'GOAL-SINGULAR-ARM-MOVED-AT-LOCATION'), task_start(T, S), task_~
+        {   "q": "task(T), task_goal(T, 'GOAL-SINGULAR-ARM-MOVED-AT-LOCATION'), task_start(T, S), task_end(T, E), add_trajectory('/l_gripper_tool_frame', S, E, 0.2).",
             "text": "Display the trajectory of l_gripper_tool_frame ..."
         }
     ]
