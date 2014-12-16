@@ -100,7 +100,7 @@ def start_container():
                                                    publish_all_ports=True,
                                                    links={('mongo_db', 'mongo')},
                                                    volumes_from=[session['user_data_container_name'],
-								 session['common_data_container_name']])
+                                                   session['common_data_container_name']])
             
             # create home directory if it does not exist yet
             if not os.path.exists(session['user_home_dir']):

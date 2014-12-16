@@ -37,7 +37,7 @@
 	<a href="{{ url_for('user.login') }}">log in</a>
       {% else %}
         <ul class="menu" style="float: right;">
-          <li><a id="exp-value">Experiment</a><ul id="exp-menu"></ul></li>
+          <li><a id="exp-value">Experiment</a><ul id="exp-menu" style="min-width: 180px;"></ul></li>
           <li><a href="{{ url_for('user.logout') }}">Logout {{ current_user.username }}</a></li>
         </ul>
       {% endif %}
