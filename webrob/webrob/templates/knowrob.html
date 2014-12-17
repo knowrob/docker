@@ -64,7 +64,6 @@
     var knowrob;
     
     $(document).ready(function () {
-    console.log("initKnowrob");
       // The file that contains example queries
       var libraryFile = "{% if exp_query_file
           %}{{ url_for('static', filename=exp_query_file) }}{%
@@ -77,7 +76,6 @@
           library_file: libraryFile
       });
       knowrob.init();
-    console.log("initKnowrob done");
     });
   </script>
 {% endblock %}
