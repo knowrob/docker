@@ -6,8 +6,7 @@
   <script type="text/javascript">
 
     $(document).ready(function () {
-      var history = setupHistoryField();
-      var user_query = setupQueryField();
+    console.log("document ready");
       $('#container').layout({
         south: {
           minSize: 75
@@ -37,7 +36,9 @@
           childOptions: {
             center: {
               paneSelector: "#markers",
-              onresize: resize_canvas,
+              onresize: function() {
+               if( knowrob ) knowrob.resize_canvas();
+              },
               minSize: 250
             },
             south: {
@@ -77,7 +78,7 @@
       <div id="user_query">member(A, [a,b,c]).</div>
     </div>
     <div id="library">
-      <select onclick="addSelectedToQueryform('examplequery')" 
+      <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
         size="20" name="examplequery" id="examplequery"><option value=0></option>
       </select>
     </div>
