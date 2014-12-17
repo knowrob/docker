@@ -37,11 +37,11 @@
             "text": "Which instances of Cups being lifted are available?"
         },
         {
-            "q": "findall(StartTime, simlift_liftonly(Exp,knowrob:'Cup',StartTime,EndTime), Starts), findall(EndTime, simlift_liftonly(Exp,knowrob:'Cup',StartTime,EndTime), Ends), add_avg_trajectory('Cup', Starts, Ends, 10, 1).",
+            "q": "findall(StartTime, simlift_liftonly(Exp,knowrob:'Cup',StartTime,EndTime), Starts), findall(EndTime, simlift_liftonly(Exp,knowrob:'Cup',StartTime,EndTime), Ends), add_avg_trajectory('Cup', Starts, Ends, 20, 1).",
             "text": "Show the average trajectory of Cups being lifted for all available experiments"
         },
         {
-            "q": "nb_setval(counter,0x0000ff), simlift_liftonly(Exp, knowrob:'Cup', Start, End), add_count(0x404000), add_trajectory('Cup', Start, End, 0.5,3), nb_getval(counter,Val), highlight_trajectory('Cup', Start, End, Val).",
+            "q": "nb_setval(counter,0x0000ff), simlift_liftonly(Exp, knowrob:'Cup', Start, End), add_count(0x404000), add_trajectory('Cup', Start, End, 0.2,3), nb_getval(counter,Val), highlight_trajectory('Cup', Start, End, Val).",
             "text": "Show the individual trajectories of Cups being lifted for all available experiments"
         },
         {
@@ -49,7 +49,7 @@
             "text": "In which experiments did flipping occur?"
         },
         {
-            "q": "simflipping('Pancake1', Object,Tool,Target,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.5,3).",
+            "q": "simflipping('Pancake1', Object,Tool,Target,ToolGrasped, ToolContactObject, ObjectLifted, ObjectFlipped, ToolReleased), add_trajectory('Spatula', ToolGrasped, ToolReleased, 0.2,3).",
             "text": "Show the trajectory of the Spatula for the flipping interval during experiment 1"
         },
         {
