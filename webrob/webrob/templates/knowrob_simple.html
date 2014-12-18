@@ -26,7 +26,7 @@
             },
             south: {
               paneSelector: "#library",
-              minSize: 250
+              minSize: 150
             }
           }
         },
@@ -42,7 +42,8 @@
             },
             south: {
               paneSelector: "#chart",
-              minSize: 250
+              initClosed: true,
+              minSize: 150
             }
           }
         },
@@ -50,6 +51,7 @@
           minSize: 250,
           maxSize: 750,
           size: 500,
+          initClosed: true,
           // INNER-LAYOUT
           childOptions: {
             center: {
@@ -58,7 +60,7 @@
             },
             south: {
               paneSelector: "#mjpeg",
-              minSize: 250
+              minSize: 150
             }
           }
         }
