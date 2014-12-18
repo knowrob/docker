@@ -63,6 +63,7 @@
           }
         }
       });
+      knowrob.resize_canvas();
     });
   </script>
 
@@ -73,8 +74,18 @@
 
   <div class="ui-layout-west">
     <div id="console">
-      <div id="history"></div>
-      <div id="user_query">member(A, [a,b,c]).</div>
+      <div id="console_top">
+        <div id="history"></div>
+        <div id="user_query">member(A, [a,b,c]).</div>
+      </div>
+      <div id="console_bottom">
+        <div id="query_buttons">
+          <ul class="query_button_group">
+            <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
+            <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div id="library">
       <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
