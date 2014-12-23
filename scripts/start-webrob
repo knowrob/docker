@@ -103,7 +103,7 @@ if [ $? -eq 1 ]; then # container does not exist
 fi
 
 if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
-  echo "Postgres container exists, starting it..."
+  echo "Dockerbridge container exists, starting it..."
   docker start dockerbridge
 fi
 

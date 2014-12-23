@@ -5,7 +5,7 @@ MAINTAINER Moritz Tenorth, moritz@tenorth.de
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc ros-hydro-pr2-description imagemagick
 
-RUN pip install Flask Flask-Misaka docker-py flask-user flask-babel flask-mail psycopg2
+RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc
 WORKDIR /opt/webapp
 
 # work as user 'ros'

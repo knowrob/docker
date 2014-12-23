@@ -10,4 +10,4 @@ WORKDIR /opt/dockerbridge
 ADD . /opt/dockerbridge
 
 EXPOSE 5001
-CMD ["python", "daemon.py"]
+CMD ["python", "dockerbridge.py"]
