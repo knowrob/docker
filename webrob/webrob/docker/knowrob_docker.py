@@ -1,5 +1,5 @@
 import os.path
-import traceback
+from urllib2 import URLError
 import pyjsonrpc
 
 from flask import session, flash
@@ -42,14 +42,15 @@ def start_container():
             c.notify("start_container", session['user_container_name'], session['user_data_container_name'],
                      session['common_data_container_name'])
             # create home directory if it does not exist yet
-            user_home_dir = '/home/ros/user_data/' + session['user_container_name']
-            if not os.path.exists(user_home_dir):
-                os.makedirs(user_home_dir)
+            if not os.path.exists(session['user_home_dir']):
+                os.makedirs(session['user_home_dir'])
 
     except InternalError, e:
         flash("Error: Connection to your KnowRob instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
-        traceback.print_exc()
+    except URLError, e:
+        flash("Error: Connection to your KnowRob instance failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 
 def stop_container():
@@ -62,5 +63,7 @@ def stop_container():
 
     except InternalError, e:
         flash("Error: Connection to your KnowRob instance failed.")
-        app.logger.error("ConnectionError during disconnect: " + str(e.message) + str(e.data) + "\n")
-        traceback.print_exc()
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your KnowRob instance failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")

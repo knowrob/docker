@@ -114,7 +114,7 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
                     c.remove_container(user_container_name)
 
         except ConnectionError, e:
-            traceback.print_exc()
+            print "ConnectionError during disconnect:" + str(e.message) + "\n"
 
 
 def handler(signum, frame):

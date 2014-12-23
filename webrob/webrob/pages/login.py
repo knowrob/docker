@@ -18,6 +18,7 @@ def track_login(sender, user, **extra):
     session['user_data_container_name'] = "user_data"
     session['common_data_container_name'] = "knowrob_data"
     session['exp'] = None
+    session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['rosauth_mac'] = generate_mac()
     session['show_loading_overlay'] = True
     if not 'pkg' in session: session['pkg'] = ''

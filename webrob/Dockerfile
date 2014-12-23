@@ -9,8 +9,7 @@ RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 py
 WORKDIR /opt/webapp
 
 # work as user 'ros'
-RUN groupadd -f -g 999 docker # groupd ID '999' seems to be the docker group normally
-RUN useradd -m -d /home/ros -p ros ros && adduser ros docker && chsh -s /bin/bash ros
+RUN useradd -m -d /home/ros -p ros ros && chsh -s /bin/bash ros
 ENV HOME /home/ros
 RUN chown -R ros:ros /opt/webapp/
 USER ros
