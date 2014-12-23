@@ -6,7 +6,6 @@ then
    export KNOWROB_WEB_PORT=5000
 fi
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if knowrob_data container exists and create otherwise
 RUNNING=$(docker inspect --format="{{ .State.Running }}" knowrob_data 2>/dev/null)
@@ -94,6 +93,19 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
   docker start postgres_db
 fi
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if dockerbridge is running or stopped and start otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" dockerbridge 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No dockerbridge container exists, creating a new one..."
+  docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name dockerbridge knowrob/dockerbridge
+fi
+
+if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+  echo "Postgres container exists, starting it..."
+  docker start dockerbridge
+fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
@@ -129,4 +141,4 @@ elif [ "$RUNNING" == 'false' ]; then # container exist
 fi
 
 echo "Creating web app container..."
-docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --volumes-from user_data --link postgres_db:postgres -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python runserver.py
+docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --volumes-from user_data --link postgres_db:postgres --link dockerbridge:dockerbridge -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob knowrob/webrob python runserver.py
