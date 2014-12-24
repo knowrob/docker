@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# PyCharm
+*.iml
+.idea/
+
+# Kate
+.*.kate-swp
+.swp.*
