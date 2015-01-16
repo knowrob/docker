@@ -5,6 +5,10 @@
             "text": "----- Initialize Setup -----"
         },
         {
+            "q": "mng_db('simulation').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "load_experiment('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/sim_exp1.owl').",
             "text": "Load data from one pancake-making simulation from library"
         },

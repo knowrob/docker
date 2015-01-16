@@ -5,6 +5,10 @@
             "text": "----- init -----"
         },
         {
+            "q": "mng_db('pick-and-place').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl').",
             "text": "Load single-arm pick-and-place experiment from 'knowrob_data' library"
         },

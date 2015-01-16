@@ -5,6 +5,10 @@
             "text": "----- init -----"
         },
         {
+            "q": "mng_db('pick-and-place').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl').",
             "text": "Load single-arm pick-and-place experiment from 'knowrob_data' library"
         },
@@ -83,6 +87,14 @@
         {
             "q": "remove_trajectory('/base_link'), \n remove_trajectory('/l_wrist_roll_link'), \n remove_trajectory('/r_wrist_roll_link').",
             "text": "Stop publishing trajectory markers"
+        },
+        {
+            "q": "action_designator_exp(A, [an, action, [to, grasp]]).",
+            "text": "Which grasp actions were occurred?"
+        },
+        {
+            "q": "task_designator_exp(T, [perform, [an, action, [to, grasp]]]), task_start(T,START), task_end(T,END).",
+            "text": "Which grasp tasks were performed?"
         },
         {
             "q": "",

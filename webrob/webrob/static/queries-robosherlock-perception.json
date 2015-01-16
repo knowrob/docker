@@ -5,6 +5,10 @@
             "text": "----- init -----"
         },
         {
+            "q": "mng_db('robosherlock').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "load_experiment('/home/ros/knowrob_data/logs/robots/robosherlock/table-top-scene/cram_log.owl').",
             "text": "Load table-top experiment"
         },
