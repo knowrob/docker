@@ -1,0 +1,21 @@
+#!/bin/bash
+
+EXPERIMENTS="pick-and-place simulation robosherlock chemlab mocap"
+
+for exp in $EXPERIMENTS; do
+    # Export mongo data from open-ease to json
+    mongoexport --host data.open-ease.org --port 27017 \
+        --db $exp --collection tf -o ease.$exp.tf.json
+    mongoexport --host data.open-ease.org --port 27017 \
+        --db $exp --collection logged_designators -o ease.$exp.logged_designators.json
+    
+    # Import from json to local mongo
+    mongoimport --db $exp --collection tf --file ease.$exp.tf.json
+    mongoimport --db $exp --collection logged_designators --file ease.$exp.logged_designators.json
+
+    # set indexes in MongoDB
+    mongo $exp --eval 'db.tf.ensureIndex( { __recorded : 1 } )'
+    mongo $exp --eval 'db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )'
+    mongo $exp --eval 'db.logged_designators.ensureIndex( { __recorded : 1 } )'
+done
+

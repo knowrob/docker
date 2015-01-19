@@ -56,21 +56,3 @@ fi
 #mongoimport --db roslog --collection tf "${MY_ROSLOG_PATH}/tf.json"
 #mongoimport --db roslog --collection logged_designators "${MY_ROSLOG_PATH}/logged_designators.json"
 
-# Export mongo data from open-ease to json
-mongoexport --host data.open-ease.org --port 27017 \
-    --db roslog --collection tf -o ease.roslog.tf.json
-mongoexport --host data.open-ease.org --port 27017 \
-    --db roslog --collection logged_designators -o ease.roslog.logged_designators.json
-
-# Import from json to local mongo
-mongoimport --db roslog --collection tf --file ease.roslog.tf.json
-mongoimport --db roslog --collection logged_designators --file ease.roslog.logged_designators.json
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# set indexes in MongoDB
-mongo roslog --eval 'db.tf.ensureIndex( { __recorded : 1 } )'
-mongo roslog --eval 'db.tf.ensureIndex( { "transforms.header.stamp" : 1 } )'
-mongo roslog --eval 'db.logged_designators.ensureIndex( { __recorded : 1 } )'
-
-
