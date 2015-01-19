@@ -5,12 +5,11 @@ MAINTAINER Moritz Tenorth, moritz@tenorth.de
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc ros-hydro-pr2-description imagemagick
 
-RUN pip install Flask Flask-Misaka docker-py flask-user flask-babel flask-mail psycopg2
+RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc
 WORKDIR /opt/webapp
 
 # work as user 'ros'
-RUN groupadd -f -g 999 docker # groupd ID '999' seems to be the docker group normally
-RUN useradd -m -d /home/ros -p ros ros && adduser ros docker && chsh -s /bin/bash ros
+RUN useradd -m -d /home/ros -p ros ros && chsh -s /bin/bash ros
 ENV HOME /home/ros
 RUN chown -R ros:ros /opt/webapp/
 USER ros
