@@ -2,10 +2,10 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field %}
-<h1>{%trans%}Register{%endtrans%}</h1>
 
-<div style="width:20%;">
-<form action="" method="POST" novalidate formnovalidate class="form" role="form">
+<div class="login-box">
+  <h1>{%trans%}Register{%endtrans%}</h1>
+  <form action="" method="POST" novalidate formnovalidate class="form" role="form">
     {{ form.hidden_tag() }}
 
     {# Username or Email #}
@@ -42,7 +42,7 @@
     {% endif %}
 
     {{ render_submit_field(form.submit, tabindex=280) }}
-</form>
+  </form>
 </div>
 
 {% endblock %}

@@ -16,6 +16,7 @@
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-1.11.1.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
   {% block head %}{% endblock %}
 </head>
 
@@ -53,7 +54,8 @@
   
   <div class="container" id="container" style="padding-left:15px; margin-top: 59px;">
     {% block content %}{% endblock %}
-  
+    
+    {% if show_south_pane %}
     <div class="pane ui-layout-south">
       <div id="msg_container">
         {% with messages = get_flashed_messages() %}
@@ -87,6 +89,7 @@
         </a>
       <div>
     </div>
+    {% endif %}
   </div>
 
   {% block spinner %}{% endblock %}
