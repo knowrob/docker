@@ -21,6 +21,13 @@
 
 
 <body{% block bodyargs %}{% endblock %}>
+  <div class="header">
+    <nav id="navbar-tool">
+      <a class="navbar-tool-brand" href="http://www.open-ease.org"><img src="http://www.open-ease.org/wp-content/themes/openease_wp/img/oe-logo-small.svg"> openEASE</a>
+      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://ai.uni-bremen.de/"><img src="http://www.open-ease.org/wp-content/themes/openease_wp/img/ai_logo_white.png"></a>
+      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://ai.uni-bremen.de/"><img src="{{ url_for('static', filename='logos/uni-bremen.png') }}"></a>
+    </nav>
+  </div>
   <div class="metanav">
     <div class="metanav_left">
       <ul class="menu">
@@ -44,7 +51,7 @@
     </div>
   </div>
   
-  <div class="container" id="container" style="padding-left:15px; margin-top: 9px;">
+  <div class="container" id="container" style="padding-left:15px; margin-top: 59px;">
     {% block content %}{% endblock %}
   
     <div class="pane ui-layout-south">

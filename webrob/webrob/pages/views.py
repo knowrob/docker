@@ -63,6 +63,7 @@ def knowrob(exp_id=None):
     if 'exp' in session:
         exp = session['exp']
         if exp is not None: exp_query_file = 'queries-' + exp + '.json'
+    # TODO: Allow to select html template using a experiment configuration file
 
     return render_template('knowrob_simple.html', **locals())
 
