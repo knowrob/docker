@@ -71,8 +71,9 @@
           %}{{ url_for('static', filename='queries.json') }}{%
       endif %}";
       
+      wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       knowrob = new Knowrob({
-          ros_url: 'ws://{{ host_url }}/ws/{{ container_name }}/',
+          ros_url: wsproto + '://{{ host_url }}/ws/{{ container_name }}/',
           library_file: libraryFile
       });
       knowrob.init();

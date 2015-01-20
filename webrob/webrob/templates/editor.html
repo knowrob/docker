@@ -40,8 +40,9 @@
 
     function init() {
       // Connect to ROS.
+      wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       ros = new ROSLIB.Ros({
-        url : 'ws://{{ host_url }}/ws/{{ container_name }}/'
+        url : wsproto + '://{{ host_url }}/ws/{{ container_name }}/'
       });
       
       // 'change' event is triggered whenever the editor content changes
