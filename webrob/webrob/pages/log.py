@@ -3,6 +3,7 @@
 # @author Daniel Beßler
 
 from flask import session, render_template
+from flask_user import login_required
 
 from webrob.app_and_db import app
 from webrob.docker import knowrob_docker
