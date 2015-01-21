@@ -38,7 +38,7 @@
 	},
 	{
 	  "text":"Where was that object located?",
-	  "q":".."
+	  "q":"task_goal(T,'UIMA-PERCEIVE'),rdf_has(T,knowrob:'startTime',Time),Time='http://ias.cs.tum.edu/kb/cram_log.owl#timepoint_1413387330.323',rdf_has(T,knowrob:'perceptionResult',Obj),mng_designator_props(Obj,'SHAPE',round),mng_designator_props(Obj,'GOGGLES',G),string_to_atom('Ketchup',K),sub_atom(G,_,_,_,K),mng_designator_props(Obj,'LOCATION',Location)."
 	},
  	{
 	  "text":"Was there a Milk in the same scene?",
