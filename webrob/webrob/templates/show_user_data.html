@@ -7,6 +7,7 @@
 
 {% block content %}
 
+<div class="login-box">
 <h2>Your user data</h2>
 <dl>
   <dt>Username: </dt><dd>{{ current_user.username }}</dd>
@@ -20,6 +21,7 @@
 
 
 </dl>
+</div>
 
 {% endblock %}
 
@@ -27,6 +29,7 @@
 {% block spinner %}
 
   <script type="text/javascript">
+    // TODO: Show overlay until rosbridge connection established.
     // Overlay for loading
     function showSpinnerOverlay() {
         var opts = {

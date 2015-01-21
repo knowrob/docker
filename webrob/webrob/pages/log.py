@@ -3,11 +3,13 @@
 # @author Daniel Beßler
 
 from flask import session, render_template
+from flask_user import login_required
 
 from webrob.app_and_db import app
 from webrob.docker import knowrob_docker
 
 @app.route('/log')
+@login_required
 def log():
   c = knowrob_docker.docker_connect()
   container_id = session['user_container_name']

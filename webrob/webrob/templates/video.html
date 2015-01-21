@@ -1,0 +1,196 @@
+{% extends "knowrob.html" %}
+
+{% block content %}
+  <script type="text/javascript">
+    
+    var isStreaming = false;
+    
+    function setup_video_query() {
+        var userQuery = ace.edit('user_query');
+        userQuery.commands.removeCommand('send_query');
+        userQuery.commands.removeCommand('next_result');
+        userQuery.commands.removeCommand('next_history');
+        userQuery.commands.removeCommand('previous_history');
+        
+        var initQuery = ace.edit('init_query');
+        initQuery.resize(true);
+        initQuery.setTheme("ace/theme/solarized_light");
+        initQuery.getSession().setMode("ace/mode/prolog");
+        initQuery.getSession().setUseWrapMode(true);
+        initQuery.setOptions({
+            showGutter: false,
+            printMarginColumn: false,
+            highlightActiveLine: false,
+            highlightGutterLine: false,
+            enableBasicAutocompletion: true
+        });
+    }
+    
+    function start_streaming() {
+      var t0  = parseInt(document.getElementById("startTime").value, 10);
+      var t1  = parseInt(document.getElementById("endTime").value, 10);
+      var t = t0;
+      
+      // Clear the canvas and perform a initial prolog query (for spawning the semantic map, ...)
+      var init_query = "clear_canvas, " +
+          "T = 'timepoint_" + t.toString() + "', " +
+          ace.edit('init_query').getValue().trim();
+      init_query = init_query.substr(0, init_query.length - 1);
+      initialize_canvas(init_query, function() {
+        isStreaming = true;
+      
+        var video_query = ace.edit('user_query').getValue();
+        var fps = parseInt(document.getElementById("fps").value, 10);
+        var step_sec = 1.0/fps;
+        var frame_number = 1;
+      
+        function stream_step(){
+          if(!isStreaming) return;
+          t += step_sec;
+          if(t>t1) return;
+        
+          var query = "T = 'timepoint_" + t.toString() + "', " + video_query;
+          query = query.trim();
+          query = query.substr(0, query.length - 1);
+          
+          var prolog = knowrob.new_pl_client();
+          prolog.jsonQuery(query, function(result) {
+            console.log(prolog.format(result));
+            setTimeout(function(){
+              knowrob.publish_snapshot(frame_number, fps);
+              frame_number += 1;
+              stream_step();
+            }, 500);
+          }, mode=1);
+        };
+        stream_step();
+      });
+    }
+    
+    function initialize_canvas(init_query, handler) {
+      var prolog = knowrob.new_pl_client();
+      prolog.jsonQuery(init_query, function(result) {
+        console.log(prolog.format(result));
+        setTimeout(function(){
+          handler();
+        }, 500);
+      }, mode=1);
+    }
+    
+    function stop_streaming() {
+      isStreaming = false;
+    }
+
+    $(document).ready(function () {
+      setup_video_query();
+      $('#container').layout({
+        stateManagement__enabled: true,
+        south: {
+          minSize: 60
+        },
+        west: {
+          minSize: 250,
+          maxSize: 750,
+          size: 500,
+          onresize: function() {
+            ace.edit("init_query").resize(true);
+            ace.edit("user_query").resize(true);
+          }
+        },
+        center: {
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#markers",
+              onresize: function() {
+               if( knowrob ) knowrob.resize_canvas();
+              },
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#chart",
+              initClosed: true,
+              minSize: 150
+            }
+          }
+        }
+      });
+      knowrob.resize_canvas();
+    });
+  </script>
+  
+    <div class="ui-layout-center" id="editor-container">
+      <div id="markers"></div> 
+    </div>
+
+    <div class="ui-layout-west" style="background-color:#dadada;">
+      <div id="console" style="display: none;">
+        <div id="console_top">
+          <div id="history"></div>
+        </div>
+        <div id="console_bottom">
+          <div id="query_buttons">
+            <ul class="query_button_group">
+              <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
+              <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="library" style="display: none;">
+        <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
+          size="20" name="examplequery" id="examplequery"><option value=0></option>
+        </select>
+      </div>
+      <div id="vid_properties">
+        <table id="vid_table">
+        <tr>
+          <th>Start Time</th>
+        </tr>
+        <tr>
+          <td><input type="number" id="startTime" value="1396512584"></td>
+        </tr>
+        <tr>
+          <th>End Time</th>
+        </tr>
+        <tr>
+          <td><input type="number" id="endTime" value="1396512603"></td>
+        </tr>
+        <tr>
+          <th>Frames Per Second</th>
+        </tr>
+        <tr>
+          <td><input type="number" id="fps" value="6"></td>
+        </tr>
+        <tr>
+          <th>Initial Query</th>
+        </tr>
+        <tr>
+          <td><div id="init_query">mng_db('pick-and-place'),
+load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl'), 
+owl_parse('package://iai_semantic_maps/owl/room.owl'),
+owl_parse('package://knowrob_srdl/owl/PR2.owl'),
+add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'),
+mng_robot_pose_at_time(pr2:'PR2Robot1','/map',T,Pose),
+add_object_with_children(pr2:'PR2Robot1', T).</div></td>
+        </tr>
+        <tr>
+          <th>Animation Query</th>
+        </tr>
+        <tr>
+          <td><div id="user_query">mng_robot_pose_at_time(pr2:'PR2Robot1','/map',T,Pose),
+update_object_with_children(pr2:'PR2Robot1',T).</div></td>
+        </tr>
+        </table>
+      </div>
+      <div id="vid_bottom">
+        <div id="vid_buttons">
+          <ul class="query_button_group vid_button_group">
+            <li><a href="#" class="vid_button" id="btn_play" onclick="start_streaming()">Start</a></li>
+            <li><a href="#" class="vid_button" id="btn_stop" onclick="stop_streaming()">Stop</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

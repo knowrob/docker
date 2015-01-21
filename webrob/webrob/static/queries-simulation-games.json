@@ -5,6 +5,10 @@
             "text": "----- Initialize Setup -----"
         },
         {
+            "q": "mng_db('simulation').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "experiment_file(Exp).",
             "text": "Which sim experiments can be loaded?"
         },

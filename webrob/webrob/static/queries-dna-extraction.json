@@ -5,6 +5,10 @@
             "text": "----- init -----"
         },
         {
+            "q": "mng_db('chemlab').",
+            "text": "Select experiment database"
+        },
+        {
             "q": "load_experiment('/home/ros/knowrob_data/logs/chemlab/dna_extraction_0/cram_log.owl').",
             "text": "Load DNA Extraction Logs from 'knowrob_data' library"
         },

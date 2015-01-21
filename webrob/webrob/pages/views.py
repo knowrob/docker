@@ -32,6 +32,7 @@ def tutorials(cat_id='getting_started', page=1):
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = 'tutorials'
+    show_south_pane = True
 
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut['text'], fenced_code=True)
@@ -55,6 +56,7 @@ def knowrob(exp_id=None):
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
+    show_south_pane = True
 
     # Remember experiment selection
     if exp_id is not None: session['exp'] = exp_id
@@ -63,8 +65,28 @@ def knowrob(exp_id=None):
     if 'exp' in session:
         exp = session['exp']
         if exp is not None: exp_query_file = 'queries-' + exp + '.json'
+    # TODO: Allow to select html template using a experiment configuration file
 
     return render_template('knowrob_simple.html', **locals())
+
+@app.route('/video')
+@login_required
+def video(exp_id=None):
+    error=""
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    container_name = session['user_container_name']
+
+    # Remember experiment selection
+    if exp_id is not None: session['exp'] = exp_id
+    # Select a query file
+    exp_query_file = None
+    if 'exp' in session:
+        exp = session['exp']
+        if exp is not None: exp_query_file = 'queries-' + exp + '.json'
+    
+    return render_template('video.html', **locals())
 
 @app.route('/exp_list', methods=['POST'])
 @login_required

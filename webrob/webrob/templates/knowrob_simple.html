@@ -2,15 +2,13 @@
 
 
 {% block content %}
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
   <script type="text/javascript">
 
     $(document).ready(function () {
-      var history = setupHistoryField();
-      var user_query = setupQueryField();
       $('#container').layout({
+        stateManagement__enabled: true,
         south: {
-          minSize: 75
+          minSize: 60
         },
         west: {
           minSize: 250,
@@ -28,7 +26,7 @@
             },
             south: {
               paneSelector: "#library",
-              minSize: 250
+              minSize: 150
             }
           }
         },
@@ -37,12 +35,15 @@
           childOptions: {
             center: {
               paneSelector: "#markers",
-              onresize: resize_canvas,
+              onresize: function() {
+               if( knowrob ) knowrob.resize_canvas();
+              },
               minSize: 250
             },
             south: {
               paneSelector: "#chart",
-              minSize: 250
+              initClosed: true,
+              minSize: 150
             }
           }
         },
@@ -50,6 +51,7 @@
           minSize: 250,
           maxSize: 750,
           size: 500,
+          initClosed: true,
           // INNER-LAYOUT
           childOptions: {
             center: {
@@ -58,11 +60,12 @@
             },
             south: {
               paneSelector: "#mjpeg",
-              minSize: 250
+              minSize: 150
             }
           }
         }
       });
+      knowrob.resize_canvas();
     });
   </script>
 
@@ -73,11 +76,21 @@
 
   <div class="ui-layout-west">
     <div id="console">
-      <div id="history"></div>
-      <div id="user_query">member(A, [a,b,c]).</div>
+      <div id="console_top">
+        <div id="history"></div>
+        <div id="user_query">member(A, [a,b,c]).</div>
+      </div>
+      <div id="console_bottom">
+        <div id="query_buttons">
+          <ul class="query_button_group">
+            <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
+            <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div id="library">
-      <select onclick="addSelectedToQueryform('examplequery')" 
+      <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
         size="20" name="examplequery" id="examplequery"><option value=0></option>
       </select>
     </div>
