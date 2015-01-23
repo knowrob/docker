@@ -26,6 +26,21 @@
         });
     }
     
+    function format_date(unix_timestamp) {
+        // create a new javascript Date object based on the timestamp
+        // multiplied by 1000 so that the argument is in milliseconds, not seconds
+        var date = new Date(unix_timestamp*1000);
+        // hours part from the timestamp
+        var hours = date.getHours();
+        // minutes part from the timestamp
+        var minutes = "0" + date.getMinutes();
+        // seconds part from the timestamp
+        var seconds = "0" + date.getSeconds();
+
+        // will display time in 10:30:23 format
+        return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
+    }
+    
     function start_streaming() {
       var t0  = parseInt(document.getElementById("startTime").value, 10);
       var t1  = parseInt(document.getElementById("endTime").value, 10);
@@ -44,6 +59,42 @@
         var step_sec = 1.0/fps;
         var frame_number = 1;
       
+        function update_hud_text(handler) {
+          var hudtextLines = [];
+          
+          hudtextLines.push("   Time: " + format_date(t));
+          
+          var infoQuery = "T = 'timepoint_" + t.toString() + "', " +
+                "task(_Task, T, knowrob:'CRAMAction'), " +
+                "task_type(_Task, _TypeURL), rdf_split_url(_, TaskType, _TypeURL), " +
+                "( task(_Perc, T, knowrob:'UIMAPerception'), " +
+                "  rdf_has(_Perc, knowrob:'perceptionResult', Perception) ) ; Perception = '-'";
+                //"(rdf_has(_Task, knowrob:'taskContext', literal(type(_,Context))) ; Context = '-'), " +
+                //"((task(_Action, T), " +
+                //"task_type(_Action, _ActionTypeURL), rdf_split_url(_, ActionType, _ActionTypeURL), " +
+                //"rdf_has(_Action, knowrob:'objectActedOn', literal(type(_,Object)))) ; ActionType = '-', Object = '-')";
+                //"mng_latest_designator_before_time(T, Designator, _)";
+                //task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), 
+          
+          var prolog = knowrob.new_pl_client();
+          prolog.jsonQuery(infoQuery, function(result) {
+              // Parse Prolog result
+              //hudtextLines.push("  Task: Making Pancake");
+              //hudtextLines.push("Action: Grasp Pancake Tube");
+              
+              //hudtextLines.push("   Task: " + result.solution['TaskType']);
+              hudtextLines.push("     Action: " + result.solution['TaskType']);
+              hudtextLines.push(" Perception: " + result.solution['Perception']);
+              
+      
+              knowrob.show_hud_text({
+                  textLines: hudtextLines
+              });
+              setTimeout(function(){
+                handler();
+              }, 500);
+          });
+        };
         function stream_step(){
           if(!isStreaming) return;
           t += step_sec;
@@ -56,11 +107,11 @@
           var prolog = knowrob.new_pl_client();
           prolog.jsonQuery(query, function(result) {
             console.log(prolog.format(result));
-            setTimeout(function(){
+            update_hud_text(function(){
               knowrob.publish_snapshot(frame_number, fps);
               frame_number += 1;
               stream_step();
-            }, 500);
+            });
           }, mode=1);
         };
         stream_step();
