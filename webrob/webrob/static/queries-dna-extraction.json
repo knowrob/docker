@@ -18,30 +18,6 @@
         },
         {
             "q": "",
-            "text": "----- Queries on the semantic map -----"
-        },
-        {
-            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
-            "text": "Load semantic map"
-        },
-        {
-            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
-            "text": "Visualize semantic map"
-        },
-        {
-            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
-            "text": "What is the storage place for perishable items?"
-        },
-        {
-            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice'), highlight_object_with_children(Obj).",
-            "text": "Which are electrical devices?"
-        },
-        {
-            "q": "",
-            "text": ""
-        },
-        {
-            "q": "",
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
