@@ -9,7 +9,7 @@ ENV HOME /home/ros
 
 RUN apt-get -y update
 RUN apt-get -y install python-yaml python-catkin-pkg python-rospkg emacs swi-prolog-java ros-hydro-catkin
-RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server ros-hydro-pr2-description
+RUN apt-get -y install git ros-hydro-iai-common-msgs ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server ros-hydro-pr2-description ros-hydro-image-pipeline
 RUN apt-get -y install mongodb-clients gradle
 
 # ROS environment setup
