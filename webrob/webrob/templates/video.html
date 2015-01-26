@@ -61,45 +61,60 @@
       
         function update_hud_text(handler) {
           var hudtextLines = [];
-          
-          hudtextLines.push("   Time: " + format_date(t));
-          
-          var infoQuery = "T = 'timepoint_" + t.toString() + "', " +
-                "task(_Task, T, knowrob:'CRAMAction'), " +
-                "task_type(_Task, _TypeURL), rdf_split_url(_, TaskType, _TypeURL), " +
-                "( task(_Perc, T, knowrob:'UIMAPerception'), " +
-                "  rdf_has(_Perc, knowrob:'perceptionResult', Perception) ) ; Perception = '-'";
-                //"(rdf_has(_Task, knowrob:'taskContext', literal(type(_,Context))) ; Context = '-'), " +
-                //"((task(_Action, T), " +
-                //"task_type(_Action, _ActionTypeURL), rdf_split_url(_, ActionType, _ActionTypeURL), " +
-                //"rdf_has(_Action, knowrob:'objectActedOn', literal(type(_,Object)))) ; ActionType = '-', Object = '-')";
-                //"mng_latest_designator_before_time(T, Designator, _)";
-                //task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), 
-          
           var prolog = knowrob.new_pl_client();
+          var infoQuery = "_T = 'timepoint_" + t.toString() + "', " +
+                "task(_Task, _T), " +
+                "rdf_has(_Task, knowrob:'taskContext', literal(type(_,Task))), " +
+                "(( rdf_has(_Task, knowrob:'objectActedOn', _ObjectActedOn), " +
+                    "( mng_designator_props(_ObjectActedOn, 'NAME', ObjectActedOn) ; " +
+                    "( rdf_has(_ObjectActedOn, knowrob:'objectActedOn', __ObjectActedOn), " +
+                    "  mng_designator_props(__ObjectActedOn, 'NAME', ObjectActedOn) ))) ; ObjectActedOn = ''), " +
+                "(( rdf_has(_Task, knowrob:'perceptionResult', _Perception), " +
+                    "mng_designator_props(_Perception, 'NAME', Perception) ) ; Perception = ''), " +
+                "(( rdf_has(_Task, knowrob:'designator', _Designator), " +
+                    "mng_designator_props(_Designator, 'NAME', Designator) ) ; Designator = ''), " +
+                "(( rdf_has(_Task, knowrob:'goalContext', literal(type(_,Goal))) ) ; Goal = ''), " +
+                "( ObjectActedOn \\= '' ; Perception \\= '' ; Designator \\= '' ; Goal \\= '')";
+          
+          
+          function process_info(result) {
+              if(result.solution) {
+                  var solutionString = result.solution['Task'];
+                  for(var key in result.solution) {
+                      var value = result.solution[key];
+                      if(key != 'Task' && value != '') {
+                          solutionString += " " + value.trim()
+                      }
+                  }
+                  hudtextLines.push(solutionString);
+          console.log(solutionString);
+                  
+                  prolog.nextQuery(process_info);
+              }
+              else {
+                  knowrob.show_hud_text(hudtextLines, {});
+                  setTimeout(function(){ handler(); }, 500);
+              }
+          }
+          
+          var timeString = "Time: " + format_date(t);
+          console.log(timeString);
+          hudtextLines.push(timeString.trim());
           prolog.jsonQuery(infoQuery, function(result) {
+              process_info(result);
               // Parse Prolog result
               //hudtextLines.push("  Task: Making Pancake");
               //hudtextLines.push("Action: Grasp Pancake Tube");
-              
               //hudtextLines.push("   Task: " + result.solution['TaskType']);
-              hudtextLines.push("     Action: " + result.solution['TaskType']);
-              hudtextLines.push(" Perception: " + result.solution['Perception']);
-              
-      
-              knowrob.show_hud_text({
-                  textLines: hudtextLines
-              });
-              setTimeout(function(){
-                handler();
-              }, 500);
+              //hudtextLines.push("     Action: " + result.solution['TaskType']);
+              //hudtextLines.push(" Perception: " + result.solution['Perception']);
           });
         };
         function stream_step(){
           if(!isStreaming) return;
           t += step_sec;
           if(t>t1) return;
-        
+          
           var query = "T = 'timepoint_" + t.toString() + "', " + video_query;
           query = query.trim();
           query = query.substr(0, query.length - 1);
