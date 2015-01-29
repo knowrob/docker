@@ -58,6 +58,32 @@ var iosOverlay = function(params) {
 		}
 	};
 
+	var destroy = function() {
+		if (params.parentEl) {
+			document.getElementById(params.parentEl).removeChild(overlayDOM);
+		} else {
+			document.body.removeChild(overlayDOM);
+		}
+	};
+
+	var hide = function() {
+		// pre-callback
+		settings.onbeforehide();
+		// fade out
+		if (doesTransitions) {
+			// CSS animation bound to classes
+			overlayDOM.className = overlayDOM.className.replace("show","hide");
+		} else if (typeof $ === "function") {
+			// polyfill requires jQuery
+			$(overlayDOM).fadeOut({
+				duration: 200
+			}, function() {
+				destroy();
+				settings.onhide();
+			});
+		}
+	};
+
 	// IIFE
 	var create = (function() {
 
@@ -93,40 +119,25 @@ var iosOverlay = function(params) {
 				settings.onshow();
 			});
 		}
-
+		
 		if (settings.duration) {
 			window.setTimeout(function() {
 				hide();
 			},settings.duration);
 		}
+		else if (settings.isSpinning) {
+			var timeoutFunction = function() {
+				if(settings.isSpinning()) {
+					window.setTimeout(timeoutFunction, 200);
+				}
+				else {
+					hide();
+				}
+			};
+			timeoutFunction();
+		}
 
 	}());
-
-	var hide = function() {
-		// pre-callback
-		settings.onbeforehide();
-		// fade out
-		if (doesTransitions) {
-			// CSS animation bound to classes
-			overlayDOM.className = overlayDOM.className.replace("show","hide");
-		} else if (typeof $ === "function") {
-			// polyfill requires jQuery
-			$(overlayDOM).fadeOut({
-				duration: 200
-			}, function() {
-				destroy();
-				settings.onhide();
-			});
-		}
-	};
-
-	var destroy = function() {
-		if (params.parentEl) {
-			document.getElementById(params.parentEl).removeChild(overlayDOM);
-		} else {
-			document.body.removeChild(overlayDOM);
-		}
-	};
 
 	var update = function(params) {
 		if (params.text) {

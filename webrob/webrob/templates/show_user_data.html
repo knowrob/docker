@@ -29,7 +29,14 @@
 {% block spinner %}
 
   <script type="text/javascript">
-    // TODO: Show overlay until rosbridge connection established.
+    var counter = 0;
+    function isWaitingForConnection() {
+        // TODO: Show overlay until rosbridge connection established.
+        //   - use ajax request
+        counter += 1;
+        // wait 8 seconds for now
+        return counter*200<8000;
+    }
     // Overlay for loading
     function showSpinnerOverlay() {
         var opts = {
@@ -54,7 +61,7 @@
         var spinner = new Spinner(opts).spin(target);
         iosOverlay({
                 text: "Loading",
-                duration: 8e3,
+                isSpinning: isWaitingForConnection,
                 spinner: spinner
         });
         return false;
