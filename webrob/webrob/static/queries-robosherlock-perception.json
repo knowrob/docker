@@ -28,8 +28,12 @@
             "text": "How many objects did we see at time=t0?",
             "q": "setof([T,Time,Obj],(task_goal(T,'UIMA-PERCEIVE'),rdf_has(T,knowrob:'startTime',Time),Time='http://ias.cs.tum.edu/kb/cram_log.owl#timepoint_1413387330.323',rdf_has(T,knowrob:'perceptionResult',Obj)),L),length(L,N)."
         },
+	{
+	    "text": "Show me the processed frame.",	
+            "q": "findall([Obj,E], ((task_goal(T,'UIMA-PERCEIVE'),rdf_has(T,knowrob:'startTime',Time),Time='http://ias.cs.tum.edu/kb/cram_log.owl#timepoint_1413387330.323',rdf_has(T,knowrob:'perceptionResult',Obj))),Objs),!,member([Obj, E], Objs),belief_at(loc(Obj,Loc),E)."
+	},	
         {
-            "text": "How many were round?",
+            "text": "How many objects were round?",
             "q": "setof([T,Time,Obj],(task_goal(T,'UIMA-PERCEIVE'),rdf_has(T,knowrob:'startTime',Time),Time='http://ias.cs.tum.edu/kb/cram_log.owl#timepoint_1413387330.323',rdf_has(T,knowrob:'perceptionResult',Obj),mng_designator_props(Obj,'SHAPE',round)),L),length(L,N)."
         },
 	{
