@@ -2,7 +2,7 @@
 
 
 
-{% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
+{% block bodyargs %} onload="showSpinnerOverlay()"{% endblock %}
 
 
 {% block content %}
@@ -29,13 +29,44 @@
 {% block spinner %}
 
   <script type="text/javascript">
-    var counter = 0;
+    var webSocket = undefined;
+    var isWebsocketOpened = false;
+    var hasWebsocketError = false;
+    
+    function isWaitingForWebsocket() {
+        if(isWebsocketOpened) {
+            if(webSocket) webSocket.close();
+            return false;
+        }
+        if(webSocket == undefined) {
+            hasWebsocketError = false;
+            
+            var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
+            webSocket = new WebSocket(wsproto + '://{{ host_url }}/ws/{{ container_name }}/');
+            
+            webSocket.onopen = function() {
+                isWebsocketOpened = true;
+            };
+            webSocket.onclose = function() {
+                webSocket = undefined;
+            };
+            webSocket.onerror = function() {
+                hasWebsocketError = true;
+            };
+        }
+        
+        if(hasWebsocketError) {
+            if(webSocket) webSocket.close();
+        }
+        
+        return true;
+    }
+    function isWaitingForKnowrob() {
+        // TODO: Check if json_prolog service is up!
+        return false;
+    }
     function isWaitingForConnection() {
-        // TODO: Show overlay until rosbridge connection established.
-        //   - use ajax request
-        counter += 1;
-        // wait 8 seconds for now
-        return counter*200<8000;
+        return isWaitingForWebsocket() || isWaitingForKnowrob();
     }
     // Overlay for loading
     function showSpinnerOverlay() {
@@ -59,6 +90,7 @@
         var target = document.createElement("div");
         document.body.appendChild(target);
         var spinner = new Spinner(opts).spin(target);
+        
         iosOverlay({
                 text: "Loading",
                 isSpinning: isWaitingForConnection,

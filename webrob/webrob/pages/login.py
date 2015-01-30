@@ -1,6 +1,8 @@
 
 from webrob.docker import knowrob_docker
 
+from urlparse import urlparse
+
 from flask import session, request, flash, redirect, url_for, render_template
 from flask.ext.user.signals import user_logged_in
 from flask.ext.user.signals import user_logged_out
@@ -36,12 +38,13 @@ def show_user_data():
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
     
-    overlay = None
-    if(session.get('show_loading_overlay') == True):
-        overlay = True
-        session.pop('show_loading_overlay')
+    error=""
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    container_name = session['user_container_name']
 
-    return render_template('show_user_data.html', overlay=overlay)
+    return render_template('show_user_data.html', **locals())
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

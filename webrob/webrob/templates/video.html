@@ -214,12 +214,18 @@
           <th>Start Time</th>
         </tr>
         <tr>
+          <!--
+          <td><input type="number" id="startTime" value="1398864739"></td>
+          -->
           <td><input type="number" id="startTime" value="1396512584"></td>
         </tr>
         <tr>
           <th>End Time</th>
         </tr>
         <tr>
+          <!--
+          <td><input type="number" id="endTime" value="1398864737"></td>
+          -->
           <td><input type="number" id="endTime" value="1396512603"></td>
         </tr>
         <tr>
@@ -232,20 +238,28 @@
           <th>Initial Query</th>
         </tr>
         <tr>
+<!--
+          <td><div id="init_query">mng_db('mocap'),
+owl_parse('package://iai_semantic_maps/owl/room.owl'),
+owl_parse('package://knowrob_srdl/owl/xsens-human.owl'),
+load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl'),
+add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').</div></td>
+-->
           <td><div id="init_query">mng_db('pick-and-place'),
 load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl'), 
 owl_parse('package://iai_semantic_maps/owl/room.owl'),
 owl_parse('package://knowrob_srdl/owl/PR2.owl'),
 add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'),
-mng_robot_pose_at_time(pr2:'PR2Robot1','/map',T,Pose),
-add_object_with_children(pr2:'PR2Robot1', T).</div></td>
+add_agent_visualization(pr2:'PR2Robot1', T).</div></td>
         </tr>
         <tr>
           <th>Animation Query</th>
         </tr>
         <tr>
-          <td><div id="user_query">mng_robot_pose_at_time(pr2:'PR2Robot1','/map',T,Pose),
-update_object_with_children(pr2:'PR2Robot1',T).</div></td>
+<!--
+          <td><div id="user_query">add_stickman_visualization(xsens:'XSensHuman1', T).</div></td>
+-->
+          <td><div id="user_query">add_agent_visualization(pr2:'PR2Robot1',T).</div></td>
         </tr>
         </table>
       </div>
