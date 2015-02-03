@@ -1,6 +1,7 @@
 FROM ubuntu:trusty
 MAINTAINER Moritz Tenorth, moritz@tenorth.de
 
+RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
 RUN apt-get -y update && apt-get -y install wget apt-utils
 
 
