@@ -18,6 +18,6 @@ if [ X"$RUNNING" = X"false" ]; then # container exists, but stopped
   cd $DIR
 fi
 
-echo "Building knowrob/hydro-knowrob-base....";
-docker build -t knowrob/hydro-knowrob-base .
+echo "Building knowrob/hydro-swi-base....";
+docker build -t knowrob/hydro-swi-base .
 
