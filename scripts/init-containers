@@ -37,7 +37,6 @@ fi
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
-
 RUNNING=$(docker inspect --format="{{ .State.Running }}" mongo_db 2>/dev/null)
 
 if [ $? -eq 1 ]; then # container does not exist
