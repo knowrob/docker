@@ -1,6 +1,9 @@
 #!/bin/sh
 # Author: Daniel Beßler
 
+SCRIPT=`readlink -f "$0"`
+DIR=`dirname $SCRIPT`
+
 RUNNING=$(docker inspect --format="{{ .State.Running }}" apt-cacher-run 2>/dev/null)
 if [ $? -eq 1 ]; then # container does not exist
   echo "No apt-cacher container exists, creating a new one..."
@@ -18,6 +21,6 @@ if [ X"$RUNNING" = X"false" ]; then # container exists, but stopped
   cd $DIR
 fi
 
-echo "Building knowrob/hydro-swi-base....";
-docker build -t knowrob/hydro-swi-base .
+echo "Building knowrob/hydro-knowrob-base....";
+docker build -t knowrob/hydro-knowrob-base .
 

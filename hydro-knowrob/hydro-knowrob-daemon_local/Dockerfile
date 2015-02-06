@@ -1,4 +1,4 @@
-FROM knowrob/hydro-swi-base
+FROM knowrob/hydro-knowrob-base
 MAINTAINER Moritz Tenorth, moritz@tenorth.de
 
 # set up workspace and setup knowrob
