@@ -94,8 +94,10 @@ if [ $? -eq 1 ]; then # container does not exist
   fi
 fi
 if [ X"$RUNNING" = X"false" ]; then # container exists, but stopped
-  echo "nexus container exitss, starting it..."
+  echo "nexus container exists, starting it..."
   docker start nexus-run
+  
+  RUNNING=$(docker inspect --format="{{ .State.Running }}" nexus-run 2>/dev/null)
   if [ X"$RUNNING" = X"true" ]; then # container running
       # Wait on HTTP server
       echo "NEXUS: Waiting for web server of nexus-run container."
