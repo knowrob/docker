@@ -1,0 +1,107 @@
+#!/bin/bash
+# Author: Daniel Beßler
+
+SCRIPT=`readlink -f "$0"`
+
+# TODO(daniel): I run frequently into timeouts using the official github repository,
+#               nexus also refused to use this URL. Maybe my provider is throttling github :/
+#ROSJAVA_MAVEN_REPOSITORY="https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+ROSJAVA_MAVEN_REPOSITORY="http://www.informatik.uni-bremen.de/~danielb"
+
+# JSON message that yields in a new proxy repository
+# for ROS java
+JSON_REPOSITORIES_POST='{"data":{
+  "repoType":"proxy",
+  "id":"ros",
+  "name":"Ros",
+  "browseable":true,
+  "indexable":true,
+  "notFoundCacheTTL":1440,
+  "artifactMaxAge":-1,
+  "metadataMaxAge":1440,
+  "itemMaxAge":1440,
+  "repoPolicy":"RELEASE",
+  "provider":"maven2",
+  "providerRole":"org.sonatype.nexus.proxy.repository.Repository",
+  "downloadRemoteIndexes":true,
+  "autoBlockActive":true,
+  "fileTypeValidation":true,
+  "exposed":true,
+  "checksumPolicy":"WARN",
+  "remoteStorage":{
+    "remoteStorageUrl":"${ROSJAVA_MAVEN_REPOSITORY}",
+    "authentication":null,"connectionSettings":null
+  }
+}}'
+# JSON message that puts the ROS proxy repository into the
+# 'public' repository group so that the URL 
+# $NEXUS/content/groups/public is redirected to this proxy.
+JSON_REPO_GROUPS_PUT='{"data":{
+  "id":"public",
+  "name":"Public Repositories",
+  "format":"maven2",
+  "exposed":true,
+  "provider":"maven2",
+  "repositories":[
+    {"id":"releases"},
+    {"id":"snapshots"},
+    {"id":"thirdparty"},
+    {"id":"central"},
+    {"id":"ros"}
+  ]
+}}'
+
+# Wait for valid HTTP response
+nexus_wait () {
+   X=""
+   while [ Y"$X" = Y"" ]; do
+       echo -n "."
+       sleep 1
+       X=`docker exec nexus-run curl -g -s http://localhost:8081/nexus/service/local/$1 | grep "$2"`
+   done
+}
+
+# Send JSON data to NEXUS REST service via HTTP.
+nexus_rest_json () {
+    docker exec nexus-run curl -s -g -i -f \
+      -H "Accept: application/json" \
+      -H "Content-Type: application/json" \
+      -X $1 \
+      -v -d "$3" \
+      -u admin:admin123 \
+      http://localhost:8081/nexus/service/local/$2 &> /dev/null
+}
+
+RUNNING=$(docker inspect --format="{{ .State.Running }}" nexus-run 2>/dev/null)
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No nexus container exists, creating a new one..."
+  cd `dirname $SCRIPT`/../nexus
+  docker build -t nexus .
+  docker run -d -p 8081:8081 --name nexus-run nexus
+  
+  RUNNING=$(docker inspect --format="{{ .State.Running }}" nexus-run 2>/dev/null)
+  if [ X"$RUNNING" = X"true" ]; then # container running
+      # Wait on HTTP server and setup ROS repository
+      echo "NEXUS: Waiting for web server of nexus-run container."
+      nexus_wait repositories "<id>central</id>"
+      echo "NEXUS: Add proxy ROS repository."
+      nexus_rest_json POST repositories "$JSON_REPOSITORIES_POST"
+      echo "NEXUS: Add ROS repository to 'public' group."
+      nexus_rest_json PUT repo_groups/public "$JSON_REPO_GROUPS_PUT"
+  else
+      echo "Failed to start nexus container."
+      exit 1
+  fi
+fi
+if [ X"$RUNNING" = X"false" ]; then # container exists, but stopped
+  echo "nexus container exitss, starting it..."
+  docker start nexus-run
+  if [ X"$RUNNING" = X"true" ]; then # container running
+      # Wait on HTTP server
+      echo "NEXUS: Waiting for web server of nexus-run container."
+      nexus_wait repositories "<id>central</id>"
+  else
+      echo "Failed to start nexus container."
+      exit 1
+  fi
+fi

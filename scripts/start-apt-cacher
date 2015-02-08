@@ -1,0 +1,34 @@
+#!/bin/bash
+# Author: Daniel Beßler
+
+SCRIPT=`readlink -f "$0"`
+
+# Wait for valid HTTP response
+apt_cacher_wait () {
+   X=""
+   while [ Y"$X" = Y"" ]; do
+       sleep 1
+       X=`curl -g -s http://172.17.42.1:3142`
+   done
+}
+
+RUNNING=$(docker inspect --format="{{ .State.Running }}" apt-cacher-run 2>/dev/null)
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No apt-cacher container exists, creating a new one..."
+  cd `dirname $SCRIPT`/../apt-cacher-ng
+  docker build -t apt-cacher .
+  docker run -d -p 3142:3142 --name apt-cacher-run apt-cacher
+fi
+if [ X"$RUNNING" = X"false" ]; then # container exists, but stopped
+  echo "apt-cacher container exists, starting it..."
+  docker start apt-cacher-run
+fi
+
+RUNNING=$(docker inspect --format="{{ .State.Running }}" apt-cacher-run 2>/dev/null)
+if [ X"$RUNNING" = X"true" ]; then # container running
+  apt_cacher_wait
+  echo "apt-cacher running."
+else
+  echo "Failed to start apt-cacher container."
+  exit 1
+fi

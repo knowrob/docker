@@ -27,8 +27,6 @@ RUN cp -r /opt/ros/hydro/share/pr2_description/meshes/* /opt/webapp/pr2_descript
 # Convert tif to png
 RUN for x in `ls /opt/webapp/pr2_description/meshes/*/*.tif`; do convert $x ${x%.tif}.png; done
 # Update image referneces in dae files
-# TODO: Seems dae files are loaded from /opt/ros/hydro/share/pr2_description.
-#       Update images references there!
 RUN for x in `ls /opt/webapp/pr2_description/meshes/*/*.dae`; do sed 's/.tif/.png/g' ${x} > ${x}.new && mv -v ${x}.new ${x}; done
 
 # Expose volumes for maintenance

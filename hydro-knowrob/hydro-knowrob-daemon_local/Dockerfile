@@ -7,8 +7,6 @@ WORKDIR /home/ros/src
 RUN echo "Adding repositories...."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 
-# dummy 'add' command to always check out the repositories
-ADD ./Dockerfile /home/ros/src/
 ADD ./src.tar /home/ros/src/
 
 WORKDIR /home/ros

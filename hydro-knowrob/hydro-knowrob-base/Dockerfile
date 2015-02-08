@@ -20,6 +20,9 @@ WORKDIR /home/ros
 USER ros
 RUN mkdir /home/ros/src && chown -R ros:ros /home/ros && rosdep update
 
+RUN mkdir -p /home/ros/.m2
+ADD mvn-settings.xml /home/ros/.m2/settings.xml
+
 RUN echo "export LD_LIBRARY_PATH=/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /home/ros/.bashrc && \
     echo source /home/ros/devel/setup.bash >> /home/ros/.bashrc && \
@@ -35,7 +38,9 @@ ENV PKG_CONFIG_PATH /home/ros/devel/lib/pkgconfig:/opt/ros/hydro/lib/pkgconfig
 ENV ROS_MASTER_URI http://localhost:11311
 ENV ROS_MAVEN_DEPLOYMENT_REPOSITORY /home/ros/devel/share/maven
 ENV ROS_MAVEN_PATH /home/ros/devel/share/maven:/opt/ros/hydro/share/maven
-ENV ROS_MAVEN_REPOSITORY https://github.com/rosjava/rosjava_mvn_repo/raw/master
+# Use nexus server that mirrors maven central and ROS repository.
+# NOTE: Requires that nexus server was started before build.
+ENV ROS_MAVEN_REPOSITORY http://172.17.42.1:8081/nexus/content/groups/public
 ENV ROS_WORKSPACE /home/ros
 ENV ROS_IP 127.0.0.1
 ENV LD_LIBRARY_PATH /home/ros/devel/lib:/opt/ros/hydro/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/hydro/lib/python2.7/dist-packages

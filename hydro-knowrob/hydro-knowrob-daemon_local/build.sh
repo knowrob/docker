@@ -34,6 +34,7 @@ create_archive() {
 }
 
 clone_knowrob_repo() {
+  mkdir -p $LOCAL_DIR
   cd $LOCAL_DIR
   if ls $LOCAL_DIR | grep ^$1$ > /dev/null; then
     echo "$1 already cloned."
@@ -83,6 +84,7 @@ if [ $KNOWROB_FOUND -eq 0 ]; then
   create_archive $LOCAL_DIR
 fi
 
+$DIR/../../nexus/start.sh
 echo "Building knowrob/hydro-knowrob-daemon....";
 docker build -t knowrob/hydro-knowrob-daemon .
 
