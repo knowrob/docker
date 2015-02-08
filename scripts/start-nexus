@@ -59,6 +59,7 @@ nexus_wait () {
        sleep 1
        X=`docker exec nexus-run curl -g -s http://localhost:8081/nexus/service/local/$1 | grep "$2"`
    done
+   echo ""
 }
 
 # Send JSON data to NEXUS REST service via HTTP.
