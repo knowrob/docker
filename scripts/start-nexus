@@ -3,13 +3,10 @@
 
 SCRIPT=`readlink -f "$0"`
 
-# TODO(daniel): I run frequently into timeouts using the official github repository,
-#               nexus also refused to use this URL. Maybe my provider is throttling github :/
-#ROSJAVA_MAVEN_REPOSITORY="https://github.com/rosjava/rosjava_mvn_repo/raw/master"
-ROSJAVA_MAVEN_REPOSITORY="http://www.informatik.uni-bremen.de/~danielb"
-
 # JSON message that yields in a new proxy repository
 # for ROS java
+# NOTE(daniel): I run frequently into timeouts using the official github repository,
+#               nexus also refused to use this URL. Maybe my provider is throttling github :/
 JSON_REPOSITORIES_POST='{"data":{
   "repoType":"proxy",
   "id":"ros",
@@ -29,7 +26,7 @@ JSON_REPOSITORIES_POST='{"data":{
   "exposed":true,
   "checksumPolicy":"WARN",
   "remoteStorage":{
-    "remoteStorageUrl":"${ROSJAVA_MAVEN_REPOSITORY}",
+    "remoteStorageUrl":"http://www.informatik.uni-bremen.de/~danielb",
     "authentication":null,"connectionSettings":null
   }
 }}'
@@ -64,7 +61,7 @@ nexus_wait () {
 
 # Send JSON data to NEXUS REST service via HTTP.
 nexus_rest_json () {
-    docker exec nexus-run curl -s -g -i -f \
+    docker exec nexus-run curl -g -i -f \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       -X $1 \
