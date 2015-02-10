@@ -12,7 +12,6 @@
         },
         west: {
           minSize: 250,
-          maxSize: 750,
           size: 500,
           // INNER-LAYOUT
           childOptions: {
@@ -38,18 +37,17 @@
               onresize: function() {
                if( knowrob ) knowrob.resize_canvas();
               },
-              minSize: 250
+              minSize: 50
             },
             south: {
               paneSelector: "#chart",
               initClosed: true,
-              minSize: 150
+              minSize: 50
             }
           }
         },
         east: {
           minSize: 250,
-          maxSize: 750,
           size: 500,
           initClosed: true,
           // INNER-LAYOUT
@@ -77,8 +75,8 @@
   <div class="ui-layout-west">
     <div id="console">
       <div id="console_top">
-        <div id="history"></div>
-        <div id="user_query">member(A, [a,b,c]).</div>
+        <div id="history" style="font-size:20px;"></div>
+        <div id="user_query" style="font-size:20px;">member(A, [a,b,c]).</div>
       </div>
       <div id="console_bottom">
         <div id="query_buttons">
@@ -89,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div id="library">
+    <div id="library" style="font-size:20px;">
       <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
         size="20" name="examplequery" id="examplequery"><option value=0></option>
       </select>
