@@ -27,13 +27,14 @@ def download_mesh_to_local_cache(src, dst):
     that is defined in flask settings.
     """
     dstDir = os.path.dirname(dst)
+    p_src, ext = os.path.splitext(src)
+    p_dst, ext = os.path.splitext(dst)
     
     if is_mesh_url_valid(src):
         if not os.path.exists(dstDir):
             os.makedirs(dstDir)
         urlretrieve(src,dst)
         
-        p_dst, ext = os.path.splitext(src)
         if ext == ".tif":
             call(["/usr/bin/convert", dst, p_dst+".png"])
         if ext == ".dae":
@@ -41,9 +42,8 @@ def download_mesh_to_local_cache(src, dst):
         
         return True
     else:
-        p_src, ext = os.path.splitext(src)
         if ext == ".png":
-            return download_mesh_from(p_src + ".tif", dst)
+            return download_mesh_to_local_cache(p_src + ".tif", p_dst + ".tif")
         else:
             return False
 
