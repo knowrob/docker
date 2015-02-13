@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sed 's/.tif/.png/g' "$1" > "$1.new" && mv -v "$1.new" "$1"

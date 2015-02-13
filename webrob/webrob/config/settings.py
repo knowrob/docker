@@ -20,4 +20,9 @@ USER_ENABLE_USERNAME = True
 USER_ENABLE_EMAIL           = True
 USER_ENABLE_CONFIRM_EMAIL = False
 
+MESH_REPOSITORIES = [
+    "http://svn.ai.uni-bremen.de/svn/cad_models/",
+    "https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
+]
+
 

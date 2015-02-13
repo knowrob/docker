@@ -26,6 +26,16 @@ if [ $? -eq 1 ]; then # container does not exist
   docker run --name user_data knowrob/user_data true
 fi
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mesh_data container exists and create otherwise
+RUNNING=$(docker inspect --format="{{ .State.Running }}" mesh_data 2>/dev/null)
+
+if [ $? -eq 1 ]; then # container does not exist
+  echo "No mesh_data container exists, creating a new one..."
+  docker run -d -v /home/ros/mesh_data --name mesh_data ubuntu \
+    chmod -R ugo+rw /home/ros/mesh_data
+fi
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -129,4 +139,13 @@ elif [ "$RUNNING" == 'false' ]; then # container exist
 fi
 
 echo "Creating web app container..."
-docker run --rm -i -p $KNOWROB_WEB_PORT:5000 --volumes-from knowrob_data --volumes-from user_data --link postgres_db:postgres -e VIRTUAL_HOST=webrob -e VIRTUAL_PORT=5000 --name webrob -v /var/run/docker.sock:/var/run/docker.sock knowrob/webrob python runserver.py
+docker run --rm -i -p $KNOWROB_WEB_PORT:5000 \
+    --volumes-from knowrob_data \
+    --volumes-from user_data \
+    --volumes-from mesh_data \
+    --link postgres_db:postgres \
+    -e VIRTUAL_HOST=webrob \
+    -e VIRTUAL_PORT=5000 \
+    --name webrob \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    knowrob/webrob python runserver.py

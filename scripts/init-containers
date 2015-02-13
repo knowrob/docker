@@ -49,7 +49,6 @@ if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
   docker start mongo_db
 fi
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # import the files
 #mongoimport --db roslog --collection tf "${MY_ROSLOG_PATH}/tf.json"

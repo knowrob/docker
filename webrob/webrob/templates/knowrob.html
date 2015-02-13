@@ -77,7 +77,8 @@
       wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       knowrob = new Knowrob({
           ros_url: wsproto + '://{{ host_url }}/ws/{{ container_name }}/',
-          library_file: libraryFile
+          library_file: libraryFile,
+          meshPath: '/meshes/'
       });
       knowrob.init();
     });

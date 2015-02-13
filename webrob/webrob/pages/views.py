@@ -1,5 +1,5 @@
 
-from flask import session, jsonify, request, render_template, Markup, send_from_directory
+from flask import session, jsonify, request, redirect, render_template, Markup, send_from_directory
 from flask_user import login_required
 from flask.ext.misaka import markdown
 
@@ -7,19 +7,66 @@ import os, sys, re
 import json
 
 from urlparse import urlparse
+from urllib import urlopen, urlretrieve
 
 from webrob.app_and_db import app, db
 from webrob.user.knowrob_user import read_tutorial_page
 
 from utility import *
 
+from subprocess import call
+
 MAX_HISTORY_LINES = 50
 
-@app.route('/pr2_description/meshes/<path:filename>')
-def download_mesh(filename):
-  return send_from_directory('/opt/webapp/pr2_description/meshes/', filename, as_attachment=True)
+def is_mesh_url_valid(url):
+    return urlopen(url).getcode() == 200
+
+def download_mesh_to_local_cache(src, dst):
+    """
+    download mesh file via http from trusted host
+    that is defined in flask settings.
+    """
+    dstDir = os.path.dirname(dst)
+    
+    if is_mesh_url_valid(src):
+        if not os.path.exists(dstDir):
+            os.makedirs(dstDir)
+        urlretrieve(src,dst)
+        
+        p_dst, ext = os.path.splitext(src)
+        if ext == ".tif":
+            call(["/usr/bin/convert", dst, p_dst+".png"])
+        if ext == ".dae":
+            call(["/opt/webapp/update-texture-reference", dst])
+        
+        return True
+    else:
+        p_src, ext = os.path.splitext(src)
+        if ext == ".png":
+            return download_mesh_from(p_src + ".tif", dst)
+        else:
+            return False
+
+@app.route('/meshes/<path:mesh>')
+@login_required
+def download_mesh(mesh):
+    meshFile = os.path.join('/home/ros/mesh_data', mesh)
+    
+    if not os.path.isfile(meshFile):
+        for repository in app.config['MESH_REPOSITORIES']:
+            sourceFile = repository + mesh
+            try:
+                if download_mesh_to_local_cache(sourceFile, meshFile):
+                    break
+            except:
+                pass
+    
+    return send_from_directory(
+        os.path.dirname(meshFile),
+        os.path.basename(meshFile))
 
 @app.route('/knowrob_data/<path:filename>')
+@login_required
 def download_logged_image(filename):
   return send_from_directory('/home/ros/knowrob_data/', filename)
 
