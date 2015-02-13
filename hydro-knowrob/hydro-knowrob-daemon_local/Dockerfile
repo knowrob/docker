@@ -11,10 +11,6 @@ ADD ./src.tar /home/ros/src/
 
 WORKDIR /home/ros
 
-# copy PR2 meshes into docroot
-RUN mkdir -p /home/ros/knowrob/knowrob_vis/html/pr2_description/meshes
-RUN cp -r /opt/ros/hydro/share/pr2_description/meshes/* /home/ros/knowrob/knowrob_vis/html/pr2_description/meshes/
-
 # build the catkin workspace
 WORKDIR /home/ros
 RUN /opt/ros/hydro/bin/catkin_make
