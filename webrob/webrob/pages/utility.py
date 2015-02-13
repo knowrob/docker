@@ -31,19 +31,3 @@ def copy_template_file(src, dst, args):
     dst_f = open(dst, 'w')
     dst_f.write(template % args)
     dst_f.close()
- 
-def generate_mac():
-    secret = "RW6WZ2yp67ETMdj2"
-    client = request.remote_addr
-    dest   = request.host_url # TODO: find out the actual IP; this will return the hostname
-
-    rand = "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(30)])
-
-    t = int(time.time())
-    level = "user"
-    end = int(t + 3600)
-
-    mac = hashlib.sha512(secret + client + dest + rand + str(t) + level + str(end) ).hexdigest()
-
-    return "ros.authenticate(" + mac + ", " + client + ", " + dest + ", " + rand + ", " + str(t) + ", " + level + ", " + str(end) + ")"
- 

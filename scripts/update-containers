@@ -1,11 +1,12 @@
 #!/bin/bash
 docker pull busybox
 docker pull mongo
+docker pull nginx
+docker pull jwilder/docker-gen
 docker pull knowrob/hydro-knowrob-daemon
 docker pull knowrob/webrob
 docker pull knowrob/user_db
 docker pull knowrob/user_data
-docker pull knowrob/nginx-proxy
 docker pull knowrob/postgres
 
 # update the common data container:
