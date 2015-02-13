@@ -1,0 +1,4 @@
+# Ignore certificate files and keys, those must not be commited/published!
+*.crt
+*.csr
+*.key

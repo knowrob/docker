@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
     password = db.Column(db.String(255), nullable=False, default='')
     reset_password_token = db.Column(db.String(100), nullable=False, default='')
+    api_token = db.Column(db.String(64), nullable=False, default='')
     container_id = db.Column(db.String(255), nullable=False, default='')
 
     # Relationships

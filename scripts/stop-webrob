@@ -1,0 +1,2 @@
+#!/bin/bash
+docker stop -t 3 dockerbridge nginx docker-gen mongo_db postgres_db `docker ps | grep knowrob/hydro-knowrob-daemon:latest | awk '{print $1}'`
