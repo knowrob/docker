@@ -23,6 +23,10 @@
         {
             "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), add_stickman_visualization('human1', human1:'iai_human_robot1', T, '', Prefix).",
             "text": "What was the pose of the Human when intrusion events occurred?"
+        },
+        {
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T0), owl_has(I, knowrob:'endTime', T1), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), atom_concat(Prefix, 'lefthand', Link), add_trajectory(Link, T0, T1, 0.1).",
+            "text": "What was the right hand trajectory of the Human during intrusion events?"
         }
     ]
 }
