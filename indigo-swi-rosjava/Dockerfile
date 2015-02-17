@@ -97,7 +97,7 @@ ENV _sav_transform_roscomplete_rosrun _roscomplete_exe
 RUN mkdir -p /home/ros/system_pkgs/src
 WORKDIR /home/ros/system_pkgs/src
 
-RUN wstool init -j4 . https://raw.githubusercontent.com/yujinrobot/yujin_tools/master/rosinstalls/indigo/rosjava.rosinstall
+RUN wstool init -j4 . https://raw.githubusercontent.com/rosjava/rosjava/indigo/rosjava.rosinstall
 
 # build the catkin workspace
 WORKDIR /home/ros/system_pkgs/
