@@ -22,6 +22,7 @@ USER_ENABLE_CONFIRM_EMAIL = False
 
 MESH_REPOSITORIES = [
     "http://svn.ai.uni-bremen.de/svn/cad_models/",
+    "https://github.com/code-iai/iai_robots/raw/master/",
     "https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
 ]
 

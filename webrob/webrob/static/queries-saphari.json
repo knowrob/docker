@@ -5,12 +5,8 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('saphari'), rdf_register_ns(saphari, 'http://knowrob.org/kb/saphari.owl#', [keep(true)]), rdf_register_ns(human1, 'http://knowrob.org/kb/openni_human1.owl#', [keep(true)]).",
-            "text": "Initialize knowledge base"
-        },
-        {
-            "q": "owl_parse('package://knowrob_srdl/owl/openni_human1.owl').",
-            "text": "Initialize kinematic chains"
+            "q": "register_ros_package(knowrob_saphari).",
+            "text": "Initialize SAPHARI context"
         },
         {
             "q": "load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_0/cram_log.owl').",
@@ -21,8 +17,12 @@
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), add_stickman_visualization('human1', human1:'iai_human_robot1', T, '', Prefix).",
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), add_stickman_visualization('human1', openni_human:'iai_human_robot1', T, '', Prefix).",
             "text": "What was the pose of the Human when intrusion events occurred?"
+        },
+        {
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), add_agent_visualization('_', boxy:'boxy_robot1', T, '', '').",
+            "text": "What was the pose of the Robot when intrusion events occurred?"
         },
         {
             "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T0), owl_has(I, knowrob:'endTime', T1), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), atom_concat(Prefix, 'lefthand', Link), add_trajectory(Link, T0, T1, 0.1).",
