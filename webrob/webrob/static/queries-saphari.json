@@ -17,7 +17,7 @@
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), add_stickman_visualization('human1', openni_human:'iai_human_robot1', T, '', Prefix).",
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), saphari_visualize_human(Prefix, T).",
             "text": "What was the pose of the Human when intrusion events occurred?"
         },
         {
