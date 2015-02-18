@@ -17,16 +17,12 @@
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), saphari_visualize_human(Prefix, T).",
-            "text": "What was the pose of the Human when intrusion events occurred?"
+            "q": "owl_individual_of(_I, saphari:'HumanIntrusion'), owl_has(_I, knowrob:'startTime', T), owl_has(_I, knowrob:'designator', _D), mng_designator_props(_D, 'TF-PREFIX', _Prefix), intrusion_link(openni_human:'iai_human_robot1', _Prefix, T, BodyPart).",
+            "text": "Which body parts of the human intersected the safety area at first?"
         },
         {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), add_agent_visualization('_', boxy:'boxy_robot1', T, '', '').",
-            "text": "What was the pose of the Robot when intrusion events occurred?"
-        },
-        {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T0), owl_has(I, knowrob:'endTime', T1), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), atom_concat(Prefix, 'lefthand', Link), add_trajectory(Link, T0, T1, 0.1).",
-            "text": "What was the right hand trajectory of the Human during intrusion events?"
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), saphari_visualize_agents(T).",
+            "text": "What was the pose of agents when intrusion events occurred?"
         }
     ]
 }
