@@ -9,7 +9,7 @@
             "text": "Initialize SAPHARI context"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_0/cram_log.owl').",
+            "q": "load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_0/cram_log.owl'), load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_1/cram_log.owl'), load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_2/cram_log.owl').",
             "text": "Load logged experiments"
         },
         {
