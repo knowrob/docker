@@ -22,6 +22,19 @@
         },
         {
             "q": "",
+            "text": "----- Queries on controller designators -----"
+        },
+        {
+            "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-DOWN-UNTIL-TOUCH', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['CONTACT-STRATEGIES', 'SEVERE-COLLISION'], Policy).",
+            "text": "What was the collision strategy during the experiment?"
+        },
+        
+        {
+            "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-OVER-OBJECT', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['ARM'], 'RIGHT'), mng_designator_property(Designator, _DesigJava, ['OBJECT', 'RESPONSE'], Object).",
+            "text": "Over which objects did the robot moved the right arm?"
+        },
+        {
+            "q": "",
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
