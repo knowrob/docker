@@ -9,8 +9,12 @@
             "text": "Initialize SAPHARI context"
         },
         {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_0/cram_log.owl'), load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_1/cram_log.owl'), load_experiment('/home/ros/knowrob_data/logs/saphari/intrusion_2/cram_log.owl').",
+            "q": "load_experiments('/home/ros/knowrob_data/logs/saphari/', 'cram_log.owl').",
             "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://knowrob_saphari/owl/saphari_map.owl'), add_object_with_children('http://knowrob.org/kb/saphari_map.owl#Map_SAPHARI').",
+            "text": "Load semantic map"
         },
         {
             "q": "findall([_Obj,_Time], (owl_individual_of(_Perception, knowrob:'UIMAPerception'), owl_has(_Perception, knowrob:'perceptionResult', _Obj), owl_has(_Perception, knowrob:'endTime', _Time)), _Objs), member([Obj,Time], _Objs), belief_at(loc(Obj,Loc), Time), add_object_as_semantic_instance(Obj, Loc, Time, Instance), add_object_with_children(Instance).",
