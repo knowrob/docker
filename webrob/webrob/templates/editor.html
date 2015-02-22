@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
+{% block bodyargs %}{% if overlay %} {% endif %}{% endblock %}
 
 {% block head %}
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>

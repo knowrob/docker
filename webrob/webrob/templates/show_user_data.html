@@ -2,7 +2,7 @@
 
 
 
-{% block bodyargs %} onload="showSpinnerOverlay()"{% endblock %}
+{% block bodyargs %} {% endblock %}
 
 
 {% block content %}
@@ -26,52 +26,3 @@
 
 {% endblock %}
 
-
-{% block spinner %}
-
-  <script type="text/javascript">
-    var webSocket = undefined;
-    var isWebsocketOpened = false;
-    var hasWebsocketError = false;
-    
-    function isWaitingForWebsocket() {
-        if(isWebsocketOpened) {
-            if(webSocket) webSocket.close();
-            return false;
-        }
-        if(webSocket == undefined) {
-            hasWebsocketError = false;
-            
-            var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-            webSocket = new WebSocket(wsproto + '://{{ host_url }}/ws/{{ container_name }}/');
-            
-            webSocket.onopen = function() {
-                isWebsocketOpened = true;
-            };
-            webSocket.onclose = function() {
-                webSocket = undefined;
-            };
-            webSocket.onerror = function() {
-                hasWebsocketError = true;
-            };
-        }
-        
-        if(hasWebsocketError) {
-            if(webSocket) webSocket.close();
-        }
-        
-        return true;
-    }
-    // Overlay for loading
-    function showSpinnerOverlay() {
-        iosOverlay({
-                text: "Connecting to Web Socket Server",
-                isSpinning: isWaitingForWebsocket,
-                spinner: createSpinner()
-        });
-        return false;
-    }
-//     showSpinnerOverlay() ;
-</script>
-
-{% endblock %}
