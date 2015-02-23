@@ -57,6 +57,7 @@
     
     {% if show_south_pane %}
     <div class="pane ui-layout-south">
+      <!--
       <div id="msg_container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -68,6 +69,7 @@
         {% endif %}
         {% endwith %}
       </div>
+      -->
       <div id="logo_container">
         <a href="http://www.robohow.eu" class="media" title="http://www.robohow.eu"  rel="nofollow">
           <img src="{{ url_for('static', filename='logos/robohow-logo.png') }}" class="media" alt="" />
