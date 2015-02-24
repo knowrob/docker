@@ -67,6 +67,14 @@
         {
             "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), saphari_visualize_agents(T).",
             "text": "What was the pose of agents when intrusion events occurred?"
+        },
+        {
+            "q": "owl_individual_of(A,knowrob:'Scalpel'), highlight_object_mesh(A).",
+            "text": "What was the position of the scalpel during the Experiment?"
+        },
+        {
+            "q": "owl_individual_of(A,knowrob:'Scalpel'),owl_has(A,knowrob:'dangerousPart',S), remove_mesh_highlight(A), highlight_object_mesh(S).",
+            "text": "What are the dangerous parts of the Scalpel?"
         }
     ]
 }
