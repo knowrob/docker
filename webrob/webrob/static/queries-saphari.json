@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "register_ros_package(knowrob_saphari).",
+            "q": "register_ros_package(knowrob_saphari), diagram_canvas.",
             "text": "Initialize SAPHARI context"
         },
         {
@@ -28,10 +28,33 @@
             "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-DOWN-UNTIL-TOUCH', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['CONTACT-STRATEGIES', 'SEVERE-COLLISION'], Policy).",
             "text": "What was the collision strategy during the experiment?"
         },
-        
         {
             "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-OVER-OBJECT', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['ARM'], 'RIGHT'), mng_designator_property(Designator, _DesigJava, ['OBJECT', 'RESPONSE'], Object).",
             "text": "Over which objects did the robot moved the right arm?"
+        },
+        {
+            "q": "saphari_move_down_events(_Events), findall([_Event,_Collision], (member(_Event,_Events), rdf_has(_Event, knowrob:'startTime', S), rdf_has(_Event, knowrob:'endTime', E), saphari_collision_events(_CType, _CEvents), member(_Collision, _CEvents), rdf_has(_Collision, knowrob:'startTime', _CS), time_between(_CS, S, E)), Collisions).",
+            "text": "Did collisions happened during a MOVE-DOWN-UNTIL-TOUCH action?"
+        },
+        {
+            "q": "saphari_intrusion_events(Events), findall(Collision, (member(Event,Events), rdf_has(Event, knowrob:'startTime', S), rdf_has(Event, knowrob:'endTime', E), saphari_collision_events(CType, CEvents), member(Collision, CEvents), rdf_has(Collision, knowrob:'startTime', CS), time_between(CS, S, E)), Collisions), not(Collisions = []).",
+            "text": "Did collisions happened during a HUMAN-INTRUSION event?"
+        },
+        {
+            "q": "findall(Type-Num, (saphari_collision_events(Type, Events), length(Events, Num)), Distrib), pairs_keys_values(Distrib, Types, Nums), add_diagram(errordist, 'Collision distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Display the collision types which occurred during the experiment in a pie chart!"
+        },
+        {
+            "q": "findall(Type-Num, ( saphari_action_events(Type, Events), findall(E, ( member(E, Events), owl_individual_of(I, saphari:'HumanIntrusion'), rdf_has(E, knowrob:'startTime', T0), rdf_has(E, knowrob:'endTime', T1), rdf_has(I, knowrob:'startTime', T), time_between(T, T0, T1) ), MatchingEvents), length(MatchingEvents, Num) ), Distrib), pairs_keys_values(Distrib, Types, Nums), add_diagram(errordist, 'Action distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Display the action types during which an human intrusion occurred in a pie chart"
+        },
+        {
+            "q": "Ranges = [[0.0,3.0,'0-3s'], [3.0,6.0,'3-6s'], [6.0,9999.0,'>6s']], findall(Key-Num, ( member([Low,High,Key], Ranges), findall(I, ( owl_individual_of(I, saphari:'HumanIntrusion'), rdf_has(I, knowrob:'startTime', _S), rdf_has(I, knowrob:'endTime', _E), time_term(_S, _STime), time_term(_E, _ETime), Duration is _ETime - _STime, Duration >= Low, High >= Duration ), Matching), length(Matching, Num)), Distrib), pairs_keys_values(Distrib, Types, Nums), add_diagram(errordist, 'Intrusion distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Display the human intrusion as a function of their length in a pie chart"
+        },
+        {
+            "q": "mng_designator_distinct_values('designator.USER-ID', _IdList), findall(Id-Num, ( member(NumJava, _IdList), jpl_call(NumJava, 'intValue', [], Id), term_to_atom(Id,IdAtom), findall(Designator, ( owl_individual_of(Intr, saphari:'HumanIntrusion'), rdf_has(Intr, knowrob:'designator', Designator), mng_designator_props(Designator, 'USER-ID', IdAtom) ), Designators), length(Designators, Num)), Distrib), pairs_keys_values(Distrib, Types, Nums), add_diagram(errordist, 'Intrusion distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Display the human intrusion distribution in a pie chart"
         },
         {
             "q": "",
