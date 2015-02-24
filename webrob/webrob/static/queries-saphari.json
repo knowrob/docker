@@ -17,10 +17,6 @@
             "text": "Load semantic map"
         },
         {
-            "q": "findall([_Obj,_Time], (owl_individual_of(_Perception, knowrob:'UIMAPerception'), owl_has(_Perception, knowrob:'perceptionResult', _Obj), owl_has(_Perception, knowrob:'endTime', _Time)), _Objs), member([Obj,Time], _Objs), belief_at(loc(Obj,Loc), Time), add_object_as_semantic_instance(Obj, Loc, Time, Instance), add_object_with_children(Instance).",
-            "text": "Show perceived objects"
-        },
-        {
             "q": "",
             "text": "----- Queries on controller designators -----"
         },
@@ -61,12 +57,16 @@
             "text": "----- Queries on the robot's logged belief state -----"
         },
         {
+            "q": "findall([_Obj,_Time], (owl_individual_of(_Perception, knowrob:'UIMAPerception'), owl_has(_Perception, knowrob:'perceptionResult', _Obj), owl_has(_Perception, knowrob:'endTime', _Time)), _Objs), member([Obj,Time], _Objs), belief_at(loc(Obj,Loc), Time), add_object_as_semantic_instance(Obj, Loc, Time, Instance), add_object_with_children(Instance).",
+            "text": "Which objects were perceived during the experiment?"
+        },
+        {
             "q": "owl_individual_of(_I, saphari:'HumanIntrusion'), owl_has(_I, knowrob:'startTime', T), owl_has(_I, knowrob:'designator', _D), mng_designator_props(_D, 'TF-PREFIX', _Prefix), intrusion_link(openni_human:'iai_human_robot1', _Prefix, T, BodyPart).",
             "text": "Which body parts of the human intersected the safety area at first?"
         },
         {
-            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), saphari_visualize_agents(T).",
-            "text": "What was the pose of agents when intrusion events occurred?"
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T), saphari_visualize_experiment(T).",
+            "text": "How did the scene looked like when intrusion events occurred?"
         },
         {
             "q": "owl_individual_of(A,knowrob:'Scalpel'), highlight_object_mesh(A).",
