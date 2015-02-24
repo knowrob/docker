@@ -69,6 +69,10 @@
             "text": "How did the scene looked like when intrusion events occurred?"
         },
         {
+            "q": "owl_individual_of(I, saphari:'HumanIntrusion'), owl_has(I, knowrob:'startTime', T0), owl_has(I, knowrob:'endTime', T1), saphari_visualize_experiment(T0), owl_has(I, knowrob:'designator', D), mng_designator_props(D, 'TF-PREFIX', Prefix), atom_concat(Prefix, 'lefthand', Frame), clear_trajectories, add_trajectory(Frame, T0, T1, 0.1).",
+            "text": "Show left hand trajectories during intrusion events."
+        },
+        {
             "q": "owl_individual_of(A,knowrob:'Scalpel'), highlight_object_mesh(A).",
             "text": "What was the position of the scalpel during the Experiment?"
         },
