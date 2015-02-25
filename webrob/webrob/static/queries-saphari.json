@@ -25,7 +25,7 @@
             "text": "What was the collision strategy during the experiment?"
         },
         {
-            "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-OVER-OBJECT', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['ARM'], 'RIGHT'), mng_designator_property(Designator, _DesigJava, ['OBJECT', '_ID'], Object), atom_concat('http://knowrob.org/kb/cram_log.owl#', Object, Obj2), !, belief_at(loc(Obj2,Loc), Timepoint), add_object_as_semantic_instance(Obj2, Loc, Timepoint, Instance), add_object_with_children(Instance).",
+            "q": "action_designator('REPLACEABLE-FUNCTION-MOVE-OVER-OBJECT', Timepoint, Designator), mng_designator(Designator, _DesigJava), mng_designator_property(Designator, _DesigJava, ['ARM'], 'RIGHT'), mng_designator_property(Designator, _DesigJava, ['OBJECT', '_ID'], Object), atom_concat('http://knowrob.org/kb/cram_log.owl#', Object, Obj2), !, belief_at(loc(Obj2,Loc), Timepoint), add_object_as_semantic_instance(Obj2, Loc, Timepoint, Instance), add_object_with_children(Instance), highlight_object_mesh(Instance).",
             "text": "Over which objects did the robot moved the right arm?"
         },
         {
