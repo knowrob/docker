@@ -23,6 +23,18 @@ def login_by_session():
     return jsonify({'error': 'not authenticated'})
 
 
+@app.route('/api/v1.0/refresh_by_session', methods=['GET'])
+def refresh_by_session():
+    """
+    Refreshes the running session for a currently logged in user. This prevents a users container from being terminated
+    automatically.
+    """
+    if current_user.is_authenticated():
+        knowrob_docker.refresh(current_user.username)
+        return jsonify({'result': 'success'})
+    return jsonify({'error': 'not authenticated'})
+
+
 @app.route('/api/v1.0/auth_by_token/<string:token>', methods=['GET'])
 def login_by_token(token):
     """
@@ -60,6 +72,19 @@ def stop_container(token):
     if user is None:
         return jsonify({'error': 'wrong api token'})
     knowrob_docker.stop_container(user.username)
+    return jsonify({'result': 'success'})
+
+
+@app.route('/api/v1.0/refresh_by_token/<string:token>', methods=['GET'])
+def refresh_by_token(token):
+    """
+    Refreshes the running session for the user assigned to the given API token. This prevents a users container from
+    being terminated automatically.
+    """
+    user = user_by_token(token)
+    if user is None:
+        return jsonify({'error': 'wrong api token'})
+    knowrob_docker.refresh(user.username)
     return jsonify({'result': 'success'})
 
 
