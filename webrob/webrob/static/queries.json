@@ -57,7 +57,7 @@
             "text": "Where did it stand during the PUT-DOWN actions?"
         },
         {
-            "q": "findall([Obj, E], \n ((task_end(T,E), task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), \n Objs),!, member([Obj, E], Objs), belief_at(loc(Obj,Loc), E), \n add_object_as_semantic_instance(Obj, Loc, E, SemanticMapInstance), \n add_object_with_children(SemanticMapInstance).",
+            "q": "findall([Obj, E], \n ((task_end(T,E), task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), \n Objs),!, member([Obj, E], Objs), \n add_object_as_semantic_instance(Obj, Loc, E, SemanticMapInstance), \n add_object_with_children(SemanticMapInstance), designator_publish(Obj).",
             "text": "Where have objects been perceived during the task?"
         },
         {
