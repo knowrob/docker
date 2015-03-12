@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "knowrob_layout.html" %}
 
 {% block bodyargs %}{% if overlay %} {% endif %}{% endblock %}
 
@@ -134,7 +134,7 @@
         save_editor_file_if_changed();
         var pkgName = prompt("Please enter a name for the package", "my_experiment");
         $.ajax({
-            url: "/pkg_new",
+            url: "/knowrob/pkg_new",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
@@ -161,7 +161,7 @@
         var r = confirm("Do You really want to remove the package '" + activePkg + "'?");
         if (r === true) {
             $.ajax({
-                url: "/pkg_del",
+                url: "/knowrob/pkg_del",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({}),  
@@ -202,7 +202,7 @@
         $('#pkg-selection').empty();
         // Request available packages
         $.ajax({
-            url: "/pkg_list",
+            url: "/knowrob/pkg_list",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({}),  
@@ -254,7 +254,7 @@
         document.getElementById("file-list").innerHTML = "";
         
         $.ajax({
-            url: "/pkg_set",
+            url: "/knowrob/pkg_set",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
@@ -343,7 +343,7 @@
         
         update_editor_mode(fileName);
         $.ajax({
-            url: "/pkg_read",
+            url: "/knowrob/pkg_read",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({'file': fileName}),  
@@ -374,7 +374,7 @@
         // FIXME: Name clashes between newly created files and existing files.
         // e.g. when the user creates a file 'package.xml' the existing one is overwritten.
         $.ajax({
-            url: "/file_write",
+            url: "/knowrob/file_write",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({'file': file, 'content': content}),  
@@ -488,7 +488,7 @@
         var r = confirm("Do You really want to delete the file '" + activeFile + "'?");
         if (r == true) {
             $.ajax({
-                url: "/file_del",
+                url: "/knowrob/file_del",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({file: activeFile}),  
@@ -527,7 +527,7 @@
 </script>
 {% endblock %}
 
-{% block menu %}
+{% block _menu %}
   <li><a>Package</a><ul>
     <li><a href="#" onclick="new_pkg();">New</a></li>
     <li><a href="#" onclick="upload_pkg();">Upload</a></li>
@@ -545,7 +545,7 @@
 
 {% block content %}
   <!-- A hidden form used for the download of packages. -->
-  <form id="download" action="/pkg_down" method="POST">
+  <form id="download" action="/knowrob/pkg_down" method="POST">
     <input type="hidden" />
   </form>
   

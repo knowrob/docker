@@ -39,15 +39,17 @@ server {
   # iterates over all containers and creates 'location' entries
   # websocket endpoints: /ws/<container-name>
   {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
-    {{ if ne $host "webrob" }}
-      location /ws/{{ $host }}/ {
-    {{ else }}
-      location / {
-    {{ end }}
     {{ range $container := $containers }}
       {{ if $container.Env.VIRTUAL_PORT }}
         {{ range $i, $address := $container.Addresses }}
           {{ if eq $address.Port $container.Env.VIRTUAL_PORT }}
+            {{ if eq $host "login" }}
+              location / {
+            {{ else if $container.Env.OPEN_EASE_WEBAPP }}
+              location /{{ $host }}/ {
+            {{ else }}
+              location /ws/{{ $host }}/ {
+            {{ end }}
             proxy_pass http://{{ $address.IP }}:{{ $address.Port }};
             rewrite /ws/{{ $host }}/(.*) /$1 break;
           {{ end }}

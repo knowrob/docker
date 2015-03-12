@@ -32,12 +32,8 @@
   <div class="metanav">
     <div class="metanav_left">
       <ul class="menu">
-        <li><a href="{{ url_for('knowrob') }}" style="padding-left: 0px;">Knowledge Base</a></li>
-        <li><a href="{{ url_for('editor') }}">Editor</a></li>
         {% block menu %}{% endblock %}
-        <li><a>Help</a><ul>
-          <li><a href="{{ url_for('log') }}">Log</a></li>
-        </ul></li>
+        <li><a href="{{ url_for('log') }}">Log</a></li>
       </ul>
     </div>
     <div class="metanav_right">
@@ -45,7 +41,8 @@
         <a href="{{ url_for('user.login') }}">log in</a>
       {% else %}
         <ul class="menu" style="float: right;">
-          <li><a id="exp-value">Experiment</a><ul id="exp-menu" style="min-width: 180px;"></ul></li>
+          {% block menu_right %}{% endblock %}
+          <li><a id="app-value">Application</a><ul id="app-menu" style="min-width: 180px;"></ul></li>
           <li><a href="{{ url_for('user.logout') }}">Logout {{ current_user.username }}</a></li>
         </ul>
       {% endif %}
@@ -97,42 +94,42 @@
   {% block spinner %}{% endblock %}
   
   <script type="text/javascript">
-    function set_exp(exp) {
+    function set_application(application_name) {
       $.ajax({
-         url: "/exp_set",
+         url: "/application",
          type: "POST",
          contentType: "application/json",
          data: JSON.stringify({
-             experimentName: exp
+             application_name: application_name
          }),
-         dataType: "json",
-         success: function (data) {
-             window.location.reload();
-         }
+         dataType: "json"//,
+         //success: function (data) {
+             //window.location.reload();
+         //}
        }).done( function (request) {});
     }
       
     $(document).ready(function () {
-      // Request available experiments
+      // Request available apps
       $.ajax({
-          url: "/exp_list",
+          url: "/application_names",
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify({}),  
           dataType: "json",
           success: function (data) {
-              $('#exp-menu').empty();
-              $.each(data.result, function(j, exp) {
+              $('#app-menu').empty();
+              $.each(data.result, function(j, app) {
                   var li = document.createElement("li");
                   var item = document.createElement("a");
                   item.href = "#";
-                  item.onclick = function() { set_exp(exp); };
-                  item.appendChild(document.createTextNode(exp));
+                  item.onclick = function() { set_application(app); };
+                  item.appendChild(document.createTextNode(app));
                   li.appendChild(item);
-                  document.getElementById("exp-menu").appendChild(li);
+                  document.getElementById("app-menu").appendChild(li);
               });
               if(data.selection) {
-                document.getElementById("exp-value").innerHTML = data.selection;
+                document.getElementById("app-value").innerHTML = data.selection;
               }
             }
       }).done( function (request) {})

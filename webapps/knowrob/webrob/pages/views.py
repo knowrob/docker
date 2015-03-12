@@ -7,73 +7,27 @@ import os, sys, re
 import json
 
 from urlparse import urlparse
-from urllib import urlopen, urlretrieve
 
 from webrob.app_and_db import app, db
-from webrob.pages import api
 from webrob.user.knowrob_user import read_tutorial_page
 
 from utility import *
 
-from subprocess import call
-
 MAX_HISTORY_LINES = 50
 
-def is_mesh_url_valid(url):
-    return urlopen(url).getcode() == 200
-
-def download_mesh_to_local_cache(src, dst):
-    """
-    download mesh file via http from trusted host
-    that is defined in flask settings.
-    """
-    dstDir = os.path.dirname(dst)
-    p_src, ext = os.path.splitext(src)
-    p_dst, ext = os.path.splitext(dst)
-    
-    if is_mesh_url_valid(src):
-        if not os.path.exists(dstDir):
-            os.makedirs(dstDir)
-        urlretrieve(src,dst)
-        
-        if ext == ".tif":
-            call(["/usr/bin/convert", dst, p_dst+".png"])
-        if ext == ".dae":
-            call(["/opt/webapp/update-texture-reference", dst])
-        
-        return True
-    else:
-        if ext == ".png":
-            return download_mesh_to_local_cache(p_src + ".tif", p_dst + ".tif")
-        else:
-            return False
-
-@app.route('/meshes/<path:mesh>')
+@app.route('/knowrob/static/<path:filename>')
 @login_required
-def download_mesh(mesh):
-    meshFile = os.path.join('/home/ros/mesh_data', mesh)
-    
-    if not os.path.isfile(meshFile):
-        for repository in app.config['MESH_REPOSITORIES']:
-            sourceFile = repository + mesh
-            try:
-                if download_mesh_to_local_cache(sourceFile, meshFile):
-                    break
-            except:
-                pass
-    
-    return send_from_directory(
-        os.path.dirname(meshFile),
-        os.path.basename(meshFile))
+def download_static(filename):
+  return send_from_directory(os.path.join(app.root_path, "static"), filename)
 
-@app.route('/knowrob_data/<path:filename>')
+@app.route('/knowrob/knowrob_data/<path:filename>')
 @login_required
 def download_logged_image(filename):
   return send_from_directory('/home/ros/knowrob_data/', filename)
 
-@app.route('/tutorials/')
-@app.route('/tutorials/<cat_id>/')
-@app.route('/tutorials/<cat_id>/<page>')
+@app.route('/knowrob/tutorials/')
+@app.route('/knowrob/tutorials/<cat_id>/')
+@app.route('/knowrob/tutorials/<cat_id>/<page>')
 @login_required
 def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
@@ -95,8 +49,8 @@ def tutorials(cat_id='getting_started', page=1):
 
     return render_template('knowrob_tutorial.html', **locals())
 
-@app.route('/knowrob')
-@app.route('/exp/<exp_id>')
+@app.route('/knowrob/')
+@app.route('/knowrob/exp/<exp_id>')
 @login_required
 def knowrob(exp_id=None):
     error=""
@@ -117,7 +71,7 @@ def knowrob(exp_id=None):
 
     return render_template('knowrob_simple.html', **locals())
 
-@app.route('/video')
+@app.route('/knowrob/video')
 @login_required
 def video(exp_id=None):
     error=""
@@ -136,26 +90,26 @@ def video(exp_id=None):
     
     return render_template('video.html', **locals())
 
-@app.route('/exp_list', methods=['POST'])
+@app.route('/knowrob/exp_list', methods=['POST'])
 @login_required
 def exp_list():
     expList = []
     exp_file = None
     if 'exp' in session:
         exp_file = session['exp']
-    for f in os.listdir(os.path.join(app.root_path, "static")):
+    for f in os.listdir(os.path.join(app.root_path, "static/experiments/queries")):
         if f.endswith(".json") and f.startswith("queries-"):
             expList.append( f[len("queries-"):len(f)-len(".json")] )
     return jsonify(result=expList, selection=exp_file)
 
-@app.route('/exp_set', methods=['POST'])
+@app.route('/knowrob/exp_set', methods=['POST'])
 @login_required
 def exp_set():
     expName = json.loads(request.data)['experimentName']
     session['exp'] = expName
     return jsonify(result=None)
 
-@app.route('/add_history_item', methods=['POST'])
+@app.route('/knowrob/add_history_item', methods=['POST'])
 @login_required
 def add_history_item():
   query = json.loads(request.data)['query']
@@ -180,7 +134,7 @@ def add_history_item():
   
   return jsonify(result=None)
 
-@app.route('/get_history_item', methods=['POST'])
+@app.route('/knowrob/get_history_item', methods=['POST'])
 @login_required
 def get_history_item():
   index = json.loads(request.data)['index']
@@ -207,12 +161,6 @@ def get_history_item():
   
   else:
     return jsonify(item="", index=-1)
-
-@app.route('/create_api_token', methods=['GET'])
-@login_required
-def create_api_token():
-    api.create_token()
-    return redirect('/')
 
 def get_history_file():
   userDir = get_user_dir()

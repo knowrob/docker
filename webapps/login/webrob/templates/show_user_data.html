@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+
+
+{% block bodyargs %} {% endblock %}
+
+
+{% block content %}
+  <script type="text/javascript">
+    function set_application(application_name) {
+      $.ajax({
+         url: "/application",
+         type: "POST",
+         contentType: "application/json",
+         data: JSON.stringify({
+             application_name: application_name
+         }),
+         dataType: "json"//,
+         //success: function (data) {
+             //window.location.reload();
+         //}
+       }).done( function (request) {});
+    }
+  </script>
+
+<div class="login-box">
+<dl>
+  <dt>Username: </dt><dd>{{ current_user.username }}</dd>
+  <dt>Email: </dt><dd>{{ current_user.email }}</dd>
+  <br>
+  <dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
+  <dt>Application: </dt><dd>
+        <ul class="menu">
+          <li><a id="app-value">(select)</a><ul id="app-menu" style="min-width: 180px;">
+          {% for app in application_names %}
+          <li><a href="#" onclick="function() { set_application({{ app }}); }">{{ app }}</a></li>
+          {% endfor %}
+          </ul></li>
+        </ul>
+  </dd>
+</dl>
+</div>
+
+{% endblock %}
+

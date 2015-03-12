@@ -81,24 +81,22 @@ done
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start webrob container
-RUNNING=$(docker inspect --format="{{ .State.Running }}" webrob 2>/dev/null)
+RUNNING=$(docker inspect --format="{{ .State.Running }}" login 2>/dev/null)
 
 if [ "$RUNNING" == 'true' ]; then # container exists, and is running
   echo "Web app container is running, stopping and removing it..."
-  docker stop webrob && docker rm webrob
+  docker stop login && docker rm login
 elif [ "$RUNNING" == 'false' ]; then # container exist
   echo "Web app container exists, removing it..."
-  docker rm webrob
+  docker rm login
 fi
 
 echo "Creating web app container..."
 docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
-    --volumes-from knowrob_data \
     --volumes-from user_data \
-    --volumes-from mesh_data \
     --link postgres_db:postgres \
     --link dockerbridge:dockerbridge \
-    -e VIRTUAL_HOST=webrob \
+    -e VIRTUAL_HOST=login \
     -e VIRTUAL_PORT=5000 \
-    --name webrob \
-    knowrob/webrob python runserver.py
+    --name login \
+    openease/login python runserver.py

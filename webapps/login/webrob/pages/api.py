@@ -1,6 +1,7 @@
 from Crypto.Random import random
 from flask import jsonify, request, session
 from flask_login import current_user
+from flask_user import login_required
 import hashlib
 import string
 import time
@@ -10,7 +11,6 @@ from webrob.docker import knowrob_docker
 from webrob.models.users import User
 
 __author__ = 'mhorst@cs.uni-bremen.de'
-
 
 @app.route('/api/v1.0/auth_by_session', methods=['GET'])
 def login_by_session():
@@ -86,6 +86,12 @@ def refresh_by_token(token):
         return jsonify({'error': 'wrong api token'})
     knowrob_docker.refresh(user.username)
     return jsonify({'result': 'success'})
+
+@app.route('/create_api_token', methods=['GET'])
+@login_required
+def create_api_token():
+    create_token()
+    return redirect('/')
 
 
 def create_token():

@@ -18,22 +18,37 @@ def docker_connect():
     return http_client
 
 
-def start_container(user_container_name, user_data_container_name, common_data_container_name, user_home_dir):
+def start_user_container(container_name, user_home_dir, application_container, links, volumes):
     try:
         c = docker_connect()
 
         if c is not None:
-            c.notify("start_container", user_container_name,user_data_container_name,
-                     common_data_container_name)
+            c.notify("start_user_container", container_name, application_container, links, volumes)
             # create home directory if it does not exist yet
             if not os.path.exists(user_home_dir):
                 os.makedirs(user_home_dir)
 
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your OpenEASE instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your OpenEASE instance failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+
+
+def start_webapp_container(container_name, webapp_container, links, volumes):
+    try:
+        app.logger.error("start_webapp_container\n")
+        c = docker_connect()
+
+        if c is not None:
+            c.notify("start_webapp_container", container_name, webapp_container, links, volumes)
+
+    except InternalError, e:
+        flash("Error: Connection to your OpenEASE instance failed.")
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your OpenEASE instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 

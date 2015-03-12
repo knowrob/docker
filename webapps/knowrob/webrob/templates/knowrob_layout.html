@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block menu %}
+  <li><a href="{{ url_for('knowrob') }}" style="padding-left: 0px;">Knowledge Base</a></li>
+  <li><a href="{{ url_for('knowrob') }}editor">Editor</a></li>
+{% block _menu %}{% endblock %}
+{% endblock %}
+{% block menu_right %}
+{% block _menu_right %}{% endblock %}
+{% endblock %}

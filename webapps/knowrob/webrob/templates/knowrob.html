@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "knowrob_layout.html" %}
 
 
 <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
@@ -69,9 +69,9 @@
     $(document).ready(function () {
       // The file that contains example queries
       var libraryFile = "{% if exp_query_file
-          %}{{ url_for('static', filename=exp_query_file) }}{%
+          %}{{ '/knowrob/static/experiments/queries/'+exp_query_file }}{%
       else
-          %}{{ url_for('static', filename='queries.json') }}{%
+          %}{{ '/knowrob/static/experiments/queries/queries.json' }}{%
       endif %}";
       
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
@@ -94,6 +94,50 @@
         setTimeout(container_refresh, 570000);
     };
   </script>
+  <script type="text/javascript">
+    function set_exp(exp) {
+      $.ajax({
+         url: "/knowrob/exp_set",
+         type: "POST",
+         contentType: "application/json",
+         data: JSON.stringify({
+             experimentName: exp
+         }),
+         dataType: "json",
+         success: function (data) {
+             window.location.reload();
+         }
+       }).done( function (request) {});
+    };
+      
+    $(document).ready(function () {
+      // Request available experiments
+      $.ajax({
+          url: "/knowrob/exp_list",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({}),  
+          dataType: "json",
+          success: function (data) {
+              $('#exp-menu').empty();
+              $.each(data.result, function(j, exp) {
+                  var li = document.createElement("li");
+                  var item = document.createElement("a");
+                  item.href = "#";
+                  item.onclick = function() { set_exp(exp); };
+                  item.appendChild(document.createTextNode(exp));
+                  li.appendChild(item);
+                  document.getElementById("exp-menu").appendChild(li);
+              });
+              if(data.selection) {
+                document.getElementById("exp-value").innerHTML = data.selection;
+              }
+            }
+      }).done( function (request) {})
+    });
+  </script>
 {% endblock %}
 
-
+{% block _menu_right %}
+  <li><a id="exp-value">Experiment</a><ul id="exp-menu" style="min-width: 180px;"></ul></li>
+{% endblock %}

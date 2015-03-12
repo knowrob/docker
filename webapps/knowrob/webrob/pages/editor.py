@@ -17,7 +17,7 @@ from werkzeug import secure_filename
 from webrob.app_and_db import app
 from utility import *
     
-@app.route('/editor')
+@app.route('/knowrob/editor')
 @login_required
 def editor(filename=""):
     error=""
@@ -28,7 +28,7 @@ def editor(filename=""):
     
     return render_template('editor.html', **locals())
 
-@app.route('/pkg_new', methods=['POST'])
+@app.route('/knowrob/pkg_new', methods=['POST'])
 @login_required
 def pkg_new():
     packageName = json.loads(request.data)['packageName'];
@@ -64,7 +64,7 @@ def pkg_new():
     
     return jsonify(result=None)
 
-@app.route('/pkg_del', methods=['POST'])
+@app.route('/knowrob/pkg_del', methods=['POST'])
 @login_required
 def pkg_del(packageName=None):
     pkgName = packageName
@@ -73,7 +73,7 @@ def pkg_del(packageName=None):
     shutil.rmtree(os.path.join(get_user_dir(), pkgName))
     return jsonify(result=None)
 
-@app.route('/pkg_set', methods=['POST'])
+@app.route('/knowrob/pkg_set', methods=['POST'])
 @login_required
 def pkg_set():
     # Update package name
@@ -82,14 +82,14 @@ def pkg_set():
         session['pkg'] = data['packageName']
     return get_pkg_tree()
 
-@app.route('/pkg_list', methods=['POST'])
+@app.route('/knowrob/pkg_list', methods=['POST'])
 @login_required
 def pkg_list():
     # Return list of packages
     files = filter(lambda f: os.path.isdir(os.path.join(get_user_dir(), f)), os.listdir(get_user_dir()))
     return jsonify(result=files)
 
-@app.route('/pkg_read', methods=['POST'])
+@app.route('/knowrob/pkg_read', methods=['POST'])
 @login_required
 def pkg_read():
     path = get_file_path(json.loads(request.data)['file'])
@@ -101,7 +101,7 @@ def pkg_read():
     
     return jsonify(result=content)
 
-@app.route('/pkg_down', methods=['POST'])
+@app.route('/knowrob/pkg_down', methods=['POST'])
 @login_required
 def pkg_down():
     path = os.path.join(get_user_dir(), session['pkg'])
@@ -118,7 +118,7 @@ def pkg_down():
          as_attachment=True, 
          attachment_filename=zipName)
 
-@app.route('/file_write', methods=['POST'])
+@app.route('/knowrob/file_write', methods=['POST'])
 @login_required
 def file_write():
     data = json.loads(request.data)
@@ -128,7 +128,7 @@ def file_write():
     
     return jsonify(result=None)
    
-@app.route('/file_del', methods=['POST'])
+@app.route('/knowrob/file_del', methods=['POST'])
 @login_required 
 def file_del():
     path = get_file_path(json.loads(request.data)['file'])

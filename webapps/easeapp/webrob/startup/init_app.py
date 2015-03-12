@@ -13,8 +13,7 @@ from flask_user import UserManager, SQLAlchemyAdapter
 from flask.ext.babel import Babel
 
 from webrob.startup.init_db import *
-
-
+from webrob.pages.routes import register_routes
 
 def init_app(app, db, extra_config_settings={}):
 
@@ -39,11 +38,7 @@ def init_app(app, db, extra_config_settings={}):
     from webrob.models import tutorials
 
     # Load all views.py files to register @app.routes() with Flask
-    from webrob.pages import views
-    from webrob.pages import editor
-    from webrob.pages import log
-    from webrob.pages import login
-    from webrob.pages import api
+    register_routes()
 
     init_db(app, db)
 
