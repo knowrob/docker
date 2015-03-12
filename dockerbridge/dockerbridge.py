@@ -30,6 +30,10 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
     def stop_container(self, user_container_name):
         dockermanager.stop_container(user_container_name)
         timeout.remove(user_container_name)
+        
+    @pyjsonrpc.rpcmethod
+    def container_exists(self, user_container_name):
+        return dockermanager.container_exists(user_container_name)
 
     @pyjsonrpc.rpcmethod
     def get_container_ip(self, user_container_name):

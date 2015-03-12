@@ -10,6 +10,7 @@ from urlparse import urlparse
 
 from webrob.app_and_db import app, db
 from webrob.user.knowrob_user import read_tutorial_page
+from webrob.pages.routes import ensure_knowrob_started
 
 from utility import *
 
@@ -30,6 +31,9 @@ def download_logged_image(filename):
 @app.route('/knowrob/tutorials/<cat_id>/<page>')
 @login_required
 def tutorials(cat_id='getting_started', page=1):
+    if not ensure_knowrob_started():
+        return redirect(url_for('user.logout'))
+    
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
@@ -53,6 +57,9 @@ def tutorials(cat_id='getting_started', page=1):
 @app.route('/knowrob/exp/<exp_id>')
 @login_required
 def knowrob(exp_id=None):
+    if not ensure_knowrob_started():
+        return redirect(url_for('user.logout'))
+    
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
@@ -74,6 +81,9 @@ def knowrob(exp_id=None):
 @app.route('/knowrob/video')
 @login_required
 def video(exp_id=None):
+    if not ensure_knowrob_started():
+        return redirect(url_for('user.logout'))
+    
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)

@@ -7,9 +7,11 @@ from flask_user import current_user
 from flask_user import login_required
 import json
 import sys
+import time
 
 from webrob.app_and_db import app
 from webrob.docker import knowrob_docker
+from webrob.pages.utility import get_application_description
 
 @user_logged_in.connect_via(app)
 def track_login(sender, user, **extra):
@@ -17,9 +19,7 @@ def track_login(sender, user, **extra):
     session['username'] = user.username
     session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['api_token'] = user.api_token
-    
-    session['application_name']    = 'knowrob'
-    session['application_version'] = 'latest'
+    session['application_name'] = ''
     
     #session['exp'] = None
     #if not 'pkg' in session: session['pkg'] = ''
@@ -36,19 +36,13 @@ def track_logout(sender, user, **extra):
     session.pop('user_container_name')
     #sender.logger.info('user logged out')
 
-def get_application_description(application_name):
-    try:
-        return app.config['APPLICATIONS'][application_name]
-    except:
-        return None
-
 @app.route('/application_description/<application_name>', methods=['POST'])
 def application_description(application_name):
     return jsonify(result=get_application_description(application_name))
 
 @app.route('/application_names', methods=['POST'])
 def application_names():
-    return jsonify(result=app.config['APPLICATIONS'].keys())
+    return jsonify(result=app.config['APPLICATIONS'].keys(), selection=session['application_name'])
 
 @app.route('/application', methods=['POST'])
 @login_required
@@ -62,20 +56,18 @@ def select_application():
     application_description = get_application_description(application_name)
     if application_description is None: return
     
+    session['application_name'] = application_name
+    
+    # Start required webapp if not allready running
     knowrob_docker.start_webapp_container(
         application_name,
         application_description['webapp'],
         application_description['webapp_links'],
         application_description['webapp_volumes'])
+    # XXX: wait for flask
+    time.sleep(2)
     
-    knowrob_docker.start_user_container(
-        session['user_container_name'], 
-        session['user_home_dir'],
-        application_description['application'],
-        application_description['application_links'],
-        application_description['application_volumes'])
-    
-    return redirect('/'+application_name)
+    return jsonify(result=None)
 
 @app.route('/')
 def show_user_data():

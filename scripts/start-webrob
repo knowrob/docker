@@ -19,11 +19,22 @@ function runContainer {
   fi
 }
 
+function stopContainer {
+  RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
+  if [ "$RUNNING" == 'true' ]; then # container does not exist
+    docker rm -f $1
+  fi
+  if [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+    docker rm -f $1
+  fi
+}
 
 if [ -z "$KNOWROB_WEB_PORT" ]
 then
    export KNOWROB_WEB_PORT=5000
 fi
+
+stopContainer "knowrob"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if knowrob_data container exists and create otherwise

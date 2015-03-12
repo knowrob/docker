@@ -102,10 +102,11 @@
          data: JSON.stringify({
              application_name: application_name
          }),
-         dataType: "json"//,
-         //success: function (data) {
+         dataType: "json",
+         success: function (data) {
+             window.location.replace("/"+application_name)
              //window.location.reload();
-         //}
+         }
        }).done( function (request) {});
     }
       
