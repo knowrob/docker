@@ -1,5 +1,5 @@
 from Crypto.Random import random
-from flask import jsonify, request, session
+from flask import jsonify, request, session, redirect
 from flask_login import current_user
 from flask_user import login_required
 import hashlib

@@ -31,9 +31,10 @@
   </div>
   <div class="metanav">
     <div class="metanav_left">
-      <ul class="menu">
+      <ul class="menu" id="menu_left" style="float: left;">
+      </ul>
+      <ul class="menu" id="menu_left_static" style="float: left;">
         {% block menu %}{% endblock %}
-        <li><a href="{{ url_for('log') }}">Log</a></li>
       </ul>
     </div>
     <div class="metanav_right">
@@ -108,6 +109,40 @@
          }
        }).done( function (request) {});
     }
+    
+    function add_menu_item(menu, href, value) {
+    console.log("add_menu_item " + href);
+        var li = document.createElement("li");
+        var item = document.createElement("a");
+        item.href = href;
+        item.appendChild(document.createTextNode(value));
+        li.appendChild(item);
+        document.getElementById(menu).appendChild(li);
+    };
+    function add_common_menu_items() {
+        add_menu_item("menu_left", "{{ url_for('log') }}", "Log");
+    };
+    function update_menu(application_name) {
+        $('#menu_left').empty();
+        if(application_name) {
+            $.ajax({
+                url: "/"+application_name+"/menu",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({}),  
+                dataType: "json",
+                success: function (data) {
+                    for(var url in data.menu_left) {
+                        add_menu_item("menu_left", url, data.menu_left[url]);
+                    }
+                    add_common_menu_items();
+                }
+            }).done( function (request) {});
+        }
+        else {
+            add_common_menu_items();
+        }
+    };
       
     $(document).ready(function () {
       // Request available apps
@@ -130,6 +165,7 @@
               });
               if(data.selection) {
                 document.getElementById("app-value").innerHTML = data.selection;
+                update_menu(data.selection);
               }
             }
       }).done( function (request) {})

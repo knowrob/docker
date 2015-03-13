@@ -1,5 +1,5 @@
 
-from flask import session, jsonify, request, redirect, render_template, Markup, send_from_directory
+from flask import session, jsonify, request, redirect, render_template, url_for, Markup, send_from_directory
 from flask_user import login_required
 from flask.ext.misaka import markdown
 
@@ -99,6 +99,16 @@ def video(exp_id=None):
         if exp is not None: exp_query_file = 'queries-' + exp + '.json'
     
     return render_template('video.html', **locals())
+
+@app.route('/knowrob/menu', methods=['POST'])
+def menu():
+    menu_left = {}
+    menu_left[url_for('knowrob')] = 'Knowledge Base'
+    menu_left[url_for('knowrob')+'editor'] = 'Editor'
+    
+    menu_right = {}
+    
+    return jsonify(menu_left=menu_left, menu_right=menu_right)
 
 @app.route('/knowrob/exp_list', methods=['POST'])
 @login_required
