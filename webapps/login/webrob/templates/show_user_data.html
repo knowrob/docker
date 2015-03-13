@@ -15,31 +15,34 @@
          data: JSON.stringify({
              application_name: application_name
          }),
-         dataType: "json"//,
-         //success: function (data) {
-             //window.location.reload();
-         //}
+         dataType: "json",
+         success: function (data) {
+             window.location.replace("/"+application_name);
+         }
        }).done( function (request) {});
     }
   </script>
 
-<div class="login-box">
-<dl>
-  <dt>Username: </dt><dd>{{ current_user.username }}</dd>
-  <dt>Email: </dt><dd>{{ current_user.email }}</dd>
-  <br>
-  <dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
-  <dt>Application: </dt><dd>
-        <ul class="menu">
-          <li><a id="app-value">(select)</a><ul id="app-menu" style="min-width: 180px;">
-          {% for app in application_names %}
-          <li><a href="#" onclick="function() { set_application({{ app }}); }">{{ app }}</a></li>
-          {% endfor %}
-          </ul></li>
-        </ul>
-  </dd>
-</dl>
+<div id="user_content" style="padding-top: 40px">
+	<div class="login-box" style="float: left; word-wrap: break-word; width: 40%; padding-left: 100px; padding-top: 40px">
+		<dl>
+		<dt>Username: </dt><dd>{{ current_user.username }}</dd>
+		<dt>Email: </dt><dd>{{ current_user.email }}</dd>
+		<dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
+		</dl>
+	</div>
+	<div class="video" style="float: left; padding-left: 100px;">
+		<iframe width="420" height="270" src="http://www.youtube.com/embed/iu_Y7mxDjgA"></iframe>
+	</div>
 </div>
+<div id="application_content" style="text-align: center; padding-top: 60px; clear:left;">
+Please select one of the applications listed below:<br>
+<select id="application_selection" onchange="set_application(this.value)">>
+	<option disabled selected> -- select an application -- </option>
+	{% for app in application_names %}
+	<option>{{ app }}</option>
+	{% endfor %}
+</select>
 
 {% endblock %}
 
