@@ -102,26 +102,43 @@ def video(exp_id=None):
 
 @app.route('/knowrob/menu', methods=['POST'])
 def menu():
-    menu_left = {}
-    menu_left[url_for('knowrob')] = 'Knowledge Base'
-    menu_left[url_for('knowrob')+'editor'] = 'Editor'
+    menu_left = [
+        ('Knowledge Base', url_for('knowrob')),
+        ('Video',          url_for('knowrob')+'video'),
+        ('Editor',         url_for('knowrob')+'editor')
+    ]
     
-    menu_right = {}
+    exp_selection = __exp_file__()
+    if exp_selection is None: exp_selection = "Experiment"
+    
+    exp_choices =  []
+    for exp in __exp_list__():
+        exp_choices.append((exp, url_for('knowrob')+'exp/'+exp))
+    
+    menu_right = [
+        ('CHOICES', (exp_selection, exp_choices))
+    ]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)
 
 @app.route('/knowrob/exp_list', methods=['POST'])
 @login_required
 def exp_list():
+    return jsonify(result=__exp_list__(), selection=__exp_file__())
+
+def __exp_list__():
     expList = []
-    exp_file = None
-    if 'exp' in session:
-        exp_file = session['exp']
     for f in os.listdir(os.path.join(app.root_path, "static/experiments/queries")):
         if f.endswith(".json") and f.startswith("queries-"):
             expList.append( f[len("queries-"):len(f)-len(".json")] )
-    return jsonify(result=expList, selection=exp_file)
+    return expList
 
+def __exp_file__():
+    if 'exp' in session:
+        return session['exp']
+    else:
+        return None
+    
 @app.route('/knowrob/exp_set', methods=['POST'])
 @login_required
 def exp_set():

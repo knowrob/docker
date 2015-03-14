@@ -44,14 +44,11 @@ def application_description(application_name):
 def application_names():
     return jsonify(result=app.config['APPLICATIONS'].keys(), selection=session['application_name'])
 
-@app.route('/application', methods=['POST'])
+@app.route('/application/<application_name>')
 @login_required
-def select_application():
+def select_application(application_name):
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
-    
-    application_name = json.loads(request.data)['application_name']
-    if application_name is None: return
     
     application_description = get_application_description(application_name)
     if application_description is None: return
@@ -67,7 +64,7 @@ def select_application():
     # XXX: wait for flask
     time.sleep(2)
     
-    return jsonify(result=None)
+    return redirect('/'+application_name)
 
 @app.route('/')
 def show_user_data():

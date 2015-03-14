@@ -31,20 +31,19 @@
   </div>
   <div class="metanav">
     <div class="metanav_left">
+    {% if current_user.is_authenticated() %}
       <ul class="menu" id="menu_left" style="float: left;">
       </ul>
       <ul class="menu" id="menu_left_static" style="float: left;">
         {% block menu %}{% endblock %}
       </ul>
+    {% endif %}
     </div>
     <div class="metanav_right">
       {% if not current_user.is_authenticated() %}
         <a href="{{ url_for('user.login') }}">log in</a>
       {% else %}
-        <ul class="menu" style="float: right;">
-          {% block menu_right %}{% endblock %}
-          <li><a id="app-value">Application</a><ul id="app-menu" style="min-width: 180px;"></ul></li>
-          <li><a href="{{ url_for('user.logout') }}">Logout {{ current_user.username }}</a></li>
+        <ul class="menu" id="menu_right" style="float: right;">
         </ul>
       {% endif %}
     </div>
@@ -94,36 +93,72 @@
 
   {% block spinner %}{% endblock %}
   
+  
+  
   <script type="text/javascript">
-    function set_application(application_name) {
-      $.ajax({
-         url: "/application",
-         type: "POST",
-         contentType: "application/json",
-         data: JSON.stringify({
-             application_name: application_name
-         }),
-         dataType: "json",
-         success: function (data) {
-             window.location.replace("/"+application_name);
-         }
-       }).done( function (request) {});
-    }
-    
-    function add_menu_item(menu, href, value) {
-    console.log("add_menu_item " + href);
+    function add_menu_item(menu, value, href) {
         var li = document.createElement("li");
         var item = document.createElement("a");
         item.href = href;
         item.appendChild(document.createTextNode(value));
         li.appendChild(item);
-        document.getElementById(menu).appendChild(li);
+        menu.appendChild(li);
+        return li;
     };
-    function add_common_menu_items() {
-        add_menu_item("menu_left", "{{ url_for('log') }}", "Log");
+    
+    function add_submenu(menu, value) {
+        var submenu = document.createElement("ul");
+        var li = document.createElement("li");
+        var item = document.createElement("a");
+        item.href = "#";
+        item.appendChild(document.createTextNode(value));
+        li.appendChild(item);
+        li.appendChild(submenu);
+        menu.appendChild(li);
+        return submenu;
     };
-    function update_menu(application_name) {
-        $('#menu_left').empty();
+    
+    function add_common_menu_items(left_menu, right_menu, application_name, application_list) {
+        if(left_menu) {
+            add_menu_item(left_menu, "Log", "{{ url_for('log') }}");
+        }
+        
+        if(right_menu) {
+            var application_selection = application_name;
+            if(!application_selection) application_selection = "Application";
+            
+            var application_choices = [];
+            for(var i in application_list) {
+                application_choices.push([application_list[i], "/application/"+application_list[i]]);
+            }
+            handle_webapp_menu(right_menu, ["CHOICES", [application_selection, application_choices]]);
+            
+            add_menu_item(right_menu, "Logout {{ current_user.username }}", "{{ url_for('user.logout') }}");
+        }
+    };
+    
+    function handle_webapp_menu(menu_root, item) {
+        if(item[0] == "CHOICES") {
+            var selection = item[1][0];
+            var choices = item[1][1];
+            var submenu = add_submenu(menu_root, selection);
+            for(var i in choices) {
+                handle_webapp_menu(submenu, choices[i]);
+            }
+            return submenu;
+        }
+        else {
+            return add_menu_item(menu_root, item[0], item[1]);
+        }
+    };
+    
+    function update_menu(application_name, application_list) {
+        var left_menu  = document.getElementById("menu_left");
+        var right_menu = document.getElementById("menu_right");
+        
+        if(left_menu)  $('#menu_left').empty();
+        if(right_menu) $('#menu_right').empty();
+        
         if(application_name) {
             $.ajax({
                 url: "/"+application_name+"/menu",
@@ -132,43 +167,34 @@
                 data: JSON.stringify({}),  
                 dataType: "json",
                 success: function (data) {
-                    for(var url in data.menu_left) {
-                        add_menu_item("menu_left", url, data.menu_left[url]);
+                    if(left_menu) {
+                        for(var i in data.menu_left) {
+                            handle_webapp_menu(left_menu, data.menu_left[i]);
+                        }
                     }
-                    add_common_menu_items();
+                    if(right_menu) {
+                        for(var i in data.menu_right) {
+                            handle_webapp_menu(right_menu, data.menu_right[i]);
+                        }
+                    }
+                    add_common_menu_items(left_menu, right_menu, application_name, application_list);
                 }
             }).done( function (request) {});
         }
         else {
-            add_common_menu_items();
+            add_common_menu_items(left_menu, right_menu, application_name, application_list);
         }
     };
       
     $(document).ready(function () {
-      // Request available apps
       $.ajax({
           url: "/application_names",
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify({}),  
           dataType: "json",
-          success: function (data) {
-              $('#app-menu').empty();
-              $.each(data.result, function(j, app) {
-                  var li = document.createElement("li");
-                  var item = document.createElement("a");
-                  item.href = "#";
-                  item.onclick = function() { set_application(app); };
-                  item.appendChild(document.createTextNode(app));
-                  li.appendChild(item);
-                  document.getElementById("app-menu").appendChild(li);
-              });
-              if(data.selection) {
-                document.getElementById("app-value").innerHTML = data.selection;
-                update_menu(data.selection);
-              }
-            }
-      }).done( function (request) {})
+          success: function (data) { update_menu(data.selection, data.result); }
+      }).done( function (request) {});
     });
   </script>
 

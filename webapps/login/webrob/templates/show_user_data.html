@@ -9,13 +9,8 @@
   <script type="text/javascript">
     function set_application(application_name) {
       $.ajax({
-         url: "/application",
-         type: "POST",
-         contentType: "application/json",
-         data: JSON.stringify({
-             application_name: application_name
-         }),
-         dataType: "json",
+         url: "/application/"+application_name,
+         type: "GET",
          success: function (data) {
              window.location.replace("/"+application_name);
          }
