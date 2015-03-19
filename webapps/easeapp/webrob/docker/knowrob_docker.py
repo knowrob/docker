@@ -76,6 +76,7 @@ def container_exists(user_container_name):
     except URLError, e:
         flash("Error: Connection to your KnowRob instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
 
 def get_container_ip(user_container_name):
     try:
@@ -88,6 +89,7 @@ def get_container_ip(user_container_name):
     except URLError, e:
         flash("Error: Connection to your KnowRob instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
 
 
 def get_container_log(user_container_name):

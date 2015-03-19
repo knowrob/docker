@@ -5,12 +5,8 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('prediction').",
-            "text": "Select experiment database"
-        },
-        {
-            "q": "load_experiment('/home/ros/knowrob_data/logs/robots/cram/prediction/cram_log.owl').",
-            "text": "Load exploration prediction experiment from 'knowrob_data' library"
+            "q": "mng_db('prediction'), load_experiment('/home/ros/knowrob_data/logs/robots/cram/prediction/cram_log.owl').",
+            "text": "Load exploration prediction experiment"
         },
         {
             "q": "",
@@ -21,11 +17,7 @@
             "text": "----- Queries on the semantic map -----"
         },
         {
-            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
-            "text": "Load semantic map"
-        },
-        {
-            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
+            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl'), owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
             "text": "Visualize semantic map"
         },
         {
@@ -41,16 +33,8 @@
             "text": "Load PR2 robot model"
         },
         {
-            "q": "task(T), task_goal(T, '(OBJECT-PLACED-AT ?OBJ ?LOC)'), task_start(T, S), task_end(T, E), add_trajectory('/base_link', S, E, 0.5).",
-            "text": "Which path did the PR2 follow during the exploration task?"
-        },
-        {
-            "q": "remove_object_with_children(pr2:'PR2Robot1').",
-            "text": "Stop publishing PR2 markers"
-        },
-        {
-            "q": "remove_trajectory('/base_link'), \n remove_trajectory('/l_wrist_roll_link'), \n remove_trajectory('/r_wrist_roll_link').",
-            "text": "Stop publishing trajectory markers"
+            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), rdf_has(Task, knowrob:'startTime', T), add_agent_visualization('PR2', pr2:'PR2Robot1', T, '', '').",
+            "text": "What was the pose of the robot during perception actions?"
         },
         {
             "q": "",
@@ -61,15 +45,15 @@
             "text": "----- Prediction Related Queries -----"
         },
         {
-            "q": "aggregate_all(count, rdf_has(Task, rdf:type, knowrob:'FindingObjects'), Count).",
+            "q": "findall(_Task, rdf_has(_Task, rdf:type, knowrob:'FindingObjects'), _L), length(_L, Count).",
             "text": "Count instances of object finding tasks"
         },
         {
-            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), not((subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', Obj)))).",
+            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), not((subtask_all(Task, _SubtaskPerceive), rdf_has(_SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(_SubtaskPerceive, knowrob:'perceptionResult', _Obj)))).",
             "text": "Object finding tasks that failed due to no object being found"
         },
         {
-            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', Obj)).",
+            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, _SubtaskPerceive), rdf_has(_SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(_SubtaskPerceive, knowrob:'perceptionResult', Obj)).",
             "text": "Object finding tasks that succeeded"
         },
         {
