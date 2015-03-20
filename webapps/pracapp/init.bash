@@ -10,4 +10,4 @@ echo 'application/db                  db' >> $HOME/.mime.types
 echo 'application/pracmln             pracmln' >> $HOME/.mime.types
 
 python /opt/webapp/runserver.py
-# /bin/bash
+#/bin/bash
