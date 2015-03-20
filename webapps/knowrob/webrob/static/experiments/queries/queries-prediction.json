@@ -57,11 +57,11 @@
             "text": "Object finding tasks that succeeded"
         },
         {
-            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', Obj)), owl_has(SubtaskPerceive, knowrob:'perceptionRequest', RequestDesig), mng_designator_props(RequestDesig, 'TYPE', 'PANCAKEMIX').",
+            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', _Obj)), owl_has(SubtaskPerceive, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, 'designator.OF._id', _DesigJava), mng_designator_props(_Desig, _DesigJava, ['OF', 'TYPE'], 'PANCAKEMIX').",
             "text": "Trying to find the pancake mix and succeeding"
         },
         {
-            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), not(once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', Obj))), owl_has(SubtaskPerceive, knowrob:'perceptionRequest', RequestDesig), mng_designator_props(RequestDesig, 'TYPE', 'COFFEE').",
+            "q": "rdf_has(Task, rdf:type, knowrob:'FindingObjects'), subtask_all(Task, SubtaskPerceive), rdf_has(SubtaskPerceive, rdf:type, knowrob:'UIMAPerception'), not(once(owl_has(SubtaskPerceive, knowrob:'perceptionResult', _Obj))), owl_has(SubtaskPerceive, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, 'designator.OF._id', _DesigJava), mng_designator_props(_Desig, _DesigJava, ['OF', 'TYPE'], 'COFFEE').",
             "text": "Trying to find the coffee and failing"
         },
         {
