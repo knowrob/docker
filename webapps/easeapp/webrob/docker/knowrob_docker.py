@@ -38,7 +38,6 @@ def start_user_container(container_name, user_home_dir, application_container, l
 
 def start_webapp_container(container_name, webapp_container, links, volumes):
     try:
-        app.logger.error("start_webapp_container\n")
         c = docker_connect()
 
         if c is not None:
