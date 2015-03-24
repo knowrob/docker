@@ -42,10 +42,10 @@ def application_description(application_name):
 
 @app.route('/application_names', methods=['POST'])
 def application_names():
+    application_name = ''
     if 'application_name' in session:
-	return jsonify(result=app.config['APPLICATIONS'].keys(), selection=session['application_name'])
-    else:
-	return jsonify(result=app.config['APPLICATIONS'].keys(), selection='')
+        application_name = session['application_name']
+    return jsonify(result=app.config['APPLICATIONS'].keys(), selection=application_name)
 
 @app.route('/application/<application_name>')
 @login_required

@@ -38,7 +38,6 @@ def start_user_container(container_name, user_home_dir, application_container, l
 
 def start_webapp_container(container_name, webapp_container, links, volumes):
     try:
-        app.logger.error("start_webapp_container\n")
         c = docker_connect()
 
         if c is not None:
@@ -76,6 +75,7 @@ def container_exists(user_container_name):
     except URLError, e:
         flash("Error: Connection to your KnowRob instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
 
 def get_container_ip(user_container_name):
     try:
@@ -88,6 +88,7 @@ def get_container_ip(user_container_name):
     except URLError, e:
         flash("Error: Connection to your KnowRob instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
 
 
 def get_container_log(user_container_name):
