@@ -53,9 +53,10 @@ def updateMLNList(modulename):
             if path.endswith('.mln'):
                 mlns.append(path[0:path.rfind('.mln')])
 
-    for path in os.listdir(app.config['UPLOAD_FOLDER']):
-        if path.endswith('.mln'):
-            mlns.append(path[0:path.rfind('.mln')])
+    if os.path.isdir(os.path.join(app.config['UPLOAD_FOLDER'], 'mln')):
+        for path in os.listdir(os.path.join(app.config['UPLOAD_FOLDER'], 'mln')):
+            if path.endswith('.mln'):
+                mlns.append(path[0:path.rfind('.mln')])
 
     return [('{}.mln'.format(mln),'{}.mln'.format(mln)) for mln in mlns]
 
@@ -67,14 +68,14 @@ def updateEvidenceList(modulename):
 
         if not os.path.isdir(os.path.join(module_path, 'db')): return []
         for path in os.listdir(os.path.join(module_path, 'db')):
-            print path
             if os.path.isdir(path): continue
             if path.endswith('.db'):
                 evidence.append(path[0:path.rfind('.db')])
 
-    for path in os.listdir(app.config['UPLOAD_FOLDER']):
-        if path.endswith('.db'):
-            evidence.append(path[0:path.rfind('.db')])
+    if os.path.isdir(os.path.join(app.config['UPLOAD_FOLDER'], 'db')):
+        for path in os.listdir(os.path.join(app.config['UPLOAD_FOLDER'], 'db')):
+            if path.endswith('.db'):
+                evidence.append(path[0:path.rfind('.db')])
 
     return [('{}.db'.format(ev),'{}.db'.format(ev)) for ev in evidence]
 

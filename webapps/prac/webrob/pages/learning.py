@@ -43,7 +43,6 @@ class PRACLearningForm(Form):
 
 
 def learn(data, files):
-    print 'Learning'
     if all(x in data for x in ['mln','logic','evidence','module']): #todo: each logic, mln, training dbs, module in data
         # praclearn = PRACLearning(prac)
         mln = readMLNFromString(str(data['mln']),str( data['logic']))

@@ -3,17 +3,17 @@
 
 {% block head %}
     <title>PRAC - {% block title %}{% endblock %}</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script type="text/javascript" src="{{url_for('static', filename='script/checks.js') }}"></script>
+    <link rel="stylesheet" href="{{ '/prac/static/css/style.css' }}">
+    <script type="text/javascript" src="{{ '/prac/static/script/checks.js' }}"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript">
       var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>        
 {% endblock %}
-<img src="{{ url_for('static', filename='images/prac_logo_2.svg') }}" alt="PRAC - Probabilistic Action Cores"> 
-{% block content %}{% endblock %}
 
-{% block footer %}
-      &copy; Copyright 2015 by <a href="http://www.open-ease.org/">Mareike Picklum</a>.
+{% block menu %}
+{% block _menu %}{% endblock %}
+{% endblock %}
+{% block menu_right %}
+{% block _menu_right %}{% endblock %}
 {% endblock %}

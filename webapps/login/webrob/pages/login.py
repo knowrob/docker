@@ -20,7 +20,7 @@ def track_login(sender, user, **extra):
     session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['api_token'] = user.api_token
     session['application_name'] = ''
-    
+
     #session['exp'] = None
     #if not 'pkg' in session: session['pkg'] = ''
     #session['user_data_container_name'] = "user_data"
@@ -65,8 +65,7 @@ def select_application(application_name):
         application_description['webapp_links'],
         application_description['webapp_volumes'])
     # XXX: wait for flask
-    time.sleep(2)
-    
+    time.sleep(3)
     return redirect('/'+application_name)
 
 @app.route('/')
