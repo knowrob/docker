@@ -1,0 +1,6 @@
+{
+    "init": "mng_db('mocap'), owl_parse('package://knowrob_srdl/owl/xsens-human.owl'), \nrdf_register_ns(xsens, 'http://knowrob.org/kb/xsens.owl#', [keep(true)]), \nload_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl'), \nowl_parse('package://iai_semantic_maps/owl/room.owl'), \nadd_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'), \nadd_stickman_visualization(xsens:'XSensHuman1', T).",
+    "user": "add_stickman_visualization(xsens:'XSensHuman1', T).",
+    "start": 1398864710,
+    "end": 1398864753
+}
