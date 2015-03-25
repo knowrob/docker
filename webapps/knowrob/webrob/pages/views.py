@@ -31,6 +31,7 @@ def download_logged_image(filename):
 @app.route('/knowrob/tutorials/<cat_id>/<page>')
 @login_required
 def tutorials(cat_id='getting_started', page=1):
+    session['video'] = 0
     if not ensure_knowrob_started():
         return redirect(url_for('user.logout'))
     
@@ -57,6 +58,7 @@ def tutorials(cat_id='getting_started', page=1):
 @app.route('/knowrob/exp/<exp_id>')
 @login_required
 def knowrob(exp_id=None):
+    session['video'] = 0
     if not ensure_knowrob_started():
         return redirect(url_for('user.logout'))
     
@@ -64,9 +66,9 @@ def knowrob(exp_id=None):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
+
     container_name = session['user_container_name']
     show_south_pane = True
-
     # Remember experiment selection
     if exp_id is not None: session['exp'] = exp_id
     # Select a query file
@@ -79,8 +81,10 @@ def knowrob(exp_id=None):
     return render_template('knowrob_simple.html', **locals())
 
 @app.route('/knowrob/video')
+@app.route('/knowrob/video/exp/<exp_id>')
 @login_required
 def video(exp_id=None):
+    session['video'] = 1
     if not ensure_knowrob_started():
         return redirect(url_for('user.logout'))
     
@@ -104,16 +108,21 @@ def video(exp_id=None):
 def menu():
     menu_left = [
         ('Knowledge Base', url_for('knowrob')),
-        ('Video',          url_for('knowrob')+'video'),
+        ('Robot Memory Replay', url_for('knowrob')+'video'),
         ('Editor',         url_for('knowrob')+'editor')
     ]
     
     exp_selection = __exp_file__()
     if exp_selection is None: exp_selection = "Experiment"
     
+
     exp_choices =  []
-    for exp in __exp_list__():
-        exp_choices.append((exp, url_for('knowrob')+'exp/'+exp))
+    if __is_video__() == 1:
+        for exp in __exp_list__():
+            exp_choices.append((exp, url_for('knowrob')+'video/exp/'+exp))
+    else:
+        for exp in __exp_list__():
+            exp_choices.append((exp, url_for('knowrob')+'exp/'+exp))
     
     menu_right = [
         ('CHOICES', (exp_selection, exp_choices))
@@ -138,6 +147,12 @@ def __exp_file__():
         return session['exp']
     else:
         return None
+
+def __is_video__():
+    if 'video' in session:
+        return session['video']
+    else:
+        return 0
     
 @app.route('/knowrob/exp_set', methods=['POST'])
 @login_required

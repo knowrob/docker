@@ -42,8 +42,8 @@
     }
     
     function start_streaming() {
-      var t0  = parseInt(document.getElementById("startTime").value, 10);
-      var t1  = parseInt(document.getElementById("endTime").value, 10);
+      var t0  = parseInt(document.getElementById("start_time").value, 10);
+      var t1  = parseInt(document.getElementById("end_time").value, 10);
       var t = t0;
       
       // Clear the canvas and perform a initial prolog query (for spawning the semantic map, ...)
@@ -87,7 +87,7 @@
                       }
                   }
                   hudtextLines.push(solutionString);
-          console.log(solutionString);
+          	  console.log(solutionString);
                   
                   prolog.nextQuery(process_info);
               }
@@ -148,7 +148,9 @@
     }
 
     $(document).ready(function () {
+      knowrob.setup_query_field();
       setup_video_query();
+      document.getElementById("currentRange").value = document.getElementById("start_time").value + " - " + document.getElementById("end_time").value;
       $('#container').layout({
         stateManagement__enabled: true,
         south: {
@@ -181,6 +183,22 @@
           }
         }
       });
+      $("#start_time").on("change", 
+   	function(){
+		if(document.getElementById("start_time").value > document.getElementById("end_time").value)
+		{
+			document.getElementById("start_time").value = document.getElementById("end_time").value - 1;
+		}
+		$( "#currentRange" ).val(document.getElementById("start_time").value + " - " + document.getElementById("end_time").value )
+	});
+      $("#end_time").on("change", 
+   	function(){
+		if(document.getElementById("start_time").value > document.getElementById("end_time").value)
+		{
+			document.getElementById("end_time").value = document.getElementById("start_time").value + 1;
+		}
+		$( "#currentRange" ).val(document.getElementById("start_time").value + " - " + document.getElementById("end_time").value )
+	});
       knowrob.resize_canvas();
     });
   </script>
@@ -210,23 +228,32 @@
       </div>
       <div id="vid_properties">
         <table id="vid_table">
+	<tr> 
+	  <th><label for="amount">Time range:</label>
+	  <input type="text" id="currentRange" readonly style="border:0; color:#f6931f; font-weight:bold;"></th>
+	</tr>
         <tr>
           <th>Start Time</th>
         </tr>
         <tr>
+	  <td><input id="start_time" type="range" min="1396512584" max="1396512603" value="1396512584"></td>
           <!--
           <td><input type="number" id="startTime" value="1398864739"></td>
           -->
-          <td><input type="number" id="startTime" value="1396512584"></td>
+          <!--<td><input type="number" id="startTime" value="1396512584"></td>
+	  -->
         </tr>
         <tr>
           <th>End Time</th>
         </tr>
         <tr>
+	  <td><input id="end_time" type="range" min="1396512584" max="1396512603" value="1396512603"></td>
           <!--
           <td><input type="number" id="endTime" value="1398864737"></td>
           -->
+	  <!--
           <td><input type="number" id="endTime" value="1396512603"></td>
+	  -->
         </tr>
         <tr>
           <th>Frames Per Second</th>
