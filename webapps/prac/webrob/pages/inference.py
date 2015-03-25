@@ -31,7 +31,6 @@ class PRACInferenceForm(Form):
     method =  SelectField('Method', validators=[validators.optional()], coerce=str)
     queries = TextField('Queries', [validators.optional()])
     parameters = TextField('Parameters', [validators.optional()])
-    senses = TextField('WN Senses', [validators.optional()])
     cwPreds = TextField('CW Preds', [validators.optional()])
     useWn = BooleanField('Add similarities', [validators.optional()], default='')
     closedWorld = BooleanField('Apply CW assumption', [validators.optional()], default='')
@@ -116,17 +115,16 @@ def infer(data, files):
                 e = db.evidence[ek]
                 if e == 1.0 and any(ek.startswith(p) for p in ['color', 'size', 'shape', 'hypernym', 'hasa', 'dimension', 'consistency', 'material']):
                     result += '{}({}, {}\n'.format(ek.split('(')[0], ek.split('(')[1].split(',')[0], ek.split('(')[1].split(',')[1])
+                        
     elif data['module'] in prac.moduleManifestByName: # call module's inference method
         print 'Running Inference for module ', data['module']
         infer = PRACInference(prac, [])
         module = prac.getModuleByName(str(data['module']))
         inferenceStep = PRACInferenceStep(infer, module)
 
-        # mln = readMLNFromFile(data['mln_dd'], data['logic'])
         mln = readMLNFromString(str(data['mln']),str( data['logic']))
         
         trainingDBs = readDBFromString(mln, str(data['evidence']), ignoreUnknownPredicates=True)
-        # trainingDBs = readDBFromFile(mln, inputdbs, ignoreUnknownPredicates=True) #remove
         inferenceStep.output_dbs = trainingDBs
         infer.inference_steps.append(inferenceStep)
 
@@ -138,10 +136,11 @@ def infer(data, files):
         params = {}
         params['queries'] = str(data['queries'])
         params['method'] = str(data['method'])
-        params['cwPreds'] = list(data['cwPreds'])
+        params['cwPreds'] = str(data['cwPreds'])
         params['closedWorld'] = (1 if 'closedWorld' in data else 0)
         params['useMultiCPU'] = (1 if 'useMultiCPU' in data else 0)
         params['logic'] = str(data['logic'])
+        params.update(eval("dict({})".format(str(data['parameters']))))
 
         kb.query_params = params
         kb.set_querymln(str(data['mln']), path=os.path.join(module.module_path, 'mln'))
@@ -165,48 +164,6 @@ def infer(data, files):
                     result += '{} {}({}, {})\n'.format('{:.4f}'.format(e), 'object', ek.split(',')[0].split('(')[1], ek.split(',')[1].split(')')[0])
     else: # inference without module (no WN)
         print 'Running Inference w/o module'
-        mln = readMLNFromString(str(data['mln']),str( data['logic']))
-        trainingDBs = readDBFromString(mln, str(data['evidence']), ignoreUnknownPredicates=True)
-        kb = PRACKnowledgeBase(prac)
-
-        params = {}
-        params['queries'] = str(data['queries'])
-        params['method'] = str(data['method'])
-        params['cwPreds'] = list(data['cwPreds'])
-        params['closedWorld'] = (1 if 'closedWorld' in data else 0)
-        params['useMultiCPU'] = (1 if 'useMultiCPU' in data else 0)
-        params['logic'] = str(data['logic'])
-        kb.query_params = params
-
-        kb.set_querymln(str(data['mln'])) # TODO: path=uploadfolder?
-        
-        kb.dbs = list(readDBFromString(kb.query_mln, str(data['evidence'])))
-            
-        # infer and update output dbs
-        output_dbs = []
-        dbStr = StringIO.StringIO()
-        for db in kb.dbs:
-            if 'useWN' in data:
-                wn = prac.wordnet
-                output_db = add_wn_similarities(db, data['concepts'].replace(' ', '').split(','), wn)
-            else:
-                output_db = db
-            inferred_dbs = list(kb.infer(output_db))
-            output_dbs.extend(inferred_dbs)
-
-        if 'saveKB' in data:
-            if 'kbName' in data:
-                save_kb(kb, str(data['kbName']))
-            else:
-                save_kb(kb, 'default')
-
-        for db in inferred_dbs:
-                for ek in sorted(db.evidence):
-                    e = db.evidence[ek]
-                    if e == 1.0 and any(ek.startswith(p) for p in kb.query_params['queries'].replace(' ', '').split(',')):
-                        result += '{} {}\n'.format(e, ek)
-
-
 
     return result
 

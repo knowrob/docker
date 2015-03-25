@@ -24,6 +24,8 @@ class PRACLearningForm(Form):
     evidence_dd = SelectField('Databases', validators=[validators.optional()], coerce=str)
     evidenceFile = FileField('')
     evidence = TextAreaField('')
+    parameters = TextField('Parameters', [validators.optional()])
+    evidencePreds = TextField('Evidence Predicates', [validators.optional()])
     method =  SelectField('Method', validators=[validators.optional()], coerce=str)
     useMultiCPU = BooleanField('Use all CPU\'s', [validators.optional()], default='')
 
@@ -43,21 +45,14 @@ class PRACLearningForm(Form):
 
 
 def learn(data, files):
-    if all(x in data for x in ['mln','logic','evidence','module']): #todo: each logic, mln, training dbs, module in data
-        # praclearn = PRACLearning(prac)
+    if all(x in data for x in ['mln','logic','evidence','module']):
         mln = readMLNFromString(str(data['mln']),str( data['logic']))
-        # praclearn.otherParams['mln_'] = mln
         trainingDBs = readDBFromString(mln, str(data['evidence']), ignoreUnknownPredicates=True)
         method = str(getattr(data, 'method', LearningMethods.DCLL))
-        evidencePreds = list(getattr(data, 'evidencePreds', POSSIBLEPROPS))
-        # partSize = list(getattr(data, 'evidencePreds', POSSIBLEPROPS))
-        # praclearn.otherParams['logic'] = data['logic']
-        # praclearn.training_dbs = data['evidence']
+        evidencePreds = list(getattr(data, 'evidencePreds', [])) or POSSIBLEPROPS
+        params = eval("dict({})".format(str(data['parameters'])))
 
-        # module = prac.getModuleByName(data['module'])
-        # result = module.train(praclearn)
-        # return result
-        trainedMLN = mln.learnWeights(trainingDBs, method, evidencePreds=evidencePreds, partSize=1, gaussianPriorSigma=10, useMultiCPU=0, optimizer='cg', learningRate=0.9)
+        trainedMLN = mln.learnWeights(trainingDBs, method, evidencePreds=evidencePreds, **params)
 
         mlnStr = StringIO.StringIO()
         trainedMLN.write(mlnStr)

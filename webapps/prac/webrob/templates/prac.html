@@ -1,23 +1,13 @@
 {% extends 'prac_layout.html' %}
 {% block title %}Overview{% endblock %}
 {% block _menu_right %}
-  <li><a id="exp-value">Experiment</a><ul id="exp-menu" style="min-width: 180px;"></ul></li>
 {% endblock %}
 
 
 {% block content %}
+<a href="{{ url_for('prac')}}"><img src="{{ '/prac/static/images/prac_logo_2.svg' }}"></a>
 <ul style="min-width: 180px;">
-    <li><a href="{{ url_for('praclearn')}}"><img src="{{ '/prac/static/images/prac_logo_2.svg' }}"></a></li>
-    <li><a href="{{ url_for('pracinfer')}}"><img src="{{ '/prac/static/images/prac_logo_2.svg' }}"></a></li>
+    <li><a href="{{ url_for('praclearn')}}">PRAC Learning</a></li>
+    <li><a href="{{ url_for('pracinfer')}}">PRAC Inference</a></li>
 </ul>
 {% endblock %}
-<!-- <img src="{{ '/prac/static/images/prac_logo_2.svg' }}" alt="PRAC - Probabilistic Action Cores"> -->
-<!-- <h2>Options</h2>
-    <div id="prac_menu">
-    <p>
-        <a href="{{ url_for('praclearn')}}">PRAC Learning</a><br>
-    </p>
-    <p>
-        <a href="{{ url_for('pracinfer')}}">PRAC Inference</a>
-    </p>
-    </div> -->

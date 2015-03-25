@@ -31,8 +31,10 @@
 
     {{ render_Line() }}
     {{ render_field(form.method) }}
+    {{ render_field(form.evidencePreds) }}
+    {{ render_field(form.parameters) }}
+    {{ render_fields(fs=[(form.useMultiCPU, {})] ) }}
     {{ render_field(form.submit, value='Learn') }}
-    {{ render_fields(fs=[(form.useMultiCPU, {}), (form.useMultiCPU, {})], title='') }}
 </table>
 </form>
 </div>
