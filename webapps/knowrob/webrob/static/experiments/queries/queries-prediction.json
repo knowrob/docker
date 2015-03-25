@@ -45,7 +45,7 @@
             "text": "----- Decision Tree Queries -----"
         },
         {
-            "q": "mng_decision_tree(_Desig), findall([_Key,_Value], mng_designator_props('DT', _Desig, _Key, Value_), Designator).",
+            "q": "mng_decision_tree(_Desig), findall([_Key,_Value], mng_designator_props('DT', _Desig, _Key, Value_), Designator), designator_publish('DT', _Desig).",
             "text": "Show the decision tree"
         },
         {
