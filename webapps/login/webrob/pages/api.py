@@ -7,7 +7,7 @@ import string
 import time
 from urlparse import urlparse
 from webrob.app_and_db import app, db
-from webrob.docker import knowrob_docker
+from webrob.docker import docker_interface
 from webrob.models.users import User
 
 __author__ = 'mhorst@cs.uni-bremen.de'
@@ -30,7 +30,7 @@ def refresh_by_session():
     automatically.
     """
     if current_user.is_authenticated():
-        knowrob_docker.refresh(current_user.username)
+        docker_interface.refresh(current_user.username)
         return jsonify({'result': 'success'})
     return jsonify({'error': 'not authenticated'})
 
@@ -44,7 +44,7 @@ def login_by_token(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    ip = knowrob_docker.get_container_ip(user.username)
+    ip = docker_interface.get_container_ip(user.username)
     return generate_rosauth(ip)
 
 
@@ -57,7 +57,7 @@ def start_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    knowrob_docker.start_container(user.username, 'user_data', 'knowrob_data', '/home/ros/user_data/' + user.username)
+    docker_interface.start_container(user.username, 'user_data', 'knowrob_data', '/home/ros/user_data/' + user.username)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})
@@ -71,7 +71,7 @@ def stop_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    knowrob_docker.stop_container(user.username)
+    docker_interface.stop_container(user.username)
     return jsonify({'result': 'success'})
 
 
@@ -84,7 +84,7 @@ def refresh_by_token(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    knowrob_docker.refresh(user.username)
+    docker_interface.refresh(user.username)
     return jsonify({'result': 'success'})
 
 @app.route('/create_api_token', methods=['GET'])

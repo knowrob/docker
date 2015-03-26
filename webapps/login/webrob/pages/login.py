@@ -10,7 +10,7 @@ import sys
 import time
 
 from webrob.app_and_db import app
-from webrob.docker import knowrob_docker
+from webrob.docker import docker_interface
 from webrob.pages.utility import get_application_description
 
 @user_logged_in.connect_via(app)
@@ -25,14 +25,14 @@ def track_login(sender, user, **extra):
     #if not 'pkg' in session: session['pkg'] = ''
     #session['user_data_container_name'] = "user_data"
     #session['common_data_container_name'] = "knowrob_data"
-    #knowrob_docker.start_container(session['user_container_name'], session['user_data_container_name'],
+    #docker_interface.start_container(session['user_container_name'], session['user_data_container_name'],
     #                               session['common_data_container_name'],session['user_home_dir'])
-    #session['container_ip'] = knowrob_docker.get_container_ip(session['user_container_name'])
+    #session['container_ip'] = docker_interface.get_container_ip(session['user_container_name'])
     #sender.logger.info('user logged in')
 
 @user_logged_out.connect_via(app)
 def track_logout(sender, user, **extra):
-    knowrob_docker.stop_container(session['user_container_name'])
+    docker_interface.stop_container(session['user_container_name'])
     session.pop('user_container_name')
     #sender.logger.info('user logged out')
 
@@ -59,7 +59,7 @@ def select_application(application_name):
     session['application_name'] = application_name
     
     # Start required webapp if not allready running
-    knowrob_docker.start_webapp_container(
+    docker_interface.start_webapp_container(
         application_name,
         application_description['webapp'],
         application_description['webapp_links'],
