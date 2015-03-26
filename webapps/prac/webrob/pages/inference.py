@@ -4,15 +4,18 @@ from prac.inference import PRACInference, PRACInferenceStep
 from prac.core import PRACKnowledgeBase
 from mln import readMLNFromFile, readDBFromFile
 from mln.database import readDBFromString
+from mln.methods import InferenceMethods
 from mln.mln import readMLNFromString
 from flask import render_template, redirect, request, jsonify, url_for
 from wtforms import BooleanField, TextField, TextAreaField, validators, SelectField, FileField, SubmitField
 from flask_wtf import Form
 from webrob.pages.fileupload import upload
-from webrob.pages.utils import updateKBList, updateMLNList, updateEvidenceList, INFMETHODS, LEARNMETHODS, LOGICS, MODULES, getFileContent, save_kb, add_wn_similarities
+from webrob.pages.utils import updateKBList, updateMLNList, updateEvidenceList, LOGICS, FILEDIRS, MODULES, getFileContent, save_kb, add_wn_similarities
 import os, sys
 import pickle
 import StringIO
+
+INFMETHODS = [(InferenceMethods.byName(method),method) for method in InferenceMethods.name2value]
 
 
 class PRACInferenceForm(Form):
@@ -47,54 +50,6 @@ class PRACInferenceForm(Form):
         self.evidence_dd.choices = updateEvidenceList(self.module.data)
 
 
-@app.route('/prac/updateModule/', methods=['GET'])
-def updateModule():
-    module = request.args.get('moduleName')
-    kbList = [kb[0] for kb in updateKBList(module)]
-    mlnList = [mln[0] for mln in updateMLNList(module)] 
-    evidenceList = [ev[0] for ev in updateEvidenceList(module)] 
-    ret_data = {'value': module,'kblist': kbList, 'mlnlist': mlnList, 'evidencelist': evidenceList}
-
-    return jsonify(ret_data)
-
-
-@app.route('/prac/updateUploadedFiles/', methods=['GET'])
-def updateUploadedFiles():
-    mlnList = [mln[0] for mln in updateMLNList(None)] 
-    evidenceList = [ev[0] for ev in updateEvidenceList(None)] 
-    ret_data = {'mlnlist': mlnList, 'evidencelist': evidenceList}
-
-    return jsonify(ret_data)
-
-
-@app.route('/prac/updateText/', methods=['GET'])
-def updateText():
-
-    # look for file in upload folder
-    filePathUpload = os.path.join(app.config['UPLOAD_FOLDER'], request.args.get('fName'))
-    if os.path.isfile(filePathUpload):
-        return jsonify({'text': getFileContent(filePathUpload)})
-    
-    # look for file in module path
-    if request.args.get('module') in prac.moduleManifestByName:
-        module_path = prac.moduleManifestByName[request.args.get('module')].module_path
-        filePathModule = os.path.join(os.path.join(module_path, request.args.get('field')), request.args.get('fName'))
-        if os.path.isfile(filePathModule):
-            return jsonify({'text': getFileContent(filePathModule)})
-
-    return jsonify({'text': ''})
-
-
-@app.route('/prac/updateKB/', methods=['GET'])
-def updateKB():
-    if not request.args.get('module') in prac.moduleManifestByName or not request.args.get('kb'): 
-        return jsonify({})
-    module = prac.getModuleByName(request.args.get('module'))
-    kb = module.load_pracmt(request.args.get('kb'))
-    res = kb.query_params
-    res['mln'] = kb.query_mln_str
-    return jsonify(res)
-
 
 def infer(data, files):
     result = ''
@@ -115,7 +70,7 @@ def infer(data, files):
                 e = db.evidence[ek]
                 if e == 1.0 and any(ek.startswith(p) for p in ['color', 'size', 'shape', 'hypernym', 'hasa', 'dimension', 'consistency', 'material']):
                     result += '{}({}, {}\n'.format(ek.split('(')[0], ek.split('(')[1].split(',')[0], ek.split('(')[1].split(',')[1])
-                        
+
     elif data['module'] in prac.moduleManifestByName: # call module's inference method
         print 'Running Inference for module ', data['module']
         infer = PRACInference(prac, [])

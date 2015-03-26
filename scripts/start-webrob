@@ -84,7 +84,7 @@ runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock kno
 runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from knowrob_data --link mongo_db:mongo knowrob/hydro-knowrob-daemon" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check if user_data container exists and create otherwise
+# Check if prac_tools container exists and create otherwise
 runContainer "prac_tools" "-d -v /opt/practools prac/prac_app"
 
 

@@ -8,9 +8,24 @@ from flask import render_template, request
 from wtforms import BooleanField, TextField, TextAreaField, validators, SelectField, FileField, SubmitField, HiddenField
 from flask_wtf import Form
 from webrob.pages.fileupload import upload
-from webrob.pages.utils import updateKBList, updateMLNList, updateEvidenceList, GRAMMAR, LOGICS, MODULES, LEARNMETHODS, ENGINES, POSSIBLEPROPS
+from webrob.pages.utils import updateKBList, updateMLNList, updateEvidenceList, GRAMMAR, LOGICS, MODULES
 import os, sys
 import StringIO
+
+LEARNMETHODS = [(LearningMethods.byName(method),method) for method in LearningMethods.name2value]
+POSSIBLEPROPS = ['color', 'size', 'shape', 'hypernym', 'hasa']
+new_usage = {
+    "openWorld": "-ow",
+    "maxSteps": "-maxSteps",
+    "numChains": "-numChains"}
+
+ENGINES = [ ('PRACMLNs', "PRACMLNs"),
+            ({"path": r"/usr/wiss/jain/work/code/alchemy-2009-07-07/bin", "usage": new_usage},"Alchemy - July 2009 (AMD64)"),
+            ({"path": r"/usr/wiss/jain/work/code/alchemy-2008-06-30/bin/amd64", "usage": new_usage},"Alchemy - June 2008 (AMD64)"),
+            ({"path": os.getenv("ALCHEMY_HOME"), "usage": new_usage},"Alchemy - August 2010 (AMD64)"),
+            ({"path": r"c:\users\Domini~1\Research\code\alchemy-2010-08-23\bin", "usage": new_usage},"Alchemy (Win32 desktop)"),
+            ({"path": r"c:\research\code\alchemy\bin", "usage": new_usage},"Alchemy (Win32 laptop)")]
+
 
 class PRACLearningForm(Form):
     engine = SelectField('Engine', validators=[validators.optional()], coerce=str)
@@ -32,7 +47,6 @@ class PRACLearningForm(Form):
     submit = SubmitField('')
     uploadMLNFile = SubmitField('')
     uploadDBFile = SubmitField('')
-
 
     def updateChoices(self):
         self.engine.choices = ENGINES

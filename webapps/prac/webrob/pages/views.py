@@ -6,7 +6,7 @@ from flask_user import login_required
 from webrob.pages.routes import ensure_prac_started
 from webrob.pages.learning import learn, PRACLearningForm
 from webrob.pages.inference import infer, PRACInferenceForm
-from webrob.pages.fileupload import upload
+from webrob.pages.fileupload import upload, saveMLN
 
 from urlparse import urlparse
 import os
@@ -53,6 +53,8 @@ def praclearn():
     if request.method == 'POST' and form.validate_on_submit():
         if 'uploadMLNFile' in request.form or 'uploadDBFile' in request.form:
             upload(request)
+        elif 'saveMLNFile' in request.form:
+            saveMLN(request)
         elif 'submit' in request.form:
             data = request.form
             files = request.files
@@ -81,4 +83,5 @@ def pracinfer():
             # TODO: visualize
             # return render_template('result.html', form=form)
             # return result
-    return render_template('infer.html', **locals())    
+    return render_template('infer.html', **locals())
+

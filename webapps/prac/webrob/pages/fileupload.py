@@ -1,13 +1,18 @@
 import os
-from flask import request, send_from_directory
+from flask import request, send_from_directory, jsonify
 from werkzeug import secure_filename
 from webrob.app_and_db import app
+from webrob.pages.utils import FILEDIRS
 
-FILEDIRS = {'mln':'mln', 'pracmln':'bin', 'db':'db'}
+@app.route('/prac/uploads/<filedir>/<filename>')
+def uploaded_file(filedir, filename):
+    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], filedir), filename)
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
 
 def upload(request):
     for f in request.files:
@@ -20,7 +25,20 @@ def upload(request):
             file.save(os.path.join(fpath, filename))
 
 
-@app.route('/uploads/<filedir>/<filename>')
-def uploaded_file(filedir, filename):
-    # return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], filedir), filename)
+@app.route('/prac/saveMLN/', methods=['POST'])
+def saveMLN():
+    data = request.get_json()
+    MLNPATH = os.path.join(app.config['UPLOAD_FOLDER'], 'mln')
+    content = str(data['content'])
+    fName = str(data['fName'])
+    if '.' in fName and fName.rsplit('.', 1)[1] == 'mln':
+        fullFileName = os.path.join(MLNPATH, fName)
+    else:
+        fullFileName = os.path.join(MLNPATH, "{}.mln".format(fName.rsplit('.', 1)[0]))
+
+    if not os.path.exists(MLNPATH):
+        os.mkdir(MLNPATH)    
+    with open(fullFileName,'w') as f:
+        f.write(content)
+
+    return jsonify({'path': fullFileName})

@@ -1,27 +1,64 @@
 from webrob.pracinit import prac
 from webrob.app_and_db import app
-from mln.methods import InferenceMethods, LearningMethods
+from flask import request, jsonify
 import os
 
-INFMETHODS = [(InferenceMethods.byName(method),method) for method in InferenceMethods.name2value]
-LEARNMETHODS = [(LearningMethods.byName(method),method) for method in LearningMethods.name2value]
+FILEDIRS = {'mln':'mln', 'pracmln':'bin', 'db':'db'}
 LOGICS = [('FirstOrderLogic','FOL'),('FuzzyLogic','Fuzzy')]
 MODULES = [(module,module) for module in prac.moduleManifestByName]
 GRAMMAR = [('PRACGrammar','PRAC Grammar'), ('StandardGrammar','Standard Grammar')]
 MODULES = [('None','None')] + [(module,module) for module in prac.moduleManifestByName]
-new_usage = {
-    "openWorld": "-ow",
-    "maxSteps": "-maxSteps",
-    "numChains": "-numChains"}
 
-ENGINES = [ ('PRACMLNs', "PRACMLNs"),
-            ({"path": r"/usr/wiss/jain/work/code/alchemy-2009-07-07/bin", "usage": new_usage},"Alchemy - July 2009 (AMD64)"),
-            ({"path": r"/usr/wiss/jain/work/code/alchemy-2008-06-30/bin/amd64", "usage": new_usage},"Alchemy - June 2008 (AMD64)"),
-            ({"path": os.getenv("ALCHEMY_HOME"), "usage": new_usage},"Alchemy - August 2010 (AMD64)"),
-            ({"path": r"c:\users\Domini~1\Research\code\alchemy-2010-08-23\bin", "usage": new_usage},"Alchemy (Win32 desktop)"),
-            ({"path": r"c:\research\code\alchemy\bin", "usage": new_usage},"Alchemy (Win32 laptop)")]
 
-POSSIBLEPROPS = ['color', 'size', 'shape', 'hypernym', 'hasa']
+
+@app.route('/prac/updateModule/', methods=['GET'])
+def updateModule():
+    module = request.args.get('moduleName')
+    kbList = [kb[0] for kb in updateKBList(module)]
+    mlnList = [mln[0] for mln in updateMLNList(module)] 
+    evidenceList = [ev[0] for ev in updateEvidenceList(module)] 
+    ret_data = {'value': module,'kblist': kbList, 'mlnlist': mlnList, 'evidencelist': evidenceList}
+
+    return jsonify(ret_data)
+
+
+@app.route('/prac/updateUploadedFiles/', methods=['GET'])
+def updateUploadedFiles():
+    mlnList = [mln[0] for mln in updateMLNList(None)] 
+    evidenceList = [ev[0] for ev in updateEvidenceList(None)] 
+    ret_data = {'mlnlist': mlnList, 'evidencelist': evidenceList}
+
+    return jsonify(ret_data)
+
+
+@app.route('/prac/updateText/', methods=['GET'])
+def updateText():
+
+    # look for file in upload folder
+    fdir = os.path.join(app.config['UPLOAD_FOLDER'], FILEDIRS.get(request.args.get('fName').rsplit('.', 1)[1], 'misc'))
+    filePathUpload = os.path.join(fdir, request.args.get('fName'))
+    if os.path.isfile(filePathUpload):
+        return jsonify({'text': getFileContent(filePathUpload)})
+    
+    # look for file in module path
+    if request.args.get('module') in prac.moduleManifestByName:
+        module_path = prac.moduleManifestByName[request.args.get('module')].module_path
+        filePathModule = os.path.join(os.path.join(module_path, request.args.get('field')), request.args.get('fName'))
+        if os.path.isfile(filePathModule):
+            return jsonify({'text': getFileContent(filePathModule)})
+
+    return jsonify({'text': ''})
+
+
+@app.route('/prac/updateKB/', methods=['GET'])
+def updateKB():
+    if not request.args.get('module') in prac.moduleManifestByName or not request.args.get('kb'): 
+        return jsonify({})
+    module = prac.getModuleByName(request.args.get('module'))
+    kb = module.load_pracmt(request.args.get('kb'))
+    res = kb.query_params
+    res['mln'] = kb.query_mln_str
+    return jsonify(res)
 
 
 def updateKBList(modulename):

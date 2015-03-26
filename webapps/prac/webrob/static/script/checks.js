@@ -126,3 +126,22 @@ function updateTrainedMLN(res){
   alert("The input value has changed.is: " + res);  
   document.getElementById('trainedMLN').value = res.value;
 }
+
+function mlnFileName() {
+  var fileName = prompt("Please enter a file name", "trained_mln");
+  var res = document.getElementById('result').value;
+
+  if (/[^a-z0-9\.\s\-\_]/gi.test(fileName)) {
+    alert("File name not suitable");
+  } else {
+    $.ajax({  
+      type: "POST",
+      url: $SCRIPT_ROOT + "/prac/saveMLN/",
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({ fName: fileName, content: document.getElementById('result').value }),
+      success: function(data) {
+          alert("The trained MLN has been saved to: " + data.path);  
+      }
+    }); 
+  }
+}
