@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
 
   <name>openEASE java client</name>
-  <url>http://www.open-ease.org</url>
+  <url>https://www.open-ease.org</url>
 
   <dependencies>
     <dependency>
@@ -22,4 +22,27 @@
       <version>20141113</version>
     </dependency>
   </dependencies>
+  <build>
+    <finalName>oeclient</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/org/openease/**</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

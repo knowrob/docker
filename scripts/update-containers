@@ -9,6 +9,8 @@ docker pull knowrob/postgres
 
 # Application container
 docker pull knowrob/hydro-knowrob-daemon
+docker pull knowrob/dockerbridge
+
 
 # WebApp container
 docker pull openease/easeapp
