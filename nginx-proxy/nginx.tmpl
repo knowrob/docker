@@ -44,19 +44,19 @@ server {
         {{ range $i, $address := $container.Addresses }}
           {{ if eq $address.Port $container.Env.VIRTUAL_PORT }}
             {{ if eq $host "login" }}
-              location / {
+  location / {
             {{ else if $container.Env.OPEN_EASE_WEBAPP }}
-              location /{{ $host }}/ {
+  location /{{ $host }}/ {
             {{ else }}
-              location /ws/{{ $host }}/ {
+  location /ws/{{ $host }}/ {
+    rewrite /ws/{{ $host }}/(.*) /$1 break;
             {{ end }}
-            proxy_pass http://{{ $address.IP }}:{{ $address.Port }};
-            rewrite /ws/{{ $host }}/(.*) /$1 break;
+    proxy_pass http://{{ $address.IP }}:{{ $address.Port }};
           {{ end }}
         {{ end }}
       {{ end }}
     {{ end }}
-    }
+  }
   {{ end }}
 }
 

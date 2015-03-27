@@ -5,7 +5,7 @@
   <script type="text/javascript">
 
     $(document).ready(function () {
-      $('#container').layout({
+      var knowrobLayout = $('#container').layout({
         stateManagement__enabled: true,
         south: {
           minSize: 60
@@ -29,23 +29,7 @@
             }
           }
         },
-        center: {
-          // INNER-LAYOUT
-          childOptions: {
-            center: {
-              paneSelector: "#markers",
-              onresize: function() {
-               if( knowrob ) knowrob.resize_canvas();
-              },
-              minSize: 50
-            },
-            south: {
-              paneSelector: "#chart",
-              initClosed: true,
-              minSize: 50
-            }
-          }
-        },
+        center: {},
         east: {
           minSize: 250,
           size: 500,
@@ -63,7 +47,25 @@
           }
         }
       });
+      centerLayout = $('#editor-container').layout({
+            center: {
+              paneSelector: "#markers",
+              onresize: function() {
+               if( knowrob ) knowrob.resize_canvas();
+              },
+              minSize: 50
+            },
+            south: {
+              paneSelector: "#chart",
+              initClosed: true,
+              minSize: 50
+            }
+      });
       knowrob.resize_canvas();
+      
+      $('#designator').change(function() { knowrobLayout.open('east'); });
+      $('#mjpeg').change(function() { knowrobLayout.open('east'); });
+      $('#chart').change(function() { centerLayout.open('south'); });
     });
   </script>
 
