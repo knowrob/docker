@@ -1,6 +1,5 @@
 from webrob.pracinit import prac
 from webrob.app_and_db import app
-from prac.learning import PRACLearning
 from mln.database import readDBFromString
 from mln.mln import readMLNFromString
 from mln.methods import LearningMethods

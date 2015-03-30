@@ -28,17 +28,14 @@ APPLICATIONS = {
         'application'        : 'knowrob/hydro-knowrob-daemon',
         'application_links'  : [('mongo_db', 'mongo')],
         'application_volumes': ['user_data', 'knowrob_data']
-    }
-    # currently not enabled because mareikep/prac_app is a private repository and therefore prac_tools
-    # can only be checked out by collaborators
-    #,
-    # 'prac': {
-    #     'webapp'             : 'openease/prac',
-    #     'webapp_links'       : [('postgres_db', 'postgres'), ('dockerbridge', 'dockerbridge')],
-    #     'webapp_volumes'     : ['user_data','prac_tools'],
+    },
+    'prac': {
+        'webapp'             : 'openease/prac',
+        'webapp_links'       : [('postgres_db', 'postgres'), ('dockerbridge', 'dockerbridge')],
+        'webapp_volumes'     : ['user_data','prac_tools'],
         
-    #     'application'        : '',
-    #     'application_links'  : [],
-    #     'application_volumes': []
-    # }
+        'application'        : '',
+        'application_links'  : [],
+        'application_volumes': []
+    }
 }

@@ -85,8 +85,7 @@ runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --vo
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if prac_tools container exists and create otherwise
-# currently not enabled because mareikep/prac_app is a private repository
-# runContainer "prac_tools" "-d -v /opt/practools prac/prac_app"
+runContainer "prac_tools" "-d -v /opt/practools prac/prac_app"
 
 
 # Wait for the postgres port to be available

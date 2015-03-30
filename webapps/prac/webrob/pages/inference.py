@@ -1,7 +1,6 @@
 from webrob.pracinit import prac
 from webrob.app_and_db import app
 from prac.inference import PRACInference, PRACInferenceStep
-from prac.core import PRACKnowledgeBase
 from mln import readMLNFromFile, readDBFromFile
 from mln.database import readDBFromString
 from mln.methods import InferenceMethods
