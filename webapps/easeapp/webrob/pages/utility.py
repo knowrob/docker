@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-15 -*-
-# @author Daniel Be√üler
+# @author Daniel Beﬂler
 
-import os, random, string, time, hashlib
+import os
+import string
 
-from flask import session, request
+from flask import session
 from webrob.app_and_db import app
+from Crypto.Random import random
 
 def get_application_description(application_name):
     try:
@@ -37,3 +39,6 @@ def copy_template_file(src, dst, args):
     dst_f = open(dst, 'w')
     dst_f.write(template % args)
     dst_f.close()
+
+def random_string(length):
+    return "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(length)])
