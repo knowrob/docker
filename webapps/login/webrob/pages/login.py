@@ -36,9 +36,10 @@ def track_login(sender, user, **extra):
 
 @user_logged_out.connect_via(app)
 def track_logout(sender, user, **extra):
-    docker_interface.stop_container(session['user_container_name'])
-    session.pop('user_container_name')
-    #sender.logger.info('user logged out')
+    if 'user_container_name' in session:
+        docker_interface.stop_container(session['user_container_name'])
+        session.pop('user_container_name')
+        #sender.logger.info('user logged out')
 
 @app.route('/application_description/<application_name>', methods=['POST'])
 def application_description(application_name):
