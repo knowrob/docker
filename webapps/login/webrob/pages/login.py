@@ -92,17 +92,17 @@ def select_application(application_name):
     session['application_name'] = application_name
     
     # Start required webapp if not allready running
-    docker_interface.start_webapp_container(
-        application_name,
-        application_description['webapp'],
-        application_description['webapp_links'],
-        application_description['webapp_volumes'])
+    #docker_interface.start_webapp_container(
+    #    application_name,
+    #    application_description['webapp'],
+    #    application_description['webapp_links'],
+    #    application_description['webapp_volumes'])
     
     # FIXME: This is bad. Nothing happens for n seconds and we can not be sure that
     # flask is ready to serve after this time.
     # - Show a spinner indicating the webapp startup in the browser
     # - Make sure that flask is ready to serve
-    time.sleep(3)
+    # time.sleep(3)
     #ip = docker_interface.get_container_ip(application_name)
     #app.logger.error("ip: " + str(ip) + "\n")
     #ip = 'localhost'

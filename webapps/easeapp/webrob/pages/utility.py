@@ -15,6 +15,12 @@ def get_application_description(application_name):
     except:
         return None
 
+def get_applications():
+    try:
+        return app.config['APPLICATIONS'].keys()
+    except:
+        return None
+
 def get_user_dir():
     userDir = "/home/ros/user_data/" + session['user_container_name']
     if not os.path.exists(userDir):
