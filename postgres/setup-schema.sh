@@ -1,12 +1,20 @@
 #!/bin/bash
 echo "******CREATING DOCKER DATABASE******"
 gosu postgres postgres --single <<- EOSQL
-   GRANT ALL PRIVILEGES ON DATABASE docker to docker;
+    CREATE USER docker;
+    CREATE DATABASE docker;
 EOSQL
-#gosu postgres postgres --single <<- EOSQL
-#   CREATE DATABASE docker;
-#   CREATE USER docker;
-#   GRANT ALL PRIVILEGES ON DATABASE docker to docker;
-#EOSQL
-echo ""
-echo "******DOCKER DATABASE CREATED******"
+
+echo "Loading schema and tutorials..."
+gosu postgres pg_ctl -w start
+gosu postgres psql -d docker -f /tmp/schema.sql
+gosu postgres psql -d docker -f /tmp/tutorial.sql
+gosu postgres pg_dump docker -f /tmp/backup.dump
+echo "Successful. Stopping postgres..."
+gosu postgres pg_ctl -w stop
+echo "Done."
+
+echo "******GRANTING PRIVILEGES******"
+gosu postgres postgres --single <<- EOSQL
+    GRANT ALL PRIVILEGES ON DATABASE docker to docker;
+EOSQL

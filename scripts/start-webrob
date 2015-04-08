@@ -73,7 +73,8 @@ runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if postgres_db is running or stopped and start otherwise
-runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
+# runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
+runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db --volumes-from init_data knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if dockerbridge is running or stopped and start otherwise

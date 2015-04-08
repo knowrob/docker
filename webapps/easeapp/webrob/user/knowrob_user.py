@@ -1,4 +1,4 @@
-from webrob.models.tutorials import TutorialPage
+from webrob.models.tutorials import Tutorial
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # DB stuff
@@ -94,6 +94,6 @@ def get_user_data(username):
 #    return tut
 
 def read_tutorial_page(cat, page):
-    next_page = TutorialPage.query.filter_by(cat_id=cat,page=page)
+    next_page = Tutorial.query.filter_by(cat_id=cat,page=page).first()
     return next_page
 

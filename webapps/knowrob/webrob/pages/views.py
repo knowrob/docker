@@ -14,6 +14,7 @@ from webrob.pages.routes import ensure_knowrob_started
 
 from utility import *
 
+
 MAX_HISTORY_LINES = 50
 
 @app.route('/knowrob/static/<path:filename>')
@@ -38,11 +39,12 @@ def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-    container_name = 'tutorials'
+    # container_name = 'tutorials'
+    container_name = session['user_container_name']
     show_south_pane = True
 
     tut = read_tutorial_page(cat_id, page)
-    content = markdown(tut['text'], fenced_code=True)
+    content = markdown(tut.text, fenced_code=True)
 
     # automatically add "ask as query" links after code blocks
     content = re.sub('</code>(\s)?</pre>', "</code></pre><div class='show_code'><a href='#' class='show_code'>Ask as query</a></div>", str(content))
