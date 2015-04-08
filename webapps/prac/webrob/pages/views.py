@@ -1,12 +1,15 @@
 from webrob.app_and_db import app
+from webrob.pracinit import prac #temporary
 
 from flask import render_template, request, send_from_directory, session, url_for, jsonify
 from flask_user import login_required
 
-from webrob.pages.routes import ensure_prac_started
+# from webrob.pages.routes import ensure_prac_started
+from webrob.docker.docker_application import ensure_application_started
 from webrob.pages.learning import learn, PRACLearningForm
 from webrob.pages.inference import infer, PRACInferenceForm
 from webrob.pages.fileupload import upload, saveMLN
+from webrob.pages.utils import initFileStorage
 
 from urlparse import urlparse
 import os
@@ -19,7 +22,7 @@ def download_static(filename):
 @app.route('/prac/')
 @login_required
 def prac():
-    if not ensure_prac_started():
+    if not ensure_application_started('prac'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -46,6 +49,8 @@ def menu():
 @app.route('/prac/praclearn', methods=['GET', 'POST'])
 @login_required
 def praclearn():
+    if not 'UPLOAD_FOLDER' in app.config:
+        initFileStorage(session)
     form = PRACLearningForm(csrf_enabled=False)
     form.updateChoices()
     result = {'res': ''}
@@ -67,6 +72,8 @@ def praclearn():
 @app.route('/prac/pracinfer', methods=['GET', 'POST'])
 @login_required
 def pracinfer():
+    if not 'UPLOAD_FOLDER' in app.config:
+        initFileStorage(session)
     form = PRACInferenceForm(csrf_enabled=False)
     form.updateChoices()
     result = {'res': ''}
@@ -84,4 +91,3 @@ def pracinfer():
             # return render_template('result.html', form=form)
             # return result
     return render_template('infer.html', **locals())
-

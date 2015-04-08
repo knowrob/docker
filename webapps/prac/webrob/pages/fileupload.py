@@ -1,11 +1,13 @@
 import os
-from flask import request, send_from_directory, jsonify
+from flask import request, session, send_from_directory, jsonify
 from werkzeug import secure_filename
 from webrob.app_and_db import app
-from webrob.pages.utils import FILEDIRS
+from webrob.pages.utils import FILEDIRS,initFileStorage
 
 @app.route('/prac/uploads/<filedir>/<filename>')
 def uploaded_file(filedir, filename):
+    if not 'UPLOAD_FOLDER' in app.config:
+        initFileStorage(session)
     return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], filedir), filename)
 
 
@@ -27,6 +29,8 @@ def upload(request):
 
 @app.route('/prac/saveMLN/', methods=['POST'])
 def saveMLN():
+    if not 'UPLOAD_FOLDER' in app.config:
+        initFileStorage(session)
     data = request.get_json()
     MLNPATH = os.path.join(app.config['UPLOAD_FOLDER'], 'mln')
     content = str(data['content'])
@@ -42,3 +46,4 @@ def saveMLN():
         f.write(content)
 
     return jsonify({'path': fullFileName})
+

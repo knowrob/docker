@@ -1,16 +1,14 @@
 
 from flask import session, request, redirect, url_for, render_template, jsonify
-from urlparse import urlparse
 from flask.ext.user.signals import user_logged_in
 from flask.ext.user.signals import user_logged_out
 from flask_user import current_user
 from flask_user import login_required
-import json
-import sys
-import time
+
+from urlparse import urlparse
 
 from webrob.app_and_db import app
-from webrob.docker import knowrob_docker
+from webrob.docker import docker_interface
 from webrob.pages.utility import get_application_description
 
 @user_logged_in.connect_via(app)
@@ -21,20 +19,11 @@ def track_login(sender, user, **extra):
     session['api_token'] = user.api_token
     session['application_name'] = ''
 
-    #session['exp'] = None
-    #if not 'pkg' in session: session['pkg'] = ''
-    #session['user_data_container_name'] = "user_data"
-    #session['common_data_container_name'] = "knowrob_data"
-    #knowrob_docker.start_container(session['user_container_name'], session['user_data_container_name'],
-    #                               session['common_data_container_name'],session['user_home_dir'])
-    #session['container_ip'] = knowrob_docker.get_container_ip(session['user_container_name'])
-    #sender.logger.info('user logged in')
-
 @user_logged_out.connect_via(app)
 def track_logout(sender, user, **extra):
-    knowrob_docker.stop_container(session['user_container_name'])
-    session.pop('user_container_name')
-    #sender.logger.info('user logged out')
+    if 'user_container_name' in session:
+        docker_interface.stop_container(session['user_container_name'])
+        session.pop('user_container_name')
 
 @app.route('/application_description/<application_name>', methods=['POST'])
 def application_description(application_name):
@@ -50,6 +39,7 @@ def application_names():
 @app.route('/application/<application_name>')
 @login_required
 def select_application(application_name):
+    # TODO: I don't think that's needed in compination with login_required decorator
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
     
@@ -58,18 +48,11 @@ def select_application(application_name):
     
     session['application_name'] = application_name
     
-    # Start required webapp if not allready running
-    knowrob_docker.start_webapp_container(
-        application_name,
-        application_description['webapp'],
-        application_description['webapp_links'],
-        application_description['webapp_volumes'])
-    # XXX: wait for flask
-    time.sleep(3)
     return redirect('/'+application_name)
 
 @app.route('/')
 def show_user_data():
+    # TODO: I don't think that's needed in compination with login_required decorator
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
     

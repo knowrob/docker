@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "register_ros_package(knowrob_saphari), diagram_canvas.",
+            "q": "register_ros_package(knowrob_saphari).",
             "text": "Initialize SAPHARI context"
         },
         {

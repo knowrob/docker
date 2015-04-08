@@ -27,21 +27,21 @@ class DockerManager(object):
 
     def __start_common_container__(self, c, all_containers):
         
-        if not self.__container_exists__("user_data", all_containers):
+        if self.__get_container("user_data", all_containers) == None:
             sysout("Creating user_data container.")
             c.create_container('knowrob/user_data', detach=True, tty=True, name="user_data", entrypoint='true')
             c.start("user_data")
         
-        if not self.__container_exists__("knowrob_data", all_containers):
+        if self.__get_container("knowrob_data", all_containers) == None:
             sysout("Creating knowrob_data container.")
             c.create_container('knowrob/knowrob_data', detach=True, name="knowrob_data", entrypoint='true')
             c.start("knowrob_data")
 
-        if not self.__container_exists__("mongo_data", all_containers):
+        if self.__get_container("mongo_data", all_containers) == None:
             sysout("Creating mongo data container.")
             c.create_container('busybox', detach=True, name='mongo_data', volumes=['/data/db'], entrypoint='true')
 
-        if not self.__container_exists__("mongo_db", all_containers):
+        if self.__get_container("mongo_db", all_containers) == None:
             sysout("Creating mongo container.")
             c.create_container('mongo', detach=True, ports=[27017], name='mongo_db')
             c.start('mongo', port_bindings={27017: 27017}, volumes_from=['mongo_data'])
@@ -86,7 +86,7 @@ class DockerManager(object):
                 # Make sure common containers are up and running
                 self.__start_common_container__(c, all_containers)
                 # Stop user container if running
-                if not self.__container_exists__(container_name, all_containers):
+                if self.__get_container(container_name, all_containers) == None:
                     sysout("Creating webapp container " + container_name)
                     env = {"VIRTUAL_HOST": container_name,
                            "VIRTUAL_PORT": '5000',
@@ -115,7 +115,7 @@ class DockerManager(object):
 
     def __stop_container__(self, container_name, c, all_containers):
         # check if containers exist:
-        if self.__container_exists__(container_name, all_containers):
+        if self.__get_container(container_name, all_containers) != None:
             sysout("Stopping container " + container_name + "...\n")
             c.stop(container_name, timeout=5)
 
@@ -150,15 +150,34 @@ class DockerManager(object):
         try:
             c = self.__docker_connect()
             if c is not None:
-                return self.__container_exists__(container_name, c.containers(all=True))
+                return (self.__get_container(container_name, c.containers(all=True)) != None)
             else:
                 return False
         except (APIError, DockerException), e:
             sysout("Error:" + str(e.message) + "\n")
             return False
 
-    def __container_exists__(self, container_name, all_containers):
+    def container_exists(self, container_name, base_container_name):
+        try:
+            c = self.__docker_connect()
+            if c is None:
+                return False
+            
+            cont = self.__get_container(container_name, c.containers(all=True))
+            if cont is None:
+                return False
+            
+            inspect = c.inspect_container(container_name)
+            image = inspect['Config']['Image']
+            
+            return image is base_container_name
+        
+        except (APIError, DockerException), e:
+            sysout("Error:" + str(e.message) + "\n")
+            return False
+
+    def __get_container(self, container_name, all_containers):
         for cont in all_containers:
             if "/" + container_name in cont['Names']:
-                return True
-        return False
+                return cont
+        return None

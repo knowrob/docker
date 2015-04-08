@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('prediction'), load_experiment('/home/ros/knowrob_data/logs/robots/cram/prediction/cram_log.owl'), diagram_canvas.",
+            "q": "mng_db('prediction'), load_experiment('/home/ros/knowrob_data/logs/robots/cram/prediction/cram_log.owl').",
             "text": "Load exploration prediction experiment"
         },
         {

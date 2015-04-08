@@ -150,3 +150,9 @@ def add_wn_similarities(db, concepts, wn):
         for ec in evidence_concepts:
             sim = wn.wup_similarity(kc, ec)
             db.addGroundAtom('is_a({},{})'.format(kc.name, ec.name), sim)
+
+
+def initFileStorage(session):
+    app.config['UPLOAD_FOLDER'] = session['user_home_dir'] + '/pracfiles/'
+    if not os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'])):
+       os.mkdir(os.path.join(app.config['UPLOAD_FOLDER']))

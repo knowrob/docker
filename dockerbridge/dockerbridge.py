@@ -34,6 +34,10 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
     @pyjsonrpc.rpcmethod
     def container_exists(self, user_container_name):
         return dockermanager.container_exists(user_container_name)
+        
+    @pyjsonrpc.rpcmethod
+    def container_exists(self, user_container_name, base_container_name):
+        return dockermanager.container_exists(user_container_name, base_container_name)
 
     @pyjsonrpc.rpcmethod
     def get_container_ip(self, user_container_name):
