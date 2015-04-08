@@ -32,7 +32,7 @@ def download_logged_image(filename):
 @login_required
 def tutorials(cat_id='getting_started', page=1):
     session['video'] = 0
-    if not ensure_application_started():
+    if not ensure_application_started('knowrob'):
         return redirect(url_for('user.logout'))
     
     # determine hostname/IP we are currently using
@@ -59,7 +59,7 @@ def tutorials(cat_id='getting_started', page=1):
 @login_required
 def knowrob(exp_id=None):
     session['video'] = 0
-    if not ensure_application_started():
+    if not ensure_application_started('knowrob'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -85,7 +85,7 @@ def knowrob(exp_id=None):
 @login_required
 def video(exp_id=None):
     session['video'] = 1
-    if not ensure_application_started():
+    if not ensure_application_started('knowrob'):
         return redirect(url_for('user.logout'))
     
     error=""

@@ -3,9 +3,8 @@ from flask import session
 from webrob.pages.utility import get_application_description
 from webrob.docker import docker_interface
 
-def ensure_application_started():
-    application_name = session['application_name']
-    if application_name is None: return False
+def ensure_application_started(application_name):
+    session['application_name'] = application_name
     
     if not docker_interface.container_exists(session['user_container_name'], application_name):
         return start_application()
