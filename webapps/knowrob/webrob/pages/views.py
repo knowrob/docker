@@ -26,6 +26,11 @@ def download_static(filename):
 def download_logged_image(filename):
   return send_from_directory('/home/ros/knowrob_data/', filename)
 
+@app.route('/knowrob/summary_data/<path:filename>')
+@login_required
+def download_summary_image(filename):
+  return send_from_directory('/home/ros/summary_data/', filename)
+
 @app.route('/knowrob/tutorials/')
 @app.route('/knowrob/tutorials/<cat_id>/')
 @app.route('/knowrob/tutorials/<cat_id>/<page>')

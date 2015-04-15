@@ -2,5 +2,6 @@
     "init": "mng_db('pick-and-place'), \nload_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl'), \nowl_parse('package://iai_semantic_maps/owl/room.owl'), \nowl_parse('package://knowrob_srdl/owl/PR2.owl'), \nadd_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'), \nadd_agent_visualization(pr2:'PR2Robot1', T).",
     "user": "add_agent_visualization(pr2:'PR2Robot1',T).",
     "start": 1396512584,
-    "end": 1396512603
+    "end": 1396512603,
+    "summary": "mng_db('pick-and-place'), owl_parse('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl'), owl_parse('package://iai_semantic_maps/owl/room.owl'), generate_jpg_summary(['PUTDOWN'], '/home/ros/summary_data/video-fetch-and-place.tex')"
 }
