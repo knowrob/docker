@@ -1,7 +1,6 @@
 FROM knowrob/hydro-knowrob-base
 MAINTAINER Moritz Tenorth, moritz@tenorth.de
 USER root
-RUN rm /etc/apt/apt.conf.d/01proxy
 RUN apt-get -y install openjdk-7-jdk texlive-latex-base imagemagick
 RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" 1 && \
 	update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac" 1 && \
