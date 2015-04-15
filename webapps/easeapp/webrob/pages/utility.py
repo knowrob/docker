@@ -15,6 +15,12 @@ def get_application_description(application_name):
     except:
         return None
 
+def get_applications():
+    try:
+        return app.config['APPLICATIONS'].keys()
+    except:
+        return None
+
 def get_user_dir():
     userDir = "/home/ros/user_data/" + session['user_container_name']
     if not os.path.exists(userDir):
@@ -39,7 +45,6 @@ def copy_template_file(src, dst, args):
     dst_f = open(dst, 'w')
     dst_f.write(template % args)
     dst_f.close()
-
 
 def random_string(length):
     return "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(length)])

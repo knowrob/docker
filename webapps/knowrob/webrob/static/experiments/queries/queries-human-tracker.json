@@ -13,12 +13,8 @@
             "text": "Load logged OWL data for the XSens dataset"
         },
         {
-            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl').",
+            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl'), add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').",
             "text": "Load semantic map"
-        },
-        {
-            "q": "owl_individual_of(A, knowrob:'SemanticEnvironmentMap'), !, add_object_with_children(A).",
-            "text": "Visualize semantic map"
         },
         {
             "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
@@ -33,23 +29,23 @@
             "text": "----- XSens tracking data -----"
         },
         {
-            "q": "owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', knowrob:'drawer_sinkblock_dishwasher'), owl_individual_of(EVENT, knowrob:'ClosingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1).",
+            "q": "owl_has(EVENT, knowrob:'objectActedOn', knowrob:'drawer_sinkblock_dishwasher'), owl_individual_of(EVENT, knowrob:'ClosingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1).",
             "text": "When was the dish washer closed?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ).",
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, knowrob:'objectActedOn', OBJ).",
             "text": "Which events occurred that acted on dinner plates?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,'http://knowrob.org/kb/datalabel.owl#bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart').",
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart').",
             "text": "Which body part(s) were used for dinner plate taking events?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_human_pose(xsens:'XSensHuman1', T0).",
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_stickman_visualization(xsens:'XSensHuman1', T0).",
             "text": "How was the human pose when dinner plate taking events started?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, 'http://knowrob.org/kb/datalabel.owl#objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), owl_has(EVENT,'http://knowrob.org/kb/datalabel.owl#bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart'), owl_has(PART, srdl2comp:'urdfName', literal(type(_,URDF))), add_trajectory(URDF, T0, T1, 0.1).",
+            "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), owl_has(EVENT,knowrob:'bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart'), owl_has(PART, srdl2comp:'urdfName', literal(URDF)), add_trajectory(URDF, T0, T1, 0.1).",
             "text": "What was the trajectory of endeffectors for dinner plate taking events?"
         }
     ]

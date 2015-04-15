@@ -13,7 +13,7 @@
             "text": "Which sim experiments can be loaded?"
         },
         {
-            "q": "load_experiments('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/', ['pf_1.owl','pf_2.owl','pf_3.owl','pf_4.owl']).",
+            "q": "load_experiments_sim('/home/ros/knowrob_data/logs/simulation/pancakemaking_full/', ['pf_1.owl','pf_2.owl','pf_3.owl','pf_4.owl']).",
             "text": "Load data from Experiments 1, 2, 3 and 4"
         },
         {
@@ -87,10 +87,6 @@
         {
             "q": "",
             "text": "----- Logfile Statistics -----"
-        },
-        {
-            "q": "diagram_canvas.",
-            "text": "Initialize diagram canvas"
         },
         {
             "q": "rdf_has(_, knowrob:'experimentName', literal(type(_, Expname))), string_concat(Expname, ' Timeline', Title), findall(Type, (simact(E,T), rdf_split_url(_,Type,T)), X), sim_timeline_val(X, Times), add_diagram(diagram_id2, 'Title', timeline, 'Time', 'Events', 300, 300, '12px', [[['X'],['Times']]]).",

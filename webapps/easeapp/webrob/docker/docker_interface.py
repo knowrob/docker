@@ -58,10 +58,10 @@ def stop_container(user_container_name):
             c.notify("stop_container", user_container_name)
 
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 def container_exists(user_container_name):
@@ -70,10 +70,23 @@ def container_exists(user_container_name):
         if c is not None:
             return c.container_exists(user_container_name)
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
+
+def container_exists(user_container_name, base_container):
+    try:
+        c = docker_connect()
+        if c is not None:
+            return c.container_exists(user_container_name, base_container)
+    except InternalError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
     return None
 
@@ -83,10 +96,10 @@ def get_container_ip(user_container_name):
         if c is not None:
             return c.get_container_ip(user_container_name)
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
     return None
 
@@ -97,10 +110,10 @@ def get_container_log(user_container_name):
         if c is not None:
             return c.get_container_log(user_container_name)
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 
@@ -110,8 +123,8 @@ def refresh(user_container_name):
         if c is not None:
             return c.notify("refresh", user_container_name)
     except InternalError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
-        flash("Error: Connection to your KnowRob instance failed.")
+        flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
