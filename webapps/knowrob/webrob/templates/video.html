@@ -151,6 +151,9 @@
       knowrob.setup_query_field();
       setup_video_query();
       document.getElementById("currentRange").value = document.getElementById("start_time").value + " - " + document.getElementById("end_time").value;
+      //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
+
+      
       $('#container').layout({
         stateManagement__enabled: true,
         south: {
@@ -288,6 +291,12 @@ add_agent_visualization(pr2:'PR2Robot1', T).</div></td>
 -->
           <td><div id="user_query">add_agent_visualization(pr2:'PR2Robot1',T).</div></td>
         </tr>
+	<tr>
+           <th><div id="summary_header"></div></th>
+        </tr>
+	<tr>
+	    <td><div id="summary"></div></td>
+	</tr>
         </table>
       </div>
       <div id="vid_bottom">
