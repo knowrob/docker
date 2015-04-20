@@ -11,8 +11,14 @@ from webrob.pages.inference import infer, PRACInferenceForm
 from webrob.pages.fileupload import upload, saveMLN
 from webrob.pages.utils import initFileStorage
 
+import json
+
 from urlparse import urlparse
 import os
+
+@app.route('/prac/test/')
+def test():
+    return render_template('test.html')
 
 @app.route('/prac/static/<path:filename>')
 @login_required
@@ -84,7 +90,7 @@ def pracinfer():
         elif 'submit' in request.form:
             data = request.form
             files = request.files
-            result['res'] = infer(data, {str(files[x].name) : str(files[x].filename) for x in files})
+            result['steps'] = infer(data, {str(files[x].name) : str(files[x].filename) for x in files})
             return render_template('infer.html', **locals())
 
             # TODO: visualize

@@ -62,14 +62,6 @@ def infer(data, files):
         propExtract = prac.getModuleByName('prop_extraction')
         prac.run(infer,propExtract,kb=propExtract.load_pracmt('default'))
         
-        step = infer.inference_steps[-1]
-        for db in step.output_dbs:
-            result += 'Inferred properties:\n'
-            for ek in sorted(db.evidence):
-                e = db.evidence[ek]
-                if e == 1.0 and any(ek.startswith(p) for p in ['color', 'size', 'shape', 'hypernym', 'hasa', 'dimension', 'consistency', 'material']):
-                    result += '{}({}, {}\n'.format(ek.split('(')[0], ek.split('(')[1].split(',')[0], ek.split('(')[1].split(',')[1])
-
     elif data['module'] in prac.moduleManifestByName: # call module's inference method
         print 'Running Inference for module ', data['module']
         infer = PRACInference(prac, [])
@@ -109,15 +101,22 @@ def infer(data, files):
             else:
                 module.save_pracmt(kb, str(data['kb']))
 
-        for db in step.output_dbs:
-            db.write(sys.stdout, color=True)
-            result += '\nInferred possible concepts:\n'
-            for ek in sorted(db.evidence, key=db.evidence.get, reverse=True):
-                e = db.evidence[ek]
-                if e > 0.001 and ek.startswith('object'):
-                    result += '{} {}({}, {})\n'.format('{:.4f}'.format(e), 'object', ek.split(',')[0].split('(')[1], ek.split(',')[1].split(')')[0])
     else: # inference without module (no WN)
         print 'Running Inference w/o module'
+
+    result = {}
+    stpno = 0
+    for stp in infer.inference_steps:
+        stepx = []
+        for db in stp.output_dbs:
+            for ek in db.evidence:
+                e = db.evidence[ek]
+                src = ek.split('(')[1].split(',')[0]
+                tar = ek.split('(')[1].split(',')[1].split(')')[0]
+                val = ek.split('(')[0] # db.evidence[ek]?
+                stepx.append({'source': src, 'target': tar , 'value': val })
+        result[stpno] = stepx
+        stpno += 1
 
     return result
 

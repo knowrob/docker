@@ -30,12 +30,13 @@ form input[type=text] {
 }
 #visualization {
     overflow: hidden; /* if you don't want #second to wrap below #first */
-    height:1000px;
+    height:900px;
 }
 
 #viz {
     border: 1px dashed gray;
-    height: 900px;
+    height: 800px;
+    background-color: #ffffff;
 }
 
 #footer {
@@ -50,4 +51,50 @@ form input[type=text] {
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
+}
+
+
+.link {
+  fill: none;
+  stroke: #08088A;;
+  stroke-width: 1.5px;
+}
+
+.link.strokegreen {
+  stroke: green;
+}
+
+.link.object {
+  stroke: green;
+}
+
+.link.strokeblue {
+  stroke: blue;
+}
+
+.link.stroke {
+  stroke: black;
+}
+
+.link.dashedred {
+  stroke-dasharray: 0,2 1;
+  stroke: red;
+}
+
+circle {
+  fill: #A9D0F5;
+  stroke: #08088A;
+  stroke-width: 1.5px;
+}
+
+rect {
+  fill: #A9D0F5;
+  stroke: #08088A;
+  stroke-width: 1.5px;
+}
+
+text {
+  font: 15px sans-serif bold;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
