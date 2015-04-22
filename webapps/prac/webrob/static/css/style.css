@@ -30,7 +30,7 @@ form input[type=text] {
 }
 #visualization {
     overflow: hidden; /* if you don't want #second to wrap below #first */
-    height:900px;
+    height:1000px;
 }
 
 #viz {
@@ -72,7 +72,7 @@ form input[type=text] {
   stroke: blue;
 }
 
-.link.stroke {
+.link.default {
   stroke: black;
 }
 

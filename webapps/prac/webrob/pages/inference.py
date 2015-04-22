@@ -113,8 +113,9 @@ def infer(data, files):
                 e = db.evidence[ek]
                 src = ek.split('(')[1].split(',')[0]
                 tar = ek.split('(')[1].split(',')[1].split(')')[0]
-                val = ek.split('(')[0] # db.evidence[ek]?
-                stepx.append({'source': src, 'target': tar , 'value': val })
+                val = ek.split('(')[0] # db.evidence[ek]?\
+                arcStyle = 'default'
+                stepx.append({'source': src, 'target': tar , 'value': val , 'arcStyle': arcStyle})
         result[stpno] = stepx
         stpno += 1
 

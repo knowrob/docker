@@ -36,7 +36,7 @@ this.updateData = function (data) {
     if (typeof findNode(data[a].target) === "undefined") {
       nodes.push({"id":data[a].target});
     }
-    links.push({"source":findNode(data[a].source),"target":findNode(data[a].target),"value":data[a].value});
+    links.push({"source":findNode(data[a].source),"target":findNode(data[a].target),"value":data[a].value, "arcStyle":data[a].arcStyle});
     update();
     a++;
     if (a >= data.length) {
@@ -139,14 +139,14 @@ this.clear = function() {
   this.removeAllNodes();
 }
 
-this.addLink = function (source, target, value) {
-  links.push({"source":findNode(source),"target":findNode(target),"value":value});
+this.addLink = function (source, target, value, arcStyle) {
+  links.push({"source": findNode(source),"target": findNode(target),"value": value,"arcStyle": arcStyle});
   update();
 };
 
 this.showlinks = function() {
   for (var l = 0; l < links.length; l++) {
-    alert(links[l].source.id + " " + links[l].target.id + " " + links[l].value);
+    alert(links[l].source.id + " " + links[l].target.id + " " + links[l].value + " " + links[l].arcStyle);
   }
 };
 
@@ -184,7 +184,7 @@ var svnContainer = d3.select('#viz')
   .append('svg:g');
 
 svnContainer.append("defs").selectAll("marker")
-  .data(["dashedred", "strokegreen", "dashed", "strokeblue"])
+  .data(["dashedred", "strokegreen", "dashed", "strokeblue", "arrowhead", "default"])
   .enter().append("marker")
   .attr("id", function(d) { return d; })
   .attr("viewBox", "0 -5 10 10")
@@ -203,20 +203,30 @@ var nodes = force.nodes(),
     links = force.links();
 
 var update = function () {
+  console.log(graph);
   var path = svnContainer.selectAll("path.link")
     .data(links, function(d) {
             return d.source.id + "-" + d.target.id; 
             });
 
-
   var pathEnter = path.enter().append("path")
-  // path.enter().append("path")
     .attr("id", function(d) { return d.source.id + "-" + d.target.id; })
-    // .attr("class", function(d) { return "link"; })
     .attr("class", function(d) { return "link " + d.value; })
-    .attr("marker-end", function(d) { return "url(#" + d.value + ")"; });
+    .attr("marker-end", function(d) { return "url(#" + d.arcStyle + ")"; });
 
   path.exit().remove();
+
+  var edgelabels = svnContainer.selectAll(".label")
+        .data(links, function(d) {
+            return d.source.id + "-" + d.target.id; 
+            });
+
+  var edgelabelsEnter = edgelabels.enter().append('text')
+      .style("pointer-events", "none")
+      .attr('class', 'label')
+      .text(function(d){return d.value});
+
+  edgelabels.exit().remove();
 
   var circle = svnContainer.selectAll("g.node")
     .data(nodes, function(d) { return d.id; } );
@@ -236,16 +246,34 @@ var update = function () {
 
   circleEnter.append("svg:text")
     .attr("class","textClass")
-    .attr("dx", function (d) { return 5 }) // move inside rect
-    .attr("dy", function (d) { return 15 }) // move inside rect
+    .attr("dx", function (d) { return 5; }) // move inside rect
+    .attr("dy", function (d) { return 15; }) // move inside rect
     .text( function(d) { return d.id; } );
 
   circle.exit().remove();
 
+
   this.tick = function () {
-    circle.attr("transform", transform);
     path.attr("d", linkArc);
+    edgelabels.attr('d', linkArc);
+    edgelabels.attr('transform', rotateLabel);
+    edgelabels.attr('x', transformLabelX);       
+    edgelabels.attr('y', transformLabelY);       
+    circle.attr("transform", transform);
   }
+
+  this.rotateLabel = function (d) {
+    // if (d.target.x<d.source.x){
+            bbox = this.getBBox();
+            rx = bbox.x+bbox.width/2;
+            ry = bbox.y+bbox.height/2;
+            var dX = d.target.x - d.source.x;
+            var dY = d.target.y - d.source.y;
+            var rad = Math.atan2(dX, dY);
+            var deg = -90-rad * (180 / Math.PI);
+            return 'rotate(' + deg +' '+rx+' '+ry+')';
+  }
+
 
   this.linkArc = function (d) {
     var dx = d.target.x - d.source.x,
@@ -254,13 +282,38 @@ var update = function () {
     return "M" + 
         d.source.x + "," + 
         d.source.y + "A" + 
-        dr + "," + dr + " 0 0,1 " + 
+        dr + "," + dr + " 0 0,0 " + 
         d.target.x + "," + 
         d.target.y;
   }
 
+  // move arc label to arc
+  this.calcLabelPos = function (d, bbox) {
+    var scale = 0.3;
+    var origPos = { x: (d.source.x + d.target.x ) /2 - bbox.width/2, y: (d.source.y + d.target.y) /2 }; // exact middle between source and target
+    var dir = { x: d.target.x - d.source.x, y: d.target.y - d.source.y }; // direction source -> target
+    var rot = { x: dir.y, y: -dir.x }; // rotate direction -90 degrees
+    var length = Math.sqrt(rot.x * rot.x + rot.y * rot.y) / 100 // normalize length
+    var rotNorm = { x: rot.x / length, y: rot.y / length }; // normalize rotation direction
+    return { x: origPos.x - scale * rotNorm.x, y: origPos.y - scale * rotNorm.y};// return moved position
+  }
+
   this.transform = function (d) {
     return "translate(" + d.x + "," + d.y + ")";
+  }
+
+  this.transformLabel = function (d) {
+    return "translate(" + d.source.x + "," + d.source.y + ")";
+  }
+
+  this.transformLabelX = function (d) {
+    bbox = this.getBBox();
+    return calcLabelPos(d, bbox).x;
+  }
+
+  this.transformLabelY = function (d) {
+        bbox = this.getBBox();
+    return calcLabelPos(d, bbox).y;
   }
 
   force
@@ -290,7 +343,7 @@ function loadGraph(steps) {
       links = [];
       for (var y = 0, link; y < stp.length; y++) {
         link = stp[y];
-        links.push({source: link['source'], target: link['target'], value: link['value']});
+        links.push({source: link['source'], target: link['target'], value: link['value'], arcStyle: link['arcStyle']});
       }
       data.push(links);
     }
@@ -320,5 +373,3 @@ function clearGraph() {
   step = 0;
   graph.clear();
 }
-
-// window.onload = initGraph();
