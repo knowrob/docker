@@ -15,6 +15,13 @@ RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 
 ADD ./src.tar /home/ros/src/
 
+WORKDIR /home/ros/src/knowrob/knowrob_vis
+
+# Need write permissions for 'ros' user for generating JAVA classes with xjc
+USER root
+RUN chown -R ros /home/ros/src/
+USER ros
+
 WORKDIR /home/ros
 
 # build the catkin workspace
