@@ -23,11 +23,11 @@ APPLICATIONS = {
     'knowrob': {
         'webapp'             : 'openease/knowrob',
         'webapp_links'       : [('postgres_db', 'postgres'), ('dockerbridge', 'dockerbridge')],
-        'webapp_volumes'     : ['user_data', 'knowrob_data', 'mesh_data'],
+        'webapp_volumes'     : ['user_data', 'knowrob_data', 'mesh_data', 'summary_data'],
         
         'application'        : 'knowrob/hydro-knowrob-daemon',
         'application_links'  : [('mongo_db', 'mongo')],
-        'application_volumes': ['user_data', 'knowrob_data']
+        'application_volumes': ['user_data', 'knowrob_data', 'mesh_data', 'summary_data']
     },
     'prac': {
         'webapp'             : 'openease/prac',

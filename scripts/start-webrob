@@ -49,6 +49,10 @@ runContainer "user_data" "knowrob/user_data true"
 runContainer "mesh_data" "-v /home/ros/mesh_data ubuntu chmod -R ugo+rw /home/ros/mesh_data"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if summary_data container exists and create otherwise
+runContainer "summary_data" "-v /home/ros/summary_data ubuntu chmod -R 777 /home/ros/summary_data"
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_data container exists and create otherwise
 runContainer "mongo_data" "-v /data/db busybox true"
 
