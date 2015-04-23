@@ -48,7 +48,7 @@
       
       // Clear the canvas and perform a initial prolog query (for spawning the semantic map, ...)
       var init_query = "clear_canvas, " +
-          "T = 'timepoint_" + t.toString() + "', " +
+          "T = 'timepoint_" + t.toString() + "', task_tree_canvas, " +
           ace.edit('init_query').getValue().trim();
       init_query = init_query.substr(0, init_query.length - 1);
       initialize_canvas(init_query, function() {
@@ -63,38 +63,14 @@
           var hudtextLines = [];
           var prolog = knowrob.new_pl_client();
           var infoQuery = "_T = 'timepoint_" + t.toString() + "', " +
-                "task(_Task, _T), " +
-                "rdf_has(_Task, knowrob:'taskContext', literal(type(_,Task))), " +
-                "(( rdf_has(_Task, knowrob:'objectActedOn', _ObjectActedOn), " +
-                    "( mng_designator_props(_ObjectActedOn, 'NAME', ObjectActedOn) ; " +
-                    "( rdf_has(_ObjectActedOn, knowrob:'objectActedOn', __ObjectActedOn), " +
-                    "  mng_designator_props(__ObjectActedOn, 'NAME', ObjectActedOn) ))) ; ObjectActedOn = ''), " +
-                "(( rdf_has(_Task, knowrob:'perceptionResult', _Perception), " +
-                    "mng_designator_props(_Perception, 'NAME', Perception) ) ; Perception = ''), " +
-                "(( rdf_has(_Task, knowrob:'designator', _Designator), " +
-                    "mng_designator_props(_Designator, 'NAME', Designator) ) ; Designator = ''), " +
-                "(( rdf_has(_Task, knowrob:'goalContext', literal(type(_,Goal))) ) ; Goal = ''), " +
-                "( ObjectActedOn \\= '' ; Perception \\= '' ; Designator \\= '' ; Goal \\= '')";
+                "findall(TaskDetail, (task(TaskId), subtask(ParentTaskId, TaskId), task_type(TaskId, Type), rdf_has(TaskId, knowrob:'taskContext', literal(type(_,Task))), term_to_atom(TaskId, TaskIdAtom), term_to_atom(ParentTaskId, ParentTaskIdAtom), term_to_atom(Task, TaskAtom), term_to_atom(Type, TypeAtom), jpl_new( '[Ljava.lang.String;', [TaskAtom, TaskIdAtom, ParentTaskIdAtom, TypeAtom], TaskDetail)), _TaskDetails), jpl_new( '[[Ljava.lang.String;', _TaskDetails, Tasks), findall(TaskAtom, (task(Task, _T), term_to_atom(Task, TaskAtom)), _HighlightedTaskDetails), jpl_new( '[Ljava.lang.String;', _HighlightedTaskDetails, HighlightedTasks), jpl_new( '[Ljava.lang.String;', ['\\'http://knowrob.org/kb/knowrob.owl#CRAMAction\\''], Types), update_task_tree(Tasks, HighlightedTasks, Types).";
           
           
           function process_info(result) {
-              if(result.solution) {
-                  var solutionString = result.solution['Task'];
-                  for(var key in result.solution) {
-                      var value = result.solution[key];
-                      if(key != 'Task' && value != '') {
-                          solutionString += " " + value.trim()
-                      }
-                  }
-                  hudtextLines.push(solutionString);
-          	  console.log(solutionString);
-                  
-                  prolog.nextQuery(process_info);
-              }
-              else {
-                  knowrob.show_hud_text(hudtextLines, {});
-                  setTimeout(function(){ handler(); }, 500);
-              }
+              
+             knowrob.show_hud_text(hudtextLines, {});
+             setTimeout(function(){ handler(); }, 500);
+              
           }
           
           var timeString = "Time: " + format_date(t);
@@ -179,7 +155,7 @@
               minSize: 250
             },
             south: {
-              paneSelector: "#chart",
+              paneSelector: "#tasktree",
               initClosed: true,
               minSize: 150
             }
@@ -207,7 +183,8 @@
   </script>
   
     <div class="ui-layout-center" id="editor-container">
-      <div id="markers"></div> 
+      <div id="markers"></div>
+      <div id="tasktree"></div> 
     </div>
 
     <div class="ui-layout-west" style="background-color:#dadada;">
