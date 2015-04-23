@@ -3,7 +3,7 @@ from flask import session, jsonify, request, redirect, render_template, url_for,
 from flask_user import login_required
 from flask.ext.misaka import markdown
 
-import os, sys, re
+import os, re
 import json
 
 from urlparse import urlparse
@@ -29,6 +29,7 @@ def download_logged_image(filename):
 @app.route('/knowrob/summary_data/<path:filename>')
 @login_required
 def download_summary_image(filename):
+  # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
   return send_from_directory('/home/ros/summary_data/', filename)
 
 @app.route('/knowrob/tutorials/')
@@ -218,6 +219,7 @@ def get_history_item():
   
   else:
     return jsonify(item="", index=-1)
+
 
 def get_history_file():
   userDir = get_user_dir()

@@ -1,0 +1,74 @@
+############################################
+# Docker data storage concept for openEASE #
+############################################
+
+0. About this document
+
+This document describes the data storage locations for all components of openEASE. It is the reference for all questions regarding the creation/usage/deletion of new docker data containers, as well as backup and restore strategies.
+
+ANY ADDITIONS or CHANGES to the docker data container structure of openEASE or the usage of external data sources MUST be documented in this document first!
+
+1. Data from mounted host directories
+
+The openEASE platform uses the following host directories and files:
+- /var/run/docker.sock:
+	The unix socket file for the docker API. Access to this file basically is equivalent to having ROOT access to the HOST, so be careful! This file is needed to dynamically control easeapp and user containers from the dockerbridge. Also the docker-gen container has access to monitor container spawns/shutdowns for adjusting the nginx reverse proxy on the fly.
+	Used by: dockerbridge, docker-gen
+- $DOCKER_REPO/nginx-proxy:
+	Contains the nginx config template file for docker-gen.
+	Used by: docker-gen
+- $DOCKER_REPO/nginx-proxy/certs:
+	Contains the certificates for TLS used by nginx. Keep confidential!
+	Used by: nginx
+
+2. Data containers and their volumes
+	*** ATTENTION: Changes made to the structure of data containers that need backup requires the adjustment of any backup and restore scripts! See 4. and 5. chapter of this document! ***
+	user_data
+		- /home/ros/user_data
+		Used for common data files only needed by the easeapp containers, like the prolog query history files for each user.
+		Used by: All easeapp containers.
+	mesh_data
+		- /home/ros/mesh_data
+		Used for storing mesh_data that is automatically downloaded by the easeapp/knowrob container
+		Used by: easeapp/knowrob container.
+	knowrob_data
+		- /home/ros/knowrob_data
+		Used for common data files needed in every user container and the easeapp containers, like common experiment data.
+		Used by: easeapp/knowrob container and (read-only) all easeapp/knowrob user containers.
+	lft_data
+		- /tmp/openEASE/dockerbridge
+		A folder, where easeapp containers temporarily stores large files and folders. Transfers of large files from the user data containers to the easeapp containers and back will are stored here.
+		Used by: All easeapp containers, intermediate containers created on the fly for every large file copy action
+	data_* (user data containers, * is the users user name)
+		- /home/ros/user_data
+		Used for data required by the user container, like custom prolog modules or generated files.
+		Used by: The corresponding user container, intermediate containers created on the fly for every large file copy action for the corresponding user
+		- /etc/rosauth
+		Contains rosauth websocket authentication secret individual for each user.
+	mongo_data
+		- /data/db
+		Contains the mongo dbs for shared experiment data
+		Used by: mongo_db
+	user_db
+		- /var/lib/postgresql/data
+		Contains the postgres databases for user account data and user roles
+		Used by: postgres_db
+
+3. Data that needs to be backed up
+	On the host:
+		$DOCKER_REPO/nginx-proxy/certs (Do this manually and keep the backup at a safe place, the certificates must not be made public!)
+	Data containers:
+		user_data
+			- /home/ros/user_data
+		data_* (all user data containers using the knowrob/user_data base image)
+			- /home/ros/user_data
+		mongo_data
+			- /data/db
+		user_db
+			- /var/lib/postgresql/data
+
+4. Backup
+	TBD
+
+5. Restore
+	TBD
