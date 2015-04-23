@@ -77,7 +77,8 @@ runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if postgres_db is running or stopped and start otherwise
-runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
+# runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
+runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db --volumes-from init_data knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if dockerbridge is running or stopped and start otherwise
@@ -86,6 +87,11 @@ runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock kno
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
 runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from knowrob_data --link mongo_db:mongo knowrob/hydro-knowrob-daemon" true
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if prac_tools container exists and create otherwise
+runContainer "prac_tools" "-d -v /opt/practools prac/prac_app"
+
 
 # Wait for the postgres port to be available
 echo "Waiting for postgres container..."

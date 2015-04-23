@@ -1,0 +1,40 @@
+{% macro render_Line() %}
+  <tr style="border-bottom: 1px dashed #A4A4A4">
+  <td></td>
+  <td></td>
+  </tr>
+{% endmacro %}
+
+{% macro render_field(field) %}
+  <tr>
+  <td align="right">{{ field.label }}
+  <td>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </td>
+  </tr>
+{% endmacro %}
+
+{% macro render_fields(fs, title) -%}
+  <tr>
+    <td align="right">{{ title }} {{ args }}</td>
+    <td>
+      {% for field, args in fs %}
+      {{ field(**args) }} {{ field.label }}
+      {% endfor %}
+    </td>
+  </tr>
+{%- endmacro %} 
+
+{% macro visualize(result) -%}
+  {% if result != null %}
+    {{ result }}
+  {% else %}  
+    {{ '' }}
+  {% endif %}
+{%- endmacro %} 

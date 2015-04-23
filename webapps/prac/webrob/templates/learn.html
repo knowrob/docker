@@ -1,0 +1,12 @@
+{% extends "prac_layout.html" %}
+{% block title %}Learning{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+
+{% block content %}
+    {% include 'learn_content.html' %}
+{% endblock %}
