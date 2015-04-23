@@ -1,10 +1,10 @@
-{% extends "layout.html" %}
+{% extends "base_layout.html" %}
 
 
 {% block head %}
     <title>PRAC - {% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ '/prac/static/css/style.css' }}">
-    <script type="text/javascript" src="{{ '/prac/static/script/checks.js' }}"></script>
+    <link rel="stylesheet" href="{{ url_for('download_static', filename='css/style.css') }}">
+    <script type="text/javascript" src="{{ url_for('download_static', filename='script/checks.js') }}"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
@@ -12,9 +12,15 @@
     </script>        
 {% endblock %}
 
-{% block menu %}
-{% block _menu %}{% endblock %}
+{% block userauthL %}    
+      <ul class="menu" id="menu_left_static" style="float: left;">
+        {% block menu %}
+            {% block _menu %}{% endblock %}
+        {% endblock %}
+        
+      </ul>
 {% endblock %}
+
 {% block menu_right %}
-{% block _menu_right %}{% endblock %}
+    {% block _menu_right %}{% endblock %}
 {% endblock %}

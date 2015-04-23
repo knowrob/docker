@@ -5,9 +5,5 @@
 
 
 {% block content %}
-<a href="{{ url_for('prac')}}"><img src="{{ '/prac/static/images/prac_logo_2.svg' }}"></a>
-<ul style="min-width: 180px;">
-    <li><a href="{{ url_for('praclearn')}}">PRAC Learning</a></li>
-    <li><a href="{{ url_for('pracinfer')}}">PRAC Inference</a></li>
-</ul>
+    {% include 'prac_content.html' %}
 {% endblock %}

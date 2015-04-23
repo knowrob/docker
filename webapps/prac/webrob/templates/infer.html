@@ -2,52 +2,8 @@
 {% block title %}Inference{% endblock %}
 {% block head %}
   {{ super() }}
-  <style type="text/css">
-    .important { color: #336699; }
-  </style>
 {% endblock %}
 
 {% block content %}
-{% from "_formhelpers.html" import render_field, render_Line, render_fields, visualize %}
-<div id='formtable'>
-<h1>PRAC Inference</h1>
-
-<form method='POST' action="pracinfer" enctype="multipart/form-data" name="PRACForm">
-
-<table id='tb_form'>
-    {{ render_field(form.description, onkeyup="updateDescr(this)") }}
-    {{ render_Line() }}
-    {{ render_field(form.module, onchange="updateModule(this,true)") }}
-    {{ render_field(form.kb, onchange="updateKB(this)", onmouseup="updateKB(this)") }}
-    {{ render_field(form.kbName) }}
-    {{ render_field(form.saveKB) }}
-    {{ render_field(form.logic) }}
-    {{ render_Line() }}
-    {{ render_field(form.mln_dd, onchange="updateMLN(this)", onmouseup="updateMLN(this)") }}
-    {{ render_fields( fs=[(form.mlnFile, {'accept':"application/mln"}), (form.uploadMLNFile, {"value":"Upload MLN File", "onsubmit":"uploadFile()"})], title='') }}
-    {{ render_field(form.mln) }}
-    {{ render_Line() }}
-    {{ render_field(form.evidence_dd, onchange="updateEvidence(this)", onmouseup="updateEvidence(this)") }}
-    {{ render_fields( fs=[(form.evidenceFile, {'accept':"application/db"}), (form.uploadMLNFile, {"value":"Upload DB File", "onsubmit":"uploadFile()"})], title='') }}
-    {{ render_field(form.evidence) }}
-    {{ render_Line() }}
-    {{ render_field(form.method) }}
-    {{ render_field(form.queries) }}
-    {{ render_field(form.parameters) }}
-    {{ render_field(form.cwPreds) }}
-    {{ render_fields(fs=[(form.useMultiCPU, {}), (form.closedWorld, {})], title='') }}
-    {{ render_field(form.submit, value='Infer') }}
-    </table>
-</form>
-</div>
-
-<div id='visualization'>
-<h1>Visualization</h1>
-<div id='viz'>
-</div>
-<script type="text/javascript" src="{{ '/prac/static/script/graph.js' }}"></script>
-  <input type="button" name="Start" value="&#9654;" onclick="loadGraph({{ result.steps }})">
-  <input type="button" name="Next" value="&raquo;" onclick="drawGraph()">
-  <input type="button" name="Clear" value="clear" onclick="clearGraph()">
-</div>
+    {% include 'infer_content.html' %}
 {% endblock %}
