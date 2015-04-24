@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-15 -*-
 # @author Daniel Beßler
 
-import os, sys, shutil
+import os, sys
 import json
 import zipfile
 
@@ -11,12 +11,13 @@ from urlparse import urlparse
 from flask import session, request, render_template, jsonify, send_file
 from flask_user import login_required
 
-# TODO: use this somewhere?
-from werkzeug import secure_filename
 
 from webrob.app_and_db import app
-from utility import *
-    
+from webrob.docker import docker_interface
+from webrob.docker.docker_interface import LFTransfer
+from webrob.pages.utility import copy_template_file
+
+
 @app.route('/knowrob/editor')
 @login_required
 def editor(filename=""):
@@ -31,11 +32,10 @@ def editor(filename=""):
 @app.route('/knowrob/pkg_new', methods=['POST'])
 @login_required
 def pkg_new():
-    packageName = json.loads(request.data)['packageName'];
-    pkgPath = os.path.join(get_user_dir(), packageName)
+    packageName = json.loads(request.data)['packageName']
     
     # Create package root directory
-    if os.path.exists(pkgPath):
+    if docker_interface.file_exists(session['user_container_name'], packageName):
         app.logger.warning("Package already exists.")
         return jsonify(result=None)
     
@@ -44,21 +44,22 @@ def pkg_new():
     if not os.path.exists(templatePath):
         app.logger.warning("Package templates missing at " + templatePath + ".")
         return jsonify(result=None)
-    
+
     try:
-      os.makedirs(pkgPath)
-      
-      # Copy package template to user_data container while replacing some keywords
-      for root, dirs, files in os.walk(templatePath):
-          for f in files:
-              abs_p = os.path.join(root, f)
-              rel_p = os.path.relpath(abs_p, templatePath)
-              user_p = os.path.join(pkgPath, rel_p)
-              copy_template_file(abs_p, user_p, {
-                "pkgName":packageName,
-                "userName":session['user_container_name']
-              })
-    except: # catch *all* exceptions
+        with LFTransfer(session['user_container_name']) as lft:
+            pkgPath = os.path.join(lft.get_filetransfer_folder(), packageName)
+            # Copy package template to user_data container while replacing some keywords
+            for root, dirs, files in os.walk(templatePath):
+                for f in files:
+                    abs_p = os.path.join(root, f)
+                    rel_p = os.path.relpath(abs_p, templatePath)
+                    user_p = os.path.join(pkgPath, rel_p)
+                    copy_template_file(abs_p, user_p, {
+                        "pkgName": packageName,
+                        "userName": session['user_container_name']
+                    })
+            lft.to_container(packageName, packageName)
+    except:  # catch *all* exceptions
         app.logger.error(str(sys.exc_info()[0]))
         pkg_del(packageName)
     
@@ -68,9 +69,9 @@ def pkg_new():
 @login_required
 def pkg_del(packageName=None):
     pkgName = packageName
-    if pkgName==None: pkgName = session['pkg']
-    
-    shutil.rmtree(os.path.join(get_user_dir(), pkgName))
+    if pkgName is None:
+        pkgName = session['pkg']
+    docker_interface.file_rm(session['user_container_name'], pkgName, True)
     return jsonify(result=None)
 
 @app.route('/knowrob/pkg_set', methods=['POST'])
@@ -86,45 +87,41 @@ def pkg_set():
 @login_required
 def pkg_list():
     # Return list of packages
-    files = filter(lambda f: os.path.isdir(os.path.join(get_user_dir(), f)), os.listdir(get_user_dir()))
-    return jsonify(result=files)
+    files = filter(lambda s: s['isdir'], docker_interface.file_ls(session['user_container_name'], '.')['children'])
+    filenames = map(lambda s: s['name'], files)
+    return jsonify(result=filenames)
 
 @app.route('/knowrob/pkg_read', methods=['POST'])
 @login_required
 def pkg_read():
     path = get_file_path(json.loads(request.data)['file'])
-    
     # Read the file
-    f = open(path, 'r')
-    content = f.readlines()
-    f.close()
-    
+    content = docker_interface.file_read(session['user_container_name'], path).splitlines(True)
     return jsonify(result=content)
 
 @app.route('/knowrob/pkg_down', methods=['POST'])
 @login_required
 def pkg_down():
-    path = os.path.join(get_user_dir(), session['pkg'])
-    
-    zipName = session['pkg'] + '.zip'
-    zipPath = os.path.join(get_user_dir(), zipName)
-    zipf = zipfile.ZipFile(zipPath, 'w')
-    zipdir(path, get_user_dir(), zipf)
-    zipf.close()
-    # FIXME: zip file never removed!
-    
-    return send_file(zipPath, 
-         mimetype="application/zip", 
-         as_attachment=True, 
-         attachment_filename=zipName)
+    with LFTransfer(session['user_container_name']) as lft:
+        name = session['pkg']
+        zipName = session['pkg'] + '.zip'
+        lft.from_container(name, name)
+        pkgPath = os.path.join(lft.get_filetransfer_folder(), name)
+        zipPath = os.path.join(lft.get_filetransfer_folder(), zipName)
+        zipf = zipfile.ZipFile(zipPath, 'w')
+        zipdir(pkgPath, lft.get_filetransfer_folder(), zipf)
+        zipf.close()
+        return send_file(zipPath,
+                         mimetype="application/zip",
+                         as_attachment=True,
+                         attachment_filename=zipName)
 
 @app.route('/knowrob/file_write', methods=['POST'])
 @login_required
 def file_write():
     data = json.loads(request.data)
     path = get_file_path(data['file'])
-    
-    write_text_file(path, data['content'])
+    docker_interface.file_write(session['user_container_name'], data['content'], path)
     
     return jsonify(result=None)
    
@@ -132,9 +129,7 @@ def file_write():
 @login_required 
 def file_del():
     path = get_file_path(json.loads(request.data)['file'])
-    
-    if(os.path.isfile(path)):
-        os.remove(path)
+    docker_interface.file_rm(session['user_container_name'], path, True)
     
     return get_pkg_tree()
 
@@ -146,27 +141,20 @@ def get_file_path(fileName):
     """
     Selects package subdir based on file extension.
     """
-    path = os.path.join(get_user_dir(), session['pkg'])
+    path = session['pkg']
     (_, ext) = os.path.splitext(fileName)
-    if(ext == ".pl"):
+    if ext == ".pl":
         path = os.path.join(path, "prolog")
-    elif(ext == ".owl"):
+    elif ext == ".owl":
         path = os.path.join(path, "owl")
     return os.path.join(path, fileName)
 
 def get_pkg_tree():
     # List files in package dir
-    pkgPath = os.path.join(get_user_dir(), session['pkg'])
-    rootFiles = list_pkg_files(session['pkg'], pkgPath)['children']
+    pkgPath = session['pkg']
+    rootFiles = docker_interface.file_ls(session['user_container_name'], pkgPath, True)['children']
     # Return list of files
     return jsonify(result=rootFiles)
-    
-def list_pkg_files(name, root):
-    out = []
-    if os.path.isdir(root):
-        for child in os.listdir(root):
-            out.append(list_pkg_files(child, os.path.join(root,child)))
-    return {'name': name, 'children': out, 'isdir': os.path.isdir(root)}
 
 def zipdir(path, pathPrefix, zipFile):
     for root, dirs, files in os.walk(path):

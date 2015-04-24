@@ -26,4 +26,4 @@ WORKDIR /home/ros
 # build the catkin workspace
 RUN /opt/ros/hydro/bin/catkin_make
 
-ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch
+ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch

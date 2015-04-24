@@ -15,7 +15,6 @@ from webrob.pages.utility import get_application_description
 def track_login(sender, user, **extra):
     session['user_container_name'] = user.username
     session['username'] = user.username
-    session['user_home_dir'] = '/home/ros/user_data/' + session['user_container_name']
     session['api_token'] = user.api_token
     session['application_name'] = ''
 
