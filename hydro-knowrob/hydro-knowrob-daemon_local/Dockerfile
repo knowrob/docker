@@ -31,5 +31,5 @@ RUN /opt/ros/hydro/bin/catkin_make
 
 VOLUME /home/ros/summary_data
 
-ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch
+ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
 
