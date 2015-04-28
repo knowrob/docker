@@ -7,7 +7,7 @@ from webrob.app_and_db import app, db
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import generate_mac
 from webrob.models.users import User
-from webrob.pages.utility import random_string, get_application_description
+from webrob.pages.utility import random_string
 
 __author__ = 'mhorst@cs.uni-bremen.de'
 
@@ -58,14 +58,11 @@ def start_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    application_description = get_application_description('knowrob')
-    if application_description is None: return
+    # TODO: howto obtain application container?
+    application_container = session['application_container']
+    if application_container is None: return
 
-    docker_interface.start_user_container(
-        user.username,
-        application_description['application'],
-        application_description['application_links'],
-        application_description['application_volumes'])
+    docker_interface.start_user_container(application_container, user.username)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})
