@@ -7,9 +7,11 @@
 
 
 from logging.handlers import SMTPHandler
+import os
 from flask_mail import Mail
 from flask_user import UserManager, SQLAlchemyAdapter
 from flask.ext.babel import Babel
+from webrob.pages.utility import random_string
 
 from webrob.startup.init_db import *
 from webrob.pages.routes import register_routes
@@ -21,6 +23,14 @@ def init_app(app, db, extra_config_settings={}):
     app.config.update(extra_config_settings)                # Overwrite with 'extra_config_settings' parameter
     if app.testing:
         app.config['WTF_CSRF_ENABLED'] = False              # Disable CSRF checks while testing
+    if os.environ['EASE_DEBUG'] == 'true':
+        app.config['DEBUG'] = True
+        app.config['SECRET_KEY'] = app.config['DEV_SECRET_KEY']
+    else:
+        try:
+            app.config['SECRET_KEY'] = open('/etc/ease_secret/secret', 'rb').read()
+        except IOError:
+            app.config['SECRET_KEY'] = random_string(64)
 
     # Setup Flask-Mail
     mail = Mail(app)
