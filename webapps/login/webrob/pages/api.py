@@ -46,7 +46,7 @@ def login_by_token(token):
     if user is None:
         return jsonify({'error': 'wrong api token'})
     ip = docker_interface.get_container_ip(user.username)
-    return generate_rosauth(ip)
+    return generate_rosauth(user.username, ip)
 
 
 @app.route('/api/v1.0/start_container/<string:token>', methods=['GET'])
@@ -58,11 +58,8 @@ def start_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    # TODO: howto obtain application container?
-    application_container = session['application_container']
-    if application_container is None: return
 
-    docker_interface.start_user_container(application_container, user.username)
+    docker_interface.start_user_container('knowrob/hydro-knowrob-base', user.username)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})
