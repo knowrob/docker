@@ -208,7 +208,13 @@
       </div>
       <div id="vid_properties">
         <table id="vid_table">
-	<tr> 
+        <tr> 
+	  <th><label for="experiment_select">Plan:</label>
+	  <select id="experiment_select" onchange="knowrob.update_video_divs(knowrob.experimentSelect, knowrob.initQueryDiv, knowrob.userQueryDiv, knowrob.minTimeRange, knowrob.maxTimeRange, knowrob.videoFile, knowrob.summaryImageDiv, knowrob.summaryHeaderDiv)">
+              <option value=-1>Choose a plan execution</option>
+          </select>
+	</tr>
+        <tr> 
 	  <th><label for="amount">Time range:</label>
 	  <input type="text" id="currentRange" readonly style="border:0; color:#f6931f; font-weight:bold;"></th>
 	</tr>
