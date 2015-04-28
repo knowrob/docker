@@ -229,9 +229,9 @@ class DockerManager(object):
             sysout("Error:" + str(e.message))
             return 'error'
 
-    def container_exists(self, container_name, base_image_name=None):
+    def container_started(self, container_name, base_image_name=None):
         try:
-            cont = self.__get_container(container_name, self.__client.containers(all=True))
+            cont = self.__get_container(container_name, self.__client.containers())
             if base_image_name is None or cont is None:
                 return cont is not None
             

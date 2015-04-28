@@ -200,11 +200,14 @@ class FileManager(object):
         self.__stop_and_remove(cont, True)
 
     def __writefile(self, data_container, sourcestream, targetfile, user=0):
-        cont = self.__create_temp_container('sh -c \'cat > '+targetfile+'\'', data_container, user)
+        cont = self.__create_temp_container('tee '+targetfile, data_container, user)
         instream = self.__attach(cont, 'stdin')
         self.__start_container(cont)
         self.__pump(sourcestream, instream)
-        self.__stop_and_remove(cont)
+        # docker sometimes doesn't get EOF, thus leaving the socket open with the process still running.
+        # close stdin after pumping so it doesn't hang while waiting.
+        instream.stream.fd.close()
+        self.__stop_and_remove(cont, True)
 
     def __pump(self, instream, outstream):
         pump = dockerio.Pump(instream, outstream)

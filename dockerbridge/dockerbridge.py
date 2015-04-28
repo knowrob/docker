@@ -52,12 +52,12 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
         timeout.remove(user_container_name)
 
     @pyjsonrpc.rpcmethod
-    def container_exists(self, user_container_name, base_image_name=None):
+    def container_started(self, user_container_name, base_image_name=None):
         check_containername(user_container_name, 'user_container_name')
         if base_image_name is not None:
             check_imagename(base_image_name, 'base_image_name')
 
-        return dockermanager.container_exists(user_container_name, base_image_name)
+        return dockermanager.container_started(user_container_name, base_image_name)
 
     @pyjsonrpc.rpcmethod
     def get_container_ip(self, user_container_name):

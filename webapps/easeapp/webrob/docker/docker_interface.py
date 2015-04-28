@@ -14,6 +14,7 @@ from webrob.pages.utility import random_string
 client = pyjsonrpc.HttpClient(url="http://"+os.environ['DOCKERBRIDGE_PORT_5001_TCP_ADDR'] + ':'
                               + os.environ['DOCKERBRIDGE_PORT_5001_TCP_PORT'])
 
+
 def generate_mac(user_container_name, client_name, dest, rand, t, level, end, cache=False):
     """
     Generate the mac for use with rosauth. Choose params according to rosauth specification.
@@ -22,16 +23,23 @@ def generate_mac(user_container_name, client_name, dest, rand, t, level, end, ca
         secret = session['secret_key']
     else:
         secret = client.files_readsecret(user_container_name)
-    if cache:
-        session['secret_t'] = t + 30
-        session['secret_key'] = secret
+        if cache:
+            session['secret_t'] = t + 60
+            session['secret_key'] = secret
     return hashlib.sha512(secret + client_name + dest + rand + str(t) + level + str(end)).hexdigest()
+
+
+def clear_secretcache():
+    if 'secret_t' in session:
+        del session['secret_t']
+    if 'secret_key' in session:
+        del session['secret_key']
 
 
 def get_application_image_names():
     try:
         return client.get_application_image_names()
-    except InternalError, e:
+    except JsonRpcError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
@@ -43,7 +51,7 @@ def get_application_image_names():
 def get_webapp_image_names():
     try:
         return client.get_webapp_image_names()
-    except InternalError, e:
+    except JsonRpcError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
@@ -67,6 +75,7 @@ def start_user_container(application_image, user_container_name):
     try:
         client.notify("create_user_data_container", user_container_name)
         client.notify("files_writesecret", user_container_name, random_string(16))
+        clear_secretcache()
         client.notify("start_user_container", application_image, user_container_name)
     except JsonRpcError, e:
         flash("Error: Connection to your OpenEASE instance failed.")
@@ -98,10 +107,7 @@ def stop_container(user_container_name):
     """
     try:
         client.notify("stop_container", user_container_name)
-        if 'secret_t' in session:
-            del session['secret_t']
-        if 'secret_key' in session:
-            del session['secret_key']
+        clear_secretcache()
     except JsonRpcError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
@@ -110,15 +116,15 @@ def stop_container(user_container_name):
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 
-def container_exists(user_container_name, base_image=None):
+def container_started(user_container_name, base_image=None):
     """
-    Returns true if the container exists. If a base_image is specified, it only return true if the container exists and
-    is directly derived from the given base_image
+    Returns true if the container exists and is running. If a base_image is specified, it only return true if the
+    container exists and is directly derived from the given base_image
     :param user_container_name: Name of the container.
     :param base_image: Image the container is based on
     """
     try:
-        return client.container_exists(user_container_name, base_image)
+        return client.container_started(user_container_name, base_image)
     except JsonRpcError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
@@ -157,12 +163,12 @@ def get_container_log(user_container_name):
     except URLError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
- 
+
 
 def get_container_env(user_container_name, key):
     try:
         return client.get_container_env(user_container_name, key)
-    except InternalError, e:
+    except JsonRpcError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:
