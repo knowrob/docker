@@ -48,7 +48,9 @@ ENV SWI_HOME_DIR /usr/lib/swi-prolog
 ENV PYTHONPATH /home/ros/devel/lib/python2.7/dist-packages:/opt/ros/hydro/lib/python2.7/dist-packages
 
 ENV DOCKER_LINKS mongo_db:mongo
-ENV DOCKER_VOLUMES knowrob_data:ro mesh_data:ro summary_data
+# TODO: Mount mesh_data read only. Note: Meshes can be generated in knowrob_vis and saved in mesh_data 
+ENV DOCKER_VOLUMES knowrob_data:ro mesh_data summary_data
+#ENV DOCKER_VOLUMES knowrob_data:ro mesh_data:ro summary_data
 
 # forward ports: KnowRob webserver + rosbridge
 EXPOSE 1111 9090
