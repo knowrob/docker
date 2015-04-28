@@ -14,7 +14,6 @@ from webrob.pages.utility import random_string
 client = pyjsonrpc.HttpClient(url="http://"+os.environ['DOCKERBRIDGE_PORT_5001_TCP_ADDR'] + ':'
                               + os.environ['DOCKERBRIDGE_PORT_5001_TCP_PORT'])
 
-
 def generate_mac(user_container_name, client_name, dest, rand, t, level, end, cache=False):
     """
     Generate the mac for use with rosauth. Choose params according to rosauth specification.
@@ -29,7 +28,31 @@ def generate_mac(user_container_name, client_name, dest, rand, t, level, end, ca
     return hashlib.sha512(secret + client_name + dest + rand + str(t) + level + str(end)).hexdigest()
 
 
-def start_user_container(container_name, container_image, links, volumes):
+def get_application_image_names():
+    try:
+        return client.get_application_image_names()
+    except InternalError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
+
+
+def get_webapp_image_names():
+    try:
+        return client.get_webapp_image_names()
+    except InternalError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+    return None
+
+
+def start_user_container(application_image, user_container_name):
     """
     Starts a user container based on the given image. If the container already exists, it will stop and remove the
     container first. Also, a data container is created and mounted inside the given container, and a rosauth secret
@@ -37,15 +60,14 @@ def start_user_container(container_name, container_image, links, volumes):
 
     Note that containers are stopped and removed after 10 minutes if the refresh function is not called periodically
     beforehand.
-    :param container_name: Name of the container.
-    :param container_image: Image the container should be based on
-    :param links: names of docker containers to establish a network link to
-    :param volumes: names of docker containers whose volumes should be mounted
+    
+    :param application_image: Image the container should be based on
+    :param user_container_name: Name of the container.
     """
     try:
-        client.notify("create_user_data_container", container_name)
-        client.notify("files_writesecret", container_name, random_string(16))
-        client.notify("start_user_container", container_name, container_image, links, volumes)
+        client.notify("create_user_data_container", user_container_name)
+        client.notify("files_writesecret", user_container_name, random_string(16))
+        client.notify("start_user_container", application_image, user_container_name)
     except JsonRpcError, e:
         flash("Error: Connection to your OpenEASE instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
@@ -54,16 +76,13 @@ def start_user_container(container_name, container_image, links, volumes):
         app.logger.error("ConnectionError during connect: " + str(e) + "\n")
 
 
-def start_webapp_container(container_name, webapp_image, links, volumes):
+def start_webapp_container(webapp_image):
     """
     Starts a new web container based on the given image. If it already exists, no action will be taken.
-    :param container_name: Name of the container.
     :param webapp_image: Image the container should be based on
-    :param links: list of names of docker containers to establish a network link to
-    :param volumes: list of names of docker containers whose volumes should be mounted
     """
     try:
-        client.notify("start_webapp_container", container_name, webapp_image, links, volumes)
+        client.notify("start_webapp_container", webapp_image)
     except JsonRpcError, e:
         flash("Error: Connection to your OpenEASE instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
@@ -133,6 +152,17 @@ def get_container_log(user_container_name):
     try:
         return client.get_container_log(user_container_name)
     except JsonRpcError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
+    except URLError, e:
+        flash("Error: Connection to your application failed.")
+        app.logger.error("ConnectionError during connect: " + str(e) + "\n")
+ 
+
+def get_container_env(user_container_name, key):
+    try:
+        return client.get_container_env(user_container_name, key)
+    except InternalError, e:
         flash("Error: Connection to your application failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")
     except URLError, e:

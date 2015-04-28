@@ -34,7 +34,15 @@ then
    export KNOWROB_WEB_PORT=5000
 fi
 
-stopContainer "knowrob"
+# Stop all webapp containers
+IMAGES=`docker images | grep latest | grep -Eo '^[^ ]+' | grep -v "openease/easeapp" | grep -v "openease/login"`
+for IMG in $IMAGES; do
+    X=`docker inspect --format="{{ .ContainerConfig.Env }}" $IMG | grep "OPEN_EASE_WEBAPP=true"`
+    if [ -n "$X" ]; then
+        NAME=`echo "$IMG" | cut -d "/" -f2`
+        stopContainer "$NAME"
+    fi
+done
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if knowrob_data container exists and create otherwise

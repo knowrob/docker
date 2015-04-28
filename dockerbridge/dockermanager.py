@@ -12,6 +12,8 @@ from utils import sysout
 
 
 class DockerManager(object):
+    webapp_images = None
+    application_images = None
 
     def __init__(self):
         self.__client = docker.Client(base_url='unix://var/run/docker.sock', version='1.18', timeout=10)
@@ -44,19 +46,18 @@ class DockerManager(object):
             self.__client.create_container('mongo', detach=True, name='mongo_db')
             self.__client.start('mongo', volumes_from=['mongo_data'])
 
-    def start_user_container(self, container_name, container_image, links, volumes):
+    def start_user_container(self, application_image, user_container_name):
         try:
             all_containers = self.__client.containers(all=True)
             # Make sure common containers are up and running
             self.__start_common_container__(all_containers)
             # Stop user container if running
-            self.__stop_container__(container_name, all_containers)
+            self.__stop_container__(user_container_name, all_containers)
 
             user_home_dir = absolute_userpath('')
-            volumes.append(data_container_name(container_name))
 
-            sysout("Creating user container " + container_name)
-            env = {"VIRTUAL_HOST": container_name,
+            sysout("Creating user container " + user_container_name)
+            env = {"VIRTUAL_HOST": user_container_name,
                    "VIRTUAL_PORT": '9090',
                    "ROS_PACKAGE_PATH": ":".join([
                        "/home/ros/src",
@@ -64,15 +65,22 @@ class DockerManager(object):
                        "/opt/ros/hydro/stacks",
                        user_home_dir
             ])}
-            self.__client.create_container(container_image, detach=True, tty=True, environment=env,
-                                           name=container_name)
+            self.__client.create_container(application_image, detach=True, tty=True, environment=env,
+                                           name=user_container_name)
+                
+            # Read links and volumes from webapp_container ENV
+            inspect = self.__client.inspect_image(application_image)
+            env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
+            links = map(lambda x: tuple(x.split(':')), env['DOCKER_LINKS'].split(' '))
+            volumes = env['DOCKER_VOLUMES'].split(' ')
+            volumes.append(data_container_name(user_container_name))
 
-            sysout("Starting user container " + container_name)
-            self.__client.start(container_name,
+            sysout("Starting user container " + user_container_name)
+            self.__client.start(user_container_name,
                                 port_bindings={9090: ('127.0.0.1',)},
                                 links=links,
                                 volumes_from=volumes)
-        except (APIError, DockerException), e:
+        except Exception, e:
             sysout("Error:" + str(e.message))
             traceback.print_exc()
 
@@ -91,29 +99,38 @@ class DockerManager(object):
             traceback.print_exc()
         return False
 
-    def start_webapp_container(self, container_name, webapp_image, links, volumes):
+    def start_webapp_container(self, webapp_image):
         try:
             all_containers = self.__client.containers(all=True)
             # Make sure common containers are up and running
             self.__start_common_container__(all_containers)
+            container_name = webapp_image.split('/')[1]
             # Stop user container if running
             if self.__get_container(container_name, all_containers) is None:
-                sysout("Creating webapp container " + container_name)
+                sysout("Creating webapp container " + container_name + " for image " + webapp_image)
                 env = {"VIRTUAL_HOST": container_name,
                        "VIRTUAL_PORT": '5000',
                        "OPEN_EASE_WEBAPP": 'true'}
-                volumes.append('lft_data')
+                
                 self.__client.create_container(webapp_image,
                                                detach=True, tty=True, stdin_open=True,
                                                environment=env,
                                                name=container_name,
                                                command='python runserver.py')
+                
+                # Read links and volumes from webapp_image ENV
+                inspect = self.__client.inspect_image(webapp_image)
+                img_env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
+                links = map(lambda x: tuple(x.split(':')), img_env['DOCKER_LINKS'].split(' '))
+                volumes = img_env['DOCKER_VOLUMES'].split(' ')
+                volumes.append('lft_data')
+                
                 sysout("Running webapp container " + container_name)
                 self.__client.start(container_name,
                                     port_bindings={5000: ('127.0.0.1',)},
                                     links=links,
                                     volumes_from=volumes)
-        except (APIError, DockerException), e:
+        except Exception, e:
             sysout("Error:" + str(e.message))
             traceback.print_exc()
 
@@ -137,8 +154,68 @@ class DockerManager(object):
             inspect = self.__client.inspect_container(container_name)
             return inspect['NetworkSettings']['IPAddress']
         except (APIError, DockerException), e:
+            sysout("Error:" + str(e.message) + "\n")
             return 'error'
+    
+    def get_application_image_names(self):
+        if self.application_images != None: return self.application_images
+        
+        self.application_images = []
+        
+        try:
+            all_images = self.__client.images(all=True)
+            for img in self.get_named_images(all_images):
+                inspect = self.__client.inspect_image(img)
+                env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
+                if 'OPEN_EASE_APPLICATION' in env:
+                    self.application_images.append(img)
+                
+        except Exception, e:
+            sysout("Error:" + str(e.message) + "\n")
+        
+        return self.application_images
+    
+    def get_webapp_image_names(self):
+        if self.webapp_images != None: return self.webapp_images
+        
+        self.webapp_images = []
+        
+        try:
+            all_images = self.__client.images(all=True)
+            for img in self.get_named_images(all_images):
+                if img in ['openease/easeapp', 'openease/login']: continue
+                    
+                inspect = self.__client.inspect_image(img)
+                env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
+                if 'OPEN_EASE_WEBAPP' in env:
+                    self.webapp_images.append(img)
+                
+        except Exception, e:
+            sysout("Error:" + str(e.message) + "\n")
+        
+        return self.webapp_images
+    
+    def get_named_images(self, all_images):
+        named_images = []
+        for img in all_images:
+            tags = img['RepoTags']
+            if len(tags)==0: continue
+            tag0 = tags[0]
+            if tag0 == '<none>:<none>': continue
+            named_images.append(tag0.split(':')[0])
+        return named_images
 
+    def get_container_env(self, container_name, key):
+        try:
+            inspect = self.__client.inspect_container(container_name)
+            env_list = inspect['Config']['Env']
+            # Map to list of key-value pairs and convert to dict
+            env = dict(map(lambda x: x.split("="), env_list))
+            return env[key]
+        except Exception, e:
+            sysout("Error:" + str(e.message) + "\n")
+            return 'error'
+    
     def get_container_log(self, container_name):
         try:
             logger = self.__client.logs(container_name, stdout=True, stderr=True, stream=False, timestamps=False)

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-15 -*-
-# @author Daniel Be√üler
+# @author Daniel Beﬂler
 
 import os
 import string
@@ -8,18 +8,6 @@ import string
 from flask import session
 from webrob.app_and_db import app
 from Crypto.Random import random
-
-def get_application_description(application_name):
-    try:
-        return app.config['APPLICATIONS'][application_name]
-    except:
-        return None
-
-def get_applications():
-    try:
-        return app.config['APPLICATIONS'].keys()
-    except:
-        return None
 
 def copy_template_file(src, dst, args):
     # Read the template file

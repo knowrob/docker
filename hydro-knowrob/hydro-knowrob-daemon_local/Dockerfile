@@ -24,8 +24,9 @@ USER ros
 
 WORKDIR /home/ros
 
+ENV OPEN_EASE_APPLICATION true
+
 # build the catkin workspace
-WORKDIR /home/ros
 RUN /opt/ros/hydro/bin/catkin_make
 
 VOLUME /home/ros/summary_data

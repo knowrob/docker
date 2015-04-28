@@ -9,7 +9,6 @@ from urlparse import urlparse
 
 from webrob.app_and_db import app
 from webrob.docker import docker_interface
-from webrob.pages.utility import get_application_description
 
 @user_logged_in.connect_via(app)
 def track_login(sender, user, **extra):
@@ -24,29 +23,21 @@ def track_logout(sender, user, **extra):
         docker_interface.stop_container(session['user_container_name'])
         session.pop('user_container_name')
 
-@app.route('/application_description/<application_name>', methods=['POST'])
-def application_description(application_name):
-    return jsonify(result=get_application_description(application_name))
-
 @app.route('/application_names', methods=['POST'])
 def application_names():
     application_name = ''
     if 'application_name' in session:
         application_name = session['application_name']
-    return jsonify(result=app.config['APPLICATIONS'].keys(), selection=application_name)
+    
+    return jsonify(result=docker_interface.get_application_image_names(), selection=application_name)
 
-@app.route('/application/<application_name>')
+@app.route('/application/<path:application_name>')
 @login_required
 def select_application(application_name):
     # TODO: I don't think that's needed in compination with login_required decorator
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
-    
-    application_description = get_application_description(application_name)
-    if application_description is None: return
-    
     session['application_name'] = application_name
-    
     return redirect('/'+application_name)
 
 @app.route('/')
@@ -60,6 +51,6 @@ def show_user_data():
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
-    application_names = app.config['APPLICATIONS'].keys()
+    application_names = docker_interface.get_application_image_names()
 
     return render_template('show_user_data.html', **locals())

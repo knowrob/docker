@@ -38,7 +38,7 @@ def download_summary_image(filename):
 @login_required
 def tutorials(cat_id='getting_started', page=1):
     session['video'] = 0
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     # determine hostname/IP we are currently using
@@ -61,11 +61,12 @@ def tutorials(cat_id='getting_started', page=1):
     return render_template('knowrob_tutorial.html', **locals())
 
 @app.route('/knowrob/')
+@app.route('/knowrob/hydro-knowrob-daemon')
 @app.route('/knowrob/exp/<exp_id>')
 @login_required
 def knowrob(exp_id=None):
     session['video'] = 0
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -91,7 +92,7 @@ def knowrob(exp_id=None):
 @login_required
 def video(exp_id=None):
     session['video'] = 1
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -111,6 +112,7 @@ def video(exp_id=None):
     return render_template('video.html', **locals())
 
 @app.route('/knowrob/menu', methods=['POST'])
+@app.route('/knowrob/hydro-knowrob-daemon/menu', methods=['POST'])
 def menu():
     menu_left = [
         ('Knowledge Base', url_for('knowrob')),

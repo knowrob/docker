@@ -31,21 +31,18 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
         dockermanager.create_user_data_container(container_name)
 
     @pyjsonrpc.rpcmethod
-    def start_user_container(self, container_name, container_image, links, volumes):
-        check_containername(container_name, 'container_name')
-        check_imagename(container_image, 'container_image')
-        # TODO check links and volumes
+    def start_user_container(self, application_image, user_container_name):
+        check_containername(user_container_name, 'container_name')
+        check_imagename(application_image, 'container_image')
 
-        dockermanager.start_user_container(container_name, container_image, links, volumes)
-        timeout.setTimeout(container_name, 600)
+        dockermanager.start_user_container(application_image, user_container_name)
+        timeout.setTimeout(user_container_name, 600)
     
     @pyjsonrpc.rpcmethod
-    def start_webapp_container(self, container_name, webapp_image, links, volumes):
-        check_containername(container_name, 'container_name')
+    def start_webapp_container(self, webapp_image):
         check_imagename(webapp_image, 'webapp_image')
-        # TODO check links and volumes
 
-        dockermanager.start_webapp_container(container_name, webapp_image, links, volumes)
+        dockermanager.start_webapp_container(webapp_image)
 
     @pyjsonrpc.rpcmethod
     def stop_container(self, user_container_name):
@@ -67,6 +64,18 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
         check_containername(user_container_name, 'user_container_name')
 
         return dockermanager.get_container_ip(user_container_name)
+
+    @pyjsonrpc.rpcmethod
+    def get_application_image_names(self):
+        return dockermanager.get_application_image_names()
+
+    @pyjsonrpc.rpcmethod
+    def get_webapp_image_names(self):
+        return dockermanager.get_webapp_image_names()
+    
+    @pyjsonrpc.rpcmethod
+    def get_container_env(self, user_container_name, key):
+        return dockermanager.get_container_env(user_container_name, key)
 
     @pyjsonrpc.rpcmethod
     def refresh(self, user_container_name):
