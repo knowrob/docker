@@ -1,6 +1,11 @@
 {
-    "init": "mng_db('chemlab'), \nload_experiment('/home/ros/knowrob_data/logs/chemlab/dna_extraction_0/cram_log.owl'), \nowl_parse('package://iai_semantic_maps/owl/room.owl'), \nowl_parse('package://knowrob_srdl/owl/PR2.owl'), \nadd_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'), \nadd_agent_visualization(pr2:'PR2Robot1', T).",
-    "user": "add_agent_visualization(pr2:'PR2Robot1',T).",
-    "start": 1421942939,
-    "end": 1421942944
+    "video":[
+        {
+          "name": "DNA Extraction 1",
+          "init": "mng_db('chemlab'), \nload_experiment('/home/ros/knowrob_data/logs/chemlab/dna_extraction_0/cram_log.owl'), \nowl_parse('package://iai_semantic_maps/owl/room.owl'), \nowl_parse('package://knowrob_srdl/owl/PR2.owl'), \nadd_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'), \nadd_agent_visualization(pr2:'PR2Robot1', T).",
+          "user": "add_agent_visualization(pr2:'PR2Robot1',T).",
+          "start": 1421942939,
+          "end": 1421942944
+        }
+     ]
 }

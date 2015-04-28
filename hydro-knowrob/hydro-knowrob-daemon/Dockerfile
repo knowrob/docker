@@ -29,3 +29,4 @@ ENV OPEN_EASE_APPLICATION true
 RUN /opt/ros/hydro/bin/catkin_make
 
 ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
+

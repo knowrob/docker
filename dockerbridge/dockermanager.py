@@ -16,13 +16,13 @@ class DockerManager(object):
     application_images = None
 
     def __init__(self):
-        self.__client = docker.Client(base_url='unix://var/run/docker.sock', version='1.18', timeout=10)
+        self.__client = docker.Client(base_url='unix://var/run/docker.sock', version='1.18', timeout=60)
 
     def start_common_container(self):
         try:
             self.__start_common_container__(self.__client.containers(all=True))
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in start_common_container: " + str(e.message))
             traceback.print_exc()
 
     def __start_common_container__(self, all_containers):
@@ -81,7 +81,7 @@ class DockerManager(object):
                                 links=links,
                                 volumes_from=volumes)
         except Exception, e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in start_user_container: " + str(e.message))
             traceback.print_exc()
 
     def create_user_data_container(self, container_name):
@@ -95,7 +95,7 @@ class DockerManager(object):
                 self.__client.start(user_data_container)
                 return True
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in create_user_data_container: " + str(e.message))
             traceback.print_exc()
         return False
 
@@ -131,14 +131,14 @@ class DockerManager(object):
                                     links=links,
                                     volumes_from=volumes)
         except Exception, e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in start_webapp_container: " + str(e.message))
             traceback.print_exc()
 
     def stop_container(self, container_name):
         try:
             self.__stop_container__(container_name, self.__client.containers(all=True))
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in stop_container: " + str(e.message))
 
     def __stop_container__(self, container_name, all_containers):
         # check if containers exist:
@@ -154,7 +154,7 @@ class DockerManager(object):
             inspect = self.__client.inspect_container(container_name)
             return inspect['NetworkSettings']['IPAddress']
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message) + "\n")
+            sysout("Error in get_container_ip: " + str(e.message) + "\n")
             return 'error'
     
     def get_application_image_names(self):
@@ -168,10 +168,11 @@ class DockerManager(object):
                 inspect = self.__client.inspect_image(img)
                 env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
                 if 'OPEN_EASE_APPLICATION' in env:
+                    sysout("OPEN_EASE_APPLICATION: " + str(img) + "\n")
                     self.application_images.append(img)
                 
         except Exception, e:
-            sysout("Error:" + str(e.message) + "\n")
+            sysout("Error in get_application_image_names: " + str(e.message) + "\n")
         
         return self.application_images
     
@@ -188,10 +189,11 @@ class DockerManager(object):
                 inspect = self.__client.inspect_image(img)
                 env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
                 if 'OPEN_EASE_WEBAPP' in env:
+                    sysout("OPEN_EASE_WEBAPP: " + str(img) + "\n")
                     self.webapp_images.append(img)
                 
         except Exception, e:
-            sysout("Error:" + str(e.message) + "\n")
+            sysout("Error in get_webapp_image_names: " + str(e.message) + "\n")
         
         return self.webapp_images
     
@@ -213,7 +215,7 @@ class DockerManager(object):
             env = dict(map(lambda x: x.split("="), env_list))
             return env[key]
         except Exception, e:
-            sysout("Error:" + str(e.message) + "\n")
+            sysout("Error in get_container_env: " + str(e.message) + "\n")
             return 'error'
     
     def get_container_log(self, container_name):
@@ -226,7 +228,7 @@ class DockerManager(object):
                 logstr += line
             return logstr
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in get_container_log: " + str(e.message))
             return 'error'
 
     def container_started(self, container_name, base_image_name=None):
@@ -241,7 +243,7 @@ class DockerManager(object):
             return image == base_image_name
         
         except (APIError, DockerException), e:
-            sysout("Error:" + str(e.message))
+            sysout("Error in container_exists: " + str(e.message))
             return False
 
     @staticmethod
