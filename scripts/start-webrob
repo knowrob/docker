@@ -34,7 +34,15 @@ then
    export KNOWROB_WEB_PORT=5000
 fi
 
-stopContainer "knowrob"
+# Stop all webapp containers
+IMAGES=`docker images | grep latest | grep -Eo '^[^ ]+' | grep -v "openease/easeapp" | grep -v "openease/login"`
+for IMG in $IMAGES; do
+    X=`docker inspect --format="{{ .ContainerConfig.Env }}" $IMG | grep "OPEN_EASE_WEBAPP=true"`
+    if [ -n "$X" ]; then
+        NAME=`echo "$IMG" | cut -d "/" -f2`
+        stopContainer "$NAME"
+    fi
+done
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if knowrob_data container exists and create otherwise
@@ -48,9 +56,11 @@ runContainer "user_data" "knowrob/user_data true"
 # Check if mesh_data container exists and create otherwise
 runContainer "mesh_data" "-v /home/ros/mesh_data ubuntu chmod -R ugo+rw /home/ros/mesh_data"
 
+########### TODO: Remove data container below, when migration of summary data to user data container is finished. It is unsafe!
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if summary_data container exists and create otherwise
 runContainer "summary_data" "-v /home/ros/summary_data ubuntu chmod -R 777 /home/ros/summary_data"
+########### TODO: Remove data container above, when migration of summary data to user data container is finished. It is unsafe!
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_data container exists and create otherwise
@@ -85,7 +95,9 @@ runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock kno
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
-runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from knowrob_data --link mongo_db:mongo knowrob/hydro-knowrob-daemon" true
+runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
+runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from knowrob_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon" true
 
 # Wait for the postgres port to be available
 echo "Waiting for postgres container..."
@@ -108,7 +120,6 @@ fi
 
 echo "Creating login web app container..."
 docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
-    --volumes-from user_data \
     --volumes-from mesh_data \
     --link postgres_db:postgres \
     --link dockerbridge:dockerbridge \

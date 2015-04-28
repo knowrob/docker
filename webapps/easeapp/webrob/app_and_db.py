@@ -8,9 +8,16 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import logging
 
 # This is the WSGI compliant web application object
 app = Flask(__name__)
+app.logger.addHandler(logging.StreamHandler())
+app.logger.setLevel(logging.INFO)
 
 # This is the SQLAlchemy ORM object
 db = SQLAlchemy(app)
+
+# Start openEASE webapps
+from webrob.startup.init_webapps import init_webapps
+init_webapps(app)

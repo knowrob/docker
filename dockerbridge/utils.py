@@ -12,5 +12,6 @@ def sysout(msg):
     Handles logging output, because pyjsonrpc hijacks stdout.
     :param msg: Message to print
     """
+    sys.stderr.write(msg + "\n")
     out.write(msg + "\n")
     out.flush()

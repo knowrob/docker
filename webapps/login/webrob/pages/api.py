@@ -1,16 +1,16 @@
-from Crypto.Random import random
 from flask import jsonify, request, session, redirect
 from flask_login import current_user
 from flask_user import login_required
-import hashlib
-import string
 import time
 from urlparse import urlparse
 from webrob.app_and_db import app, db
 from webrob.docker import docker_interface
+from webrob.docker.docker_interface import generate_mac
 from webrob.models.users import User
+from webrob.pages.utility import random_string
 
 __author__ = 'mhorst@cs.uni-bremen.de'
+
 
 @app.route('/api/v1.0/auth_by_session', methods=['GET'])
 def login_by_session():
@@ -19,7 +19,8 @@ def login_by_session():
     request
     """
     if current_user.is_authenticated():
-        return generate_rosauth(session['container_ip'])
+        ip = docker_interface.get_container_ip(session['user_container_name'])
+        return generate_rosauth(session['user_container_name'], ip, True)
     return jsonify({'error': 'not authenticated'})
 
 
@@ -57,7 +58,11 @@ def start_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-    docker_interface.start_container(user.username, 'user_data', 'knowrob_data', '/home/ros/user_data/' + user.username)
+    # TODO: howto obtain application container?
+    application_container = session['application_container']
+    if application_container is None: return
+
+    docker_interface.start_user_container(application_container, user.username)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})
@@ -95,7 +100,7 @@ def create_api_token():
 
 
 def create_token():
-    current_user.api_token = "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(64)])
+    current_user.api_token = random_string(64)
     db.session.commit()
     session['api_token'] = current_user.api_token
 
@@ -107,25 +112,24 @@ def user_by_token(token):
     return User.query.filter_by(api_token=token).first()
 
 
-def generate_rosauth(dest):
+def generate_rosauth(user_container_name, dest, cache=False):
     """
     Generate the mac for use with rosauth and compile a json object with all necessary information to authenticate
     with the server.
+    :param user_container_name: Name of the user container
     :param dest: IP of the destination
     :return: a json object for ros
     """
-    secret = "RW6WZ2yp67ETMdj2"  # TODO customize for each user
     client = request.remote_addr
 
-    rand = "".join([random.choice(string.ascii_letters + string.digits) for n in xrange(30)])
+    rand = random_string(30)
 
     t = int(time.time())
     level = "user"
     end = int(t + 3600)
 
-    mac = hashlib.sha512(secret + client + dest + rand + str(t) + level + str(end)).hexdigest()
     return jsonify({
-            'mac': mac,
+            'mac': generate_mac(user_container_name, client, dest, rand, t, level, end, cache),
             'client': client,
             'dest': dest,
             'rand': rand,
