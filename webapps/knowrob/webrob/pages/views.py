@@ -114,10 +114,12 @@ def video(exp_id=None):
 @app.route('/knowrob/menu', methods=['POST'])
 @app.route('/knowrob/hydro-knowrob-daemon/menu', methods=['POST'])
 def menu():
+    knowrobUrl = '/knowrob/'
+    
     menu_left = [
-        ('Knowledge Base', url_for('knowrob')),
-        ('Robot Memory Replay', url_for('knowrob')+'video'),
-        ('Editor',         url_for('knowrob')+'editor')
+        ('Knowledge Base',      knowrobUrl),
+        ('Robot Memory Replay', knowrobUrl+'video'),
+        ('Editor',              knowrobUrl+'editor')
     ]
     
     exp_selection = __exp_file__()
@@ -127,10 +129,10 @@ def menu():
     exp_choices =  []
     if __is_video__() == 1:
         for exp in __exp_list__():
-            exp_choices.append((exp, url_for('knowrob')+'video/exp/'+exp))
+            exp_choices.append((exp, knowrobUrl+'video/exp/'+exp))
     else:
         for exp in __exp_list__():
-            exp_choices.append((exp, url_for('knowrob')+'exp/'+exp))
+            exp_choices.append((exp, knowrobUrl+'exp/'+exp))
     
     menu_right = [
         ('CHOICES', (exp_selection, exp_choices))
