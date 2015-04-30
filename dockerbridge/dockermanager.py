@@ -249,6 +249,6 @@ class DockerManager(object):
     @staticmethod
     def __get_container(container_name, all_containers):
         for cont in all_containers:
-            if "/" + container_name in cont['Names']:
+            if cont['Names'] != None and "/" + container_name in cont['Names']:
                 return cont
         return None
