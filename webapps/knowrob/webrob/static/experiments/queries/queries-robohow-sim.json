@@ -1,0 +1,40 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-sim'), owl_parse('package://knowrob_srdl/owl/sim-hand.owl').",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/simulation/robohow/', ['pizza0'], 'log.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://knowrob_sim/owl/simulation_map.owl'), add_object_with_children('http://knowrob.org/kb/simulation_map.owl#SemanticEnvironmentMap_SAsdfs').",
+            "text": "Visualize semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the logged simulation -----"
+        },
+        {
+            "q": "simgrasped(Experiment, EventID1, ObjClass, ObjInstance), rdfs_subclass_of(ObjClass, knowrob:'Container'), simact_start(Experiment, EventID1, Start), simact_end(Experiment, EventID1, End), anyact(Experiment, EventID2, knowrob_sim:'ParticleTranslation'), comp_temporallySubsumes(EventID1,EventID2), remove_trajectory('/palm_link'), visualize_simulation_scene(Start), add_trajectory('/palm_link', Start, End, 0.1), highlight_trajectory('/palm_link', Start, End, '2EB82E').",
+            "text": "Show the trajectory of the hand at pouring events"
+        },
+        {
+            "q": "simgrasped(Exp, ID1, OC, OI), rdfs_subclass_of(OC, knowrob:'FoodUtensil'),anyact(Exp, ID2, knowrob_sim:'ParticleTranslation'),comp_temporallySubsumes(ID1,ID2),anyact(Exp, ID3, knowrob_sim:'ParticleTranslation'),not(ID2=ID3),comp_beforeI(ID2,ID3),rdf_has(ID2, knowrob:'endTime', Start),rdf_has(ID3, knowrob:'endTime', End),not(intersected_uid_event(Exp, ID2, ID3, knowrob_sim:'ParticleTranslation', Start, End)), remove_trajectory('/palm_link'), visualize_simulation_scene(Start), add_trajectory('/palm_link', Start, End, 0.1), highlight_trajectory('/palm_link', Start, End, '6666FF').",
+            "text": "Show the trajectory of the hand at scooping events"
+        },
+        {
+            "q": "owl_individual_of(I, knowrob:'GraspingSomething'), owl_has(I, knowrob:'startTime', T0), owl_has(I, knowrob:'endTime', T1), remove_trajectory('/palm_link'), visualize_simulation_scene(T0), add_trajectory('/palm_link', T0, T1, 0.1).",
+            "text": "Show the trajectory of the hand at the beginning of any grasping events"
+        }
+    ]
+}
