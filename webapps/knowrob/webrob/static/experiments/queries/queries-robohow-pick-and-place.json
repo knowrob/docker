@@ -1,0 +1,72 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-pick-and-place'), owl_parse('package://knowrob_srdl/owl/PR2.owl').",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/robohow/pick-and-place/', ['spoon0', 'spoon1'], 'cram_log.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl'), add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the semantic map -----"
+        },
+        {
+            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
+            "text": "What is the storage place for perishable items?"
+        },
+        {
+            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice'), highlight_object_with_children(Obj).",
+            "text": "Which are electrical devices?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the robot's logged belief state -----"
+        },
+        {
+            "q": "task(T), task_goal(T, '(OBJECT-PLACED-AT ?OBJ ?LOC)'), task_start(T, S), task_end(T, E), add_trajectory('/base_link', S, E, 0.5).",
+            "text": "Which path did the PR2 follow during the pick-and-place task?"
+        },
+        {
+            "q": "findall(E, (task_goal(T,'PUTDOWN'), task_end(T, E)), Es), member(E, Es),  mng_lookup_transform('/base_link', '/map', E, Transform), add_robot_as_basic_semantic_instance(Transform, E, Inst), add_object(Inst), highlight_object(Inst).",
+            "text": "Where did it stand during the PUT-DOWN actions?"
+        },
+        {
+            "q": "findall([Obj, E], \n ((task_end(T,E), task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), \n Objs),!, member([Obj, E], Objs), \n add_object_as_semantic_instance(Obj, Loc, E, SemanticMapInstance), \n add_object_with_children(SemanticMapInstance), designator_publish(Obj).",
+            "text": "Where have objects been perceived during the task?"
+        },
+        {
+            "q": "successful_tasks_for_goal('PUTDOWN', Tasks), member(T, Tasks), task_end(T,End), !, mng_robot_pose_at_time(pr2:'PR2Robot1','/map',End,Pose), add_object_with_children(pr2:'PR2Robot1',End).",
+            "text": "What was the pose of the PR2 at the end of the PUTDOWN action?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Logfile statistics -----"
+        },
+        {
+            "q": "findall(Type-Num, (owl_subclass_of(T, knowrob:'CRAMFailure'),\n rdf_split_url(_, Type, T),findall(F, failure_type(F, T), Failures),\n length(Failures, Num)), Distrib),pairs_keys_values(Distrib, Types, Nums),\n add_diagram(errordist, 'Error distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Show occurences of typical error types in the chart"
+        }
+    ]
+}

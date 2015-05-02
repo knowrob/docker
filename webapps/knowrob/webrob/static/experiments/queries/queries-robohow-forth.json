@@ -1,0 +1,56 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-forth'), rdf_register_ns(forth_human, 'http://knowrob.org/kb/forth_human.owl#', [keep(true)]), owl_parse('package://knowrob_srdl/owl/forth_human.owl').",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/humans/forth/robohow/', ['pizza0'], 'labels.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/kitchen.owl'), add_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the semantic map -----"
+        },
+        {
+            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
+            "text": "What is the storage place for perishable items?"
+        },
+        {
+            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice'), highlight_object_with_children(Obj).",
+            "text": "Which are electrical devices?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the labeled actions -----"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ).",
+            "text": "Which events occurred that acted on a spoon?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart').",
+            "text": "Which body part(s) were used for spoon grasping events?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_stickman_visualization('forth', forth_human:'forth_human_robot1', T0, '', '').",
+            "text": "How was the human pose whenspoon grasping events started?"
+        }
+    ]
+}

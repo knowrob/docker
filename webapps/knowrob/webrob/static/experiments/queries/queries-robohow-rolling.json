@@ -1,0 +1,48 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-rolling'), owl_parser:owl_parse('package://knowrob_srdl/owl/Boxy.owl').",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/robohow/rolling/', ['rolling1'], 'cram_log.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/kitchen.owl'), add_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the semantic map -----"
+        },
+        {
+            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T), highlight_object_with_children(Obj).",
+            "text": "What is the storage place for perishable items?"
+        },
+        {
+            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice'), highlight_object_with_children(Obj).",
+            "text": "Which are electrical devices?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the logged belief state -----"
+        },
+        {
+            "q": "task_goal(_Task, 'REPLACEABLE-FUNCTION-ROLLING-DEMO'), subtask(_Task, _Sub), subtask(_Sub, _Sub2), owl_has(_Sub2, knowrob:'designator', _Sub3), owl_has(_Sub3, knowrob:'equatedDesignator', DesigId), add_designator_contour_mesh(DesigId).",
+            "text": "Visualize dough during the experiment"
+        }
+    ]
+}
