@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('robohow-rolling'), owl_parser:owl_parse('package://knowrob_srdl/owl/Boxy.owl').",
+            "q": "mng_db('robohow-rolling'), owl_parse('package://knowrob_srdl/owl/BoxyWithRoller.owl'), rdf_db:rdf_register_ns(boxy, 'http://knowrob.org/kb/BoxyWithRoller.owl#', [keep(true)]).",
             "text": "Initialize context"
         },
         {
@@ -41,8 +41,12 @@
             "text": "----- Queries on the logged belief state -----"
         },
         {
-            "q": "task_goal(_Task, 'REPLACEABLE-FUNCTION-ROLLING-DEMO'), subtask(_Task, _Sub), subtask(_Sub, _Sub2), owl_has(_Sub2, knowrob:'designator', _Sub3), owl_has(_Sub3, knowrob:'equatedDesignator', DesigId), add_designator_contour_mesh(DesigId).",
-            "text": "Visualize dough during the experiment"
+            "q": "task_goal(Rolling, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(Rolling, knowrob:'startTime', T), add_agent_visualization('BOXY', boxy:'boxy_robot2', T, '', '').",
+            "text": "Visualize boxy pre rolling"
+        },
+        {
+            "q": "task_goal(PostAction, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(PostAction, knowrob:'previousAction', PreAction), designator_between(Designator, PreAction, PostAction), add_designator_contour_mesh('Foo', Designator, [0.0,0.0,0.0], ['DOUGH', 'CONTOUR']).",
+            "text": "Visualize dough pre rolling"
         }
     ]
 }

@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('robohow-forth'), rdf_register_ns(forth_human, 'http://knowrob.org/kb/forth_human.owl#', [keep(true)]), owl_parse('package://knowrob_srdl/owl/forth_human.owl').",
+            "q": "mng_db('robohow-forth'), register_ros_package(knowrob_robohow), rdf_register_ns(forth_human, 'http://knowrob.org/kb/forth_human.owl#', [keep(true)]), owl_parse('package://knowrob_srdl/owl/forth_human.owl').",
             "text": "Initialize context"
         },
         {
@@ -49,7 +49,7 @@
             "text": "Which body part(s) were used for spoon grasping events?"
         },
         {
-            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'startTime',T0), add_stickman_visualization('forth', forth_human:'forth_human_robot1', T0, '', '').",
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'startTime',T0), visualize_forth_experiment(T0).",
             "text": "How was the human pose whenspoon grasping events started?"
         }
     ]
