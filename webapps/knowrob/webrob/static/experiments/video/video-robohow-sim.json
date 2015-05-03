@@ -1,0 +1,12 @@
+{
+    "video":[
+        {
+        "name": "Preparing Pizza",
+        "init": "mng_db('robohow-sim'), \nowl_parse('package://knowrob_srdl/owl/sim-hand.owl'), \nload_experiment('/home/ros/knowrob_data/logs/simulation/robohow/pizza0/log.owl'), \nowl_parse('package://knowrob_sim/owl/simulation_map.owl'), \nadd_object_with_children('http://knowrob.org/kb/simulation_map.owl#SemanticEnvironmentMap_SAsdfs'), \nvisualize_simulation_scene(T).",
+        "user": "add_object_with_children('http://knowrob.org/kb/simulation_map.owl#SemanticEnvironmentMap_SAsdfs'), \nvisualize_simulation_scene(T).",
+        "start": 6,
+        "end": 43,
+        "summary": "true"
+        }
+     ]
+}
