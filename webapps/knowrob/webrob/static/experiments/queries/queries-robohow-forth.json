@@ -50,7 +50,11 @@
         },
         {
             "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'startTime',T0), visualize_forth_experiment(T0).",
-            "text": "How was the human pose whenspoon grasping events started?"
+            "text": "How was the human pose when spoon grasping events started?"
+        },
+        {
+            "q": "owl_individual_of(A, knowrob:'PouringSomethingOnto'), owl_has(A,knowrob:'startTime',T0), owl_has(A,knowrob:'endTime',T1), visualize_forth_experiment(T0), owl_has(A,knowrob:'bodyPartsUsed',PART), owl_has(PART, srdl2comp:'urdfName', literal(URDF)), atom_concat('/', URDF, _Link), remove_trajectory(_Link), add_trajectory(URDF, T0, T1, 0.1).",
+            "text": "How was the trajectory of endeffectors during pouring actions?"
         }
     ]
 }
