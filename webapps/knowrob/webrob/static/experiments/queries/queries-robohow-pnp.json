@@ -5,15 +5,15 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('robohow-pick-and-place'), owl_parse('package://knowrob_srdl/owl/PR2.owl').",
+            "q": "mng_db('robohow-pnp'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), owl_parse('package://knowrob_srdl/owl/Boxy.owl').",
             "text": "Initialize context"
         },
         {
-            "q": "load_experiments('/home/ros/knowrob_data/logs/robohow/pick-and-place/', ['spoon0', 'spoon1'], 'cram_log.owl').",
+            "q": "load_experiments('/home/ros/knowrob_data/logs/robohow/pnp/', ['pnp0'], 'cram_log.owl').",
             "text": "Load logged experiments"
         },
         {
-            "q": "owl_parse('package://iai_semantic_maps/owl/room.owl'), add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').",
+            "q": "owl_parse('package://iai_semantic_maps/owl/kitchen.owl'), add_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j').",
             "text": "Load semantic map"
         },
         {
@@ -49,7 +49,7 @@
             "text": "Where did it stand during the PUT-DOWN actions?"
         },
         {
-            "q": "findall([Obj, E], \n ((task_end(T,E), task_type(T,knowrob:'UIMAPerception'), rdf_has(T, knowrob:'perceptionResult', Obj))), \n Objs),!, member([Obj, E], Objs), \n add_object_as_semantic_instance(Obj, Loc, E, SemanticMapInstance), \n add_object_with_children(SemanticMapInstance), designator_publish(Obj).",
+            "q": "findall([Obj, E, T], \n ((task_type(T,knowrob:'UIMAPerception'), task_end(T,E), rdf_has(T, knowrob:'nextAction', PostAction), designator_between(Obj, T, PostAction))), \n Objs),!, member([Obj, E, T], Objs), \n add_object_as_semantic_instance(Obj, Loc, E, SemanticMapInstance), \n add_object_with_children(SemanticMapInstance), designator_publish(Obj), designator_publish_image(T).",
             "text": "Where have objects been perceived during the task?"
         },
         {
