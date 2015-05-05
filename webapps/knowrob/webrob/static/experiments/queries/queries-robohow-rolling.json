@@ -45,24 +45,24 @@
             "text": "Visualize boxy pre rolling"
         },
         {
-            "q": "task_goal(PostAction, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(PostAction, knowrob:'previousAction', PreAction), designator_between(Designator, PreAction, PostAction), add_designator_contour_mesh('Foo', Designator, [0.6,0.6,0.2], ['DOUGH', 'CONTOUR']),get_sherlock_image_perception(PreAction,Perception),designator_publish_image(Perception).",
+            "q": "task_goal(PostAction, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(PostAction, knowrob:'previousAction', PreAction), designator_between(Designator, PreAction, PostAction), rdf_has(PostAction, knowrob:'startTime', T), visualize_rolling_experiment(T) ,get_sherlock_image_perception(PreAction,Perception),once(designator_publish_image(Perception)).",
             "text": "Visualize dough pre rolling"
         },
         {
-            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), get_reach_action(Action,Reach), get_dynamics_image_perception(Reach,Perc),            designator_publish_image(Perc),show_action_trajectory(Reach).",
+            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(Action, knowrob:'nextAction', _PostAction),rdf_has(_PostAction, knowrob:'nextAction', PostAction),designator_between(Designator, _PostAction, PostAction), rdf_has(_PostAction, knowrob:'startTime', T), visualize_rolling_experiment(T) ,get_sherlock_image_perception(_PostAction,Perception),once(designator_publish_image(Perception)).",
+            "text": "Visualize dough post rolling"
+        },
+        {
+            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), get_reach_action(Action,Reach), get_dynamics_image_perception(Reach,Perc),            once(designator_publish_image(Perc)),show_action_trajectory(Reach).",
             "text": "Show the trajectory for reaching the dough"
         },
         {
-            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), get_roll_action(Action,Roll), get_dynamics_image_perception(Roll,Perc),            designator_publish_image(Perc), show_action_trajectory(Roll).",
+            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), get_roll_action(Action,Roll), get_dynamics_image_perception(Roll,Perc), show_action_trajectory(Roll), once(designator_publish_image(Perc)).",
             "text": "Show the trajectory for rolling the dough"
         },
         {
-            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'),get_retract_action(Action,Retract), get_dynamics_image_perception(Retract,Perc), designator_publish_image(Perc),            show_action_trajectory(Retract).",
+            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'),get_retract_action(Action,Retract), get_dynamics_image_perception(Retract,Perc), once(designator_publish_image(Perc)),            show_action_trajectory(Retract).",
             "text": "Show the trajectory for going going back from rolling"
-        },
-        {
-            "q": "task_goal(Action, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(Action, knowrob:'nextAction', _PostAction),rdf_has(_PostAction, knowrob:'nextAction', PostAction),designator_between(Designator, _PostAction, PostAction), add_designator_contour_mesh('Foo', Designator, [0.6,0.6,0.2], ['DOUGH', 'CONTOUR']),get_sherlock_image_perception(_PostAction,Perception),designator_publish_image(Perception).",
-            "text": "Visualize dough post rolling"
         },
         {
             "q": "findall(_Size,  (task_goal(_PostAction, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(_PostAction, knowrob:'previousAction', _PreAction), designator_between(_Designator, _PreAction, _PostAction), get_designator_contour_size(_Designator, ['DOUGH', 'CONTOUR'],_Size))  ,Sizes),!,add_barchart('doughchart_id', 'Dough Size', [[[1,2,3,4,5,6,7,8,9,10,11],Sizes]]).",
