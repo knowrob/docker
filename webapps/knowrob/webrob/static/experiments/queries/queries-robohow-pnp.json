@@ -5,7 +5,7 @@
             "text": "----- init -----"
         },
         {
-            "q": "mng_db('robohow-pnp'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), owl_parse('package://knowrob_srdl/owl/Boxy.owl').",
+            "q": "mng_db('robohow-pnp'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), register_ros_package(knowrob_robohow).",
             "text": "Initialize context"
         },
         {
