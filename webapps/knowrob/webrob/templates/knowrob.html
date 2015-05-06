@@ -103,48 +103,6 @@
         });
     };
   </script>
-  <script type="text/javascript">
-    function set_exp(exp) {
-      $.ajax({
-         url: "/knowrob/exp_set",
-         type: "POST",
-         contentType: "application/json",
-         data: JSON.stringify({
-             experimentName: exp
-         }),
-         dataType: "json",
-         success: function (data) {
-             window.location.reload();
-         }
-       }).done( function (request) {});
-    };
-      
-    $(document).ready(function () {
-      // Request available experiments
-      $.ajax({
-          url: "/knowrob/exp_list",
-          type: "POST",
-          contentType: "application/json",
-          data: JSON.stringify({}),  
-          dataType: "json",
-          success: function (data) {
-              $('#exp-menu').empty();
-              $.each(data.result, function(j, exp) {
-                  var li = document.createElement("li");
-                  var item = document.createElement("a");
-                  item.href = "#";
-                  item.onclick = function() { set_exp(exp); };
-                  item.appendChild(document.createTextNode(exp));
-                  li.appendChild(item);
-                  document.getElementById("exp-menu").appendChild(li);
-              });
-              if(data.selection) {
-                document.getElementById("exp-value").innerHTML = data.selection;
-              }
-            }
-      }).done( function (request) {})
-    });
-  </script>
 {% endblock %}
 
 {% block _menu_right %}
