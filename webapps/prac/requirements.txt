@@ -3,3 +3,4 @@ Jinja2
 Werkzeug
 wsgiref
 Flask-WTF
+graphviz
