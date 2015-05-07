@@ -84,6 +84,7 @@ if [ $KNOWROB_FOUND -eq 0 ]; then
   create_archive $LOCAL_DIR
 fi
 
+$DIR/../../scripts/start-apt-cacher
 $DIR/../../scripts/start-nexus
 echo "Building knowrob/hydro-knowrob-daemon....";
 docker build -t knowrob/hydro-knowrob-daemon .

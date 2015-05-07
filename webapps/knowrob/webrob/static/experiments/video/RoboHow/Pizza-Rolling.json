@@ -1,0 +1,12 @@
+{
+    "video":[
+        {
+        "name": "Rolling Pizza",
+        "init": "mng_db('robohow-rolling'), \nregister_ros_package(knowrob_robohow), \nowl_parse('package://knowrob_srdl/owl/BoxyWithRoller.owl'), \nrdf_db:rdf_register_ns(boxy, 'http://knowrob.org/kb/BoxyWithRoller.owl#', [keep(true)]), \nload_experiment('/home/ros/knowrob_data/logs/robohow/rolling/rolling1/cram_log.owl'), \nowl_parse('package://iai_semantic_maps/owl/kitchen.owl'), \nadd_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j'), \nvisualize_rolling_experiment(T).",
+        "user": "visualize_rolling_experiment(T).",
+        "start": 1430586384,
+        "end": 1430586560,
+        "summary": "true"
+        }
+     ]
+}

@@ -1,0 +1,80 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-pnp'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), register_ros_package(knowrob_robohow).",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/robohow/pnp/', ['pnp0'], 'cram_log.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/kitchen.owl'), add_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j', 'timepoint_2').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the semantic map -----"
+        },
+        {
+            "q": "owl_subclass_of(T, knowrob:'StorageConstruct'), class_properties(T, knowrob:'typePrimaryFunction-StoragePlaceFor', knowrob:'Perishable'), owl_individual_of(Obj, T).",
+            "text": "What is the storage place for perishable items?"
+        },
+        {
+            "q": "owl_individual_of(Obj, knowrob:'ElectricalDevice').",
+            "text": "Which are electrical devices?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the robot's logged belief state -----"
+        },
+        {
+            "q": "rdf_has(Grasp, knowrob:'taskContext', literal(type(_,'GRASP'))), once((rdf_has(Grasp, knowrob:'objectActedOn', Obj), designator_publish(Obj), designator_publish_image(Grasp))).",
+            "text": "What did the PR2 robot see during GRASP actions?"
+        },
+        {
+            "q": "findall(T, (rdf_has(_Task, knowrob:'taskContext', literal(type(_,'WITH-CONTAINER-OPEN'))), rdf_has(_Task, knowrob:'startTime', T)), _Ts), member(T, _Ts), once((mng_robot_pose_at_time(pr2:'PR2Robot1','/map', T, Pose), visualize_pnp_experiment(T))).",
+            "text": "Where did the PR2 robot stand during a container was opened?"
+        },
+        {
+            "q": "rdfs_individual_of(Action, knowrob:'SpeechAct'), rdf_has(Action, knowrob:'content', literal(type(_,Speech))), rdf_has(Action, knowrob:'receiver', literal(type(_,Receiver))), rdf_has(Action, knowrob:'startTime', T), visualize_pnp_experiment(T).",
+            "text": "What was said to whom during the experiment?"
+        },
+        {
+            "q": "findall(_ObjType, rdf_has(_, knowrob:'OBJECT-TYPE', literal(_ObjType)), _ObjTypes), sort(_ObjTypes, ObjTypes).",
+            "text": "Which object types occurred during the experiment?"
+        },
+        {
+            "q": "rdf_has(_Action, knowrob:'taskContext', literal(type(_,'GRASP'))), findall(_Arm, rdf_has(_Action, knowrob:'ARM', literal(_Arm)), Grippers), rdf_has(_Action, knowrob:'objectActedOn', _Obj), mng_designator(_Obj, _Desig), mng_designator_props(_Obj, _Desig, ['TYPE'], Type).",
+            "text": "Which grippers used the PR2 to grasp objects?"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Logfile statistics -----"
+        },
+        {
+            "q": "findall(Container-Length, (rdf_has(_Task, knowrob:'taskContext', literal(type(_,'WITH-CONTAINER-OPEN'))), rdf_has(_Task, knowrob:'designator', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['NAME'], Container), task_start(_Task, _T0), task_end(_Task, _T1), time_term(_T0, _T_Value0), time_term(_T1, _T_Value1), Length is _T_Value1 - _T_Value0), Distrib), pairs_keys_values(Distrib, Types, Nums), add_diagram(errordist, 'Time acting on opened containers', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "How long was the PR2 acting on opened containers?"
+        },
+        {
+            "q": "findall(Type-Num, (owl_subclass_of(T, knowrob:'CRAMFailure'),\n rdf_split_url(_, Type, T),findall(F, failure_type(F, T), Failures),\n length(Failures, Num)), Distrib),pairs_keys_values(Distrib, Types, Nums),\n add_diagram(errordist, 'Error distribution', piechart, xlabel, ylabel, 350, 350, '11px', [[Types, Nums]]).",
+            "text": "Show occurences of typical error types in the chart"
+        }
+    ]
+}

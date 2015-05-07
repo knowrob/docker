@@ -23,7 +23,10 @@ RUN git clone https://github.com/code-iai/iai_common_msgs.git
 RUN git clone https://github.com/code-iai/iai_cad_tools.git
 WORKDIR /home/ros
 
+ENV OPEN_EASE_APPLICATION true
+
 # build the catkin workspace
 RUN /opt/ros/hydro/bin/catkin_make
 
-ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch
+ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
+

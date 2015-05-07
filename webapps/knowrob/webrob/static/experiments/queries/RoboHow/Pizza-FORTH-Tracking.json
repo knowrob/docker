@@ -1,0 +1,61 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('robohow-forth'), register_ros_package(knowrob_robohow), rdf_register_ns(forth_human, 'http://knowrob.org/kb/forth_human.owl#', [keep(true)]), owl_parse('package://knowrob_srdl/owl/forth_human.owl').",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/humans/forth/robohow/', ['pizza0'], 'labels.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://iai_semantic_maps/owl/kitchen.owl'), add_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j').",
+            "text": "Load semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the labeled actions -----"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ).",
+            "text": "Which events occurred that acted on a spoon?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), owl_has(EVENT,knowrob:'bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart').",
+            "text": "Which body part(s) were used for spoon grasping events?"
+        },
+        {
+            "q": "owl_individual_of(OBJ, knowrob:'Spoon'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'GraspingSomething'), forth_task_start(EVENT,T0), visualize_forth_experiment(T0).",
+            "text": "How was the human pose when spoon grasping event is started?"
+        },
+        {
+            "q": "owl_individual_of(T, knowrob:'GraspingSomething'), owl_individual_of(S, knowrob:'Spoon-SilverwarePiece'), owl_has(T, knowrob:'objectActedOn', S), forth_task_start(T, ST), forth_task_end(T, ET), remove_trajectory('/right_hand'), add_trajectory('right_hand', ST, ET, 0.1, 2).",
+            "text": "How was the trajectory of the spoon during grasp?"
+        },
+        {
+            "q": "owl_individual_of(T, knowrob:'Walking-Generic'), forth_task_start(T, ST), forth_task_end(T, ET), remove_trajectory('/hip'), add_trajectory('hip', ST, ET, 0.1, 2).",
+            "text": "How was the trajectory of hip during walking?"
+        },
+        {
+            "q": "owl_individual_of(A, knowrob:'PouringSomethingOnto'), owl_has(A,knowrob:'startTime',T0), owl_has(A,knowrob:'endTime',T1), visualize_forth_experiment(T0), owl_has(A,knowrob:'bodyPartsUsed',PART), owl_has(PART, srdl2comp:'urdfName', literal(URDF)), atom_concat('/', URDF, _Link), remove_trajectory(_Link), add_trajectory(URDF, T0, T1, 0.1).",
+            "text": "How was the trajectory of endeffectors during pouring actions?"
+        },
+        {
+            "q": "",
+            "text": "-----Queries on statistics-----"
+        },
+        {
+            "q": "experiment(_HumanExperiment), experiment_start(_HumanExperiment, _S), experiment_end(_HumanExperiment, _E), time_term(_S, _ST), time_term(_E, _ET), Duration is _ET - _ST.",
+            "text": "How much time is spent by human to make the experiment ?"
+        }
+        
+    ]
+}

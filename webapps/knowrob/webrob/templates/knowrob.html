@@ -52,6 +52,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Timeline.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DataVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TaskTreeVisClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
 
@@ -61,7 +62,11 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_regular.typeface.js') }}"></script>
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob.js') }}"></script>
-
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/html2canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/FileSaver.js') }}"></script>
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+  <script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script> 
   <script type="text/javascript">
     // global knowrob handle
     var knowrob;
@@ -80,10 +85,13 @@
       knowrob = new Knowrob({
             ros_url: rosUrl,
             library_file: libraryFile,
-	    video_file: videoFile,
+            video_file: videoFile,
+            authentication: true,
+            auth_url: '/api/v1.0/auth_by_session',
             meshPath: '/meshes/'
       });
       knowrob.init();
+      setInterval(container_refresh, 570000);
       container_refresh();
     });
     function container_refresh() {
@@ -93,50 +101,7 @@
             contentType: "application/json",
             dataType: "json"
         });
-        setTimeout(container_refresh, 570000);
     };
-  </script>
-  <script type="text/javascript">
-    function set_exp(exp) {
-      $.ajax({
-         url: "/knowrob/exp_set",
-         type: "POST",
-         contentType: "application/json",
-         data: JSON.stringify({
-             experimentName: exp
-         }),
-         dataType: "json",
-         success: function (data) {
-             window.location.reload();
-         }
-       }).done( function (request) {});
-    };
-      
-    $(document).ready(function () {
-      // Request available experiments
-      $.ajax({
-          url: "/knowrob/exp_list",
-          type: "POST",
-          contentType: "application/json",
-          data: JSON.stringify({}),  
-          dataType: "json",
-          success: function (data) {
-              $('#exp-menu').empty();
-              $.each(data.result, function(j, exp) {
-                  var li = document.createElement("li");
-                  var item = document.createElement("a");
-                  item.href = "#";
-                  item.onclick = function() { set_exp(exp); };
-                  item.appendChild(document.createTextNode(exp));
-                  li.appendChild(item);
-                  document.getElementById("exp-menu").appendChild(li);
-              });
-              if(data.selection) {
-                document.getElementById("exp-value").innerHTML = data.selection;
-              }
-            }
-      }).done( function (request) {})
-    });
   </script>
 {% endblock %}
 

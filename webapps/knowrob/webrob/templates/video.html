@@ -48,7 +48,7 @@
       
       // Clear the canvas and perform a initial prolog query (for spawning the semantic map, ...)
       var init_query = "clear_canvas, " +
-          "T = 'timepoint_" + t.toString() + "', " +
+          "T = 'timepoint_" + t.toString() + "', task_tree_canvas, " +
           ace.edit('init_query').getValue().trim();
       init_query = init_query.substr(0, init_query.length - 1);
       initialize_canvas(init_query, function() {
@@ -74,11 +74,12 @@
                 "(( rdf_has(_Task, knowrob:'designator', _Designator), " +
                     "mng_designator_props(_Designator, 'NAME', Designator) ) ; Designator = ''), " +
                 "(( rdf_has(_Task, knowrob:'goalContext', literal(type(_,Goal))) ) ; Goal = ''), " +
-                "( ObjectActedOn \\= '' ; Perception \\= '' ; Designator \\= '' ; Goal \\= '')";
+                "( ObjectActedOn \\= '' ; Perception \\= '' ; Designator \\= '' ; Goal \\= '')," +
+                "findall(_TaskDetail, (task(_TaskId), subtask(_ParentTaskId, _TaskId), task_type(_TaskId, _Type), rdf_has(_TaskId, knowrob:'taskContext', literal(type(_,_TaskContext))), (rdf_has(_TaskId, knowrob:'goalContext', literal(type(_,_TaskGoal))); _TaskGoal = ''), atomic_list_concat([_TaskContext, _TaskGoal], ' ', _TaskTip), term_to_atom(_TaskId, _TaskIdAtom), term_to_atom(_ParentTaskId, _ParentTaskIdAtom), term_to_atom(_TaskTip, _TaskAtom), term_to_atom(_Type, _TypeAtom), jpl_new( '[Ljava.lang.String;', [_TaskAtom, _TaskIdAtom, _ParentTaskIdAtom, _TypeAtom], _TaskDetail)), _TaskDetails), jpl_new( '[[Ljava.lang.String;', _TaskDetails, _Tasks), findall(_TaskAtom, (task(__TaskId, _T), term_to_atom(__TaskId, _TaskAtom)), _HighlightedTaskDetails), jpl_new( '[Ljava.lang.String;', _HighlightedTaskDetails, _HighlightedTasks), jpl_new( '[Ljava.lang.String;', ['\\'http://knowrob.org/kb/knowrob.owl#CRAMAction\\'', '\\'http://knowrob.org/kb/knowrob.owl#ArmMovement\\''], _Types), update_task_tree(_Tasks, _HighlightedTasks, _Types).";
           
           
-          function process_info(result) {
-              if(result.solution) {
+          function process_info(result) {            
+             if(result.solution) {
                   var solutionString = result.solution['Task'];
                   for(var key in result.solution) {
                       var value = result.solution[key];
@@ -95,6 +96,7 @@
                   knowrob.show_hud_text(hudtextLines, {});
                   setTimeout(function(){ handler(); }, 500);
               }
+              
           }
           
           var timeString = "Time: " + format_date(t);
@@ -179,7 +181,7 @@
               minSize: 250
             },
             south: {
-              paneSelector: "#chart",
+              paneSelector: "#tasktree",
               initClosed: true,
               minSize: 150
             }
@@ -207,7 +209,8 @@
   </script>
   
     <div class="ui-layout-center" id="editor-container">
-      <div id="markers"></div> 
+      <div id="markers"></div>
+      <div id="tasktree"></div> 
     </div>
 
     <div class="ui-layout-west" style="background-color:#dadada;">
@@ -231,7 +234,13 @@
       </div>
       <div id="vid_properties">
         <table id="vid_table">
-	<tr> 
+        <tr> 
+	  <th><label for="experiment_select">Plan:</label>
+	  <select id="experiment_select" onchange="knowrob.update_video_divs(knowrob.experimentSelect, knowrob.initQueryDiv, knowrob.userQueryDiv, knowrob.minTimeRange, knowrob.maxTimeRange, knowrob.videoFile, knowrob.summaryImageDiv, knowrob.summaryHeaderDiv)">
+              <option value=-1>Choose a plan execution</option>
+          </select>
+	</tr>
+        <tr> 
 	  <th><label for="amount">Time range:</label>
 	  <input type="text" id="currentRange" readonly style="border:0; color:#f6931f; font-weight:bold;"></th>
 	</tr>
@@ -239,7 +248,7 @@
           <th>Start Time</th>
         </tr>
         <tr>
-	  <td><input id="start_time" type="range" min="1396512584" max="1396512603" value="1396512584"></td>
+	  <td><input id="start_time" type="range" min="0" max="0" value="0"></td>
           <!--
           <td><input type="number" id="startTime" value="1398864739"></td>
           -->
@@ -250,7 +259,7 @@
           <th>End Time</th>
         </tr>
         <tr>
-	  <td><input id="end_time" type="range" min="1396512584" max="1396512603" value="1396512603"></td>
+	  <td><input id="end_time" type="range" min="0" max="0" value="0"></td>
           <!--
           <td><input type="number" id="endTime" value="1398864737"></td>
           -->
@@ -275,12 +284,7 @@ owl_parse('package://knowrob_srdl/owl/xsens-human.owl'),
 load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl'),
 add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').</div></td>
 -->
-          <td><div id="init_query">mng_db('pick-and-place'),
-load_experiment('/home/ros/knowrob_data/logs/robots/cram/pick-and-place/cram_log.owl'), 
-owl_parse('package://iai_semantic_maps/owl/room.owl'),
-owl_parse('package://knowrob_srdl/owl/PR2.owl'),
-add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'),
-add_agent_visualization(pr2:'PR2Robot1', T).</div></td>
+          <td><div id="init_query"></div></td>
         </tr>
         <tr>
           <th>Animation Query</th>
@@ -289,7 +293,10 @@ add_agent_visualization(pr2:'PR2Robot1', T).</div></td>
 <!--
           <td><div id="user_query">add_stickman_visualization(xsens:'XSensHuman1', T).</div></td>
 -->
-          <td><div id="user_query">add_agent_visualization(pr2:'PR2Robot1',T).</div></td>
+          <td><div id="user_query"></div></td>
+        </tr>
+        <tr>
+           <th><div id="hidden_tasktree_img_div"></div></th>
         </tr>
 	<tr>
            <th><div id="summary_header"></div></th>

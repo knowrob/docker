@@ -3,7 +3,7 @@ from flask import session, jsonify, request, redirect, render_template, url_for,
 from flask_user import login_required
 from flask.ext.misaka import markdown
 
-import os, sys, re
+import os, re
 import json
 
 from urlparse import urlparse
@@ -30,6 +30,7 @@ def download_logged_image(filename):
 @app.route('/knowrob/summary_data/<path:filename>')
 @login_required
 def download_summary_image(filename):
+  # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
   return send_from_directory('/home/ros/summary_data/', filename)
 
 @app.route('/knowrob/tutorials/')
@@ -38,7 +39,7 @@ def download_summary_image(filename):
 @login_required
 def tutorials(cat_id='getting_started', page=1):
     session['video'] = 0
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     # determine hostname/IP we are currently using
@@ -61,11 +62,12 @@ def tutorials(cat_id='getting_started', page=1):
     return render_template('knowrob_tutorial.html', **locals())
 
 @app.route('/knowrob/')
-@app.route('/knowrob/exp/<exp_id>')
+@app.route('/knowrob/hydro-knowrob-daemon')
+@app.route('/knowrob/exp/<path:exp_path>')
 @login_required
-def knowrob(exp_id=None):
+def knowrob(exp_path=None):
     session['video'] = 0
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -76,22 +78,22 @@ def knowrob(exp_id=None):
     container_name = session['user_container_name']
     show_south_pane = True
     # Remember experiment selection
-    if exp_id is not None: session['exp'] = exp_id
+    if exp_path is not None: session['exp'] = exp_path
     # Select a query file
     exp_query_file = None
     if 'exp' in session:
         exp = session['exp']
-        if exp is not None: exp_query_file = 'queries-' + exp + '.json'
+        if exp is not None: exp_query_file = exp + '.json'
     # TODO: Allow to select html template using a experiment configuration file
 
     return render_template('knowrob_simple.html', **locals())
 
 @app.route('/knowrob/video')
-@app.route('/knowrob/video/exp/<exp_id>')
+@app.route('/knowrob/video/exp/<path:exp_path>')
 @login_required
-def video(exp_id=None):
+def video(exp_path=None):
     session['video'] = 1
-    if not ensure_application_started('knowrob'):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     
     error=""
@@ -101,34 +103,61 @@ def video(exp_id=None):
     container_name = session['user_container_name']
 
     # Remember experiment selection
-    if exp_id is not None: session['exp'] = exp_id
+    if exp_path is not None: session['exp'] = exp_path
     # Select a query file
     exp_query_file = None
     if 'exp' in session:
         exp = session['exp']
-        if exp is not None: exp_query_file = 'queries-' + exp + '.json'
+        if exp is not None: exp_query_file = exp + '.json'
     
     return render_template('video.html', **locals())
 
 @app.route('/knowrob/menu', methods=['POST'])
+@app.route('/knowrob/hydro-knowrob-daemon/menu', methods=['POST'])
 def menu():
+    knowrobUrl = '/knowrob/'
+    
     menu_left = [
-        ('Knowledge Base', url_for('knowrob')),
-        ('Robot Memory Replay', url_for('knowrob')+'video'),
-        ('Editor',         url_for('knowrob')+'editor')
+        ('Knowledge Base',      knowrobUrl),
+        ('Robot Memory Replay', knowrobUrl+'video'),
+        ('Editor',              knowrobUrl+'editor')
     ]
     
     exp_selection = __exp_file__()
     if exp_selection is None: exp_selection = "Experiment"
     
-
-    exp_choices =  []
-    if __is_video__() == 1:
-        for exp in __exp_list__():
-            exp_choices.append((exp, url_for('knowrob')+'video/exp/'+exp))
-    else:
-        for exp in __exp_list__():
-            exp_choices.append((exp, url_for('knowrob')+'exp/'+exp))
+    app.logger.info('knowrob menu')
+    
+    exp_choices_map =  {}
+    for (submenu,exp) in __exp_list__():
+        # Find exp url
+        exp_url = knowrobUrl
+        if __is_video__():
+            exp_url += 'video/'
+        exp_url += 'exp/'
+        if len(submenu)>0:
+            exp_url += submenu + '/'
+        exp_url += exp
+        
+        menu = ''
+        if len(submenu)>0:
+            menu = submenu
+        if not menu in exp_choices_map:
+            exp_choices_map[menu] = []
+        
+        exp_choices_map[menu].append((exp, exp_url))
+    
+    exp_choices = []
+    exp_map_keys = exp_choices_map.keys()
+    exp_map_keys.sort()
+    
+    for key in exp_map_keys:
+        if key == '': continue
+        exp_choices_map[key].sort()
+        exp_choices.append(('CHOICES', (key+' >>', exp_choices_map[key])))
+    if '' in exp_map_keys:
+        exp_choices_map[''].sort()
+        exp_choices += exp_choices_map['']
     
     menu_right = [
         ('CHOICES', (exp_selection, exp_choices))
@@ -136,16 +165,30 @@ def menu():
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)
 
-@app.route('/knowrob/exp_list', methods=['POST'])
-@login_required
-def exp_list():
-    return jsonify(result=__exp_list__(), selection=__exp_file__())
-
+def __exp_menu_file__(f, category):
+    if f.endswith(".json"):
+        return (category, f[0:len(f)-len(".json")])
+    else:
+        return None
+ 
 def __exp_list__():
     expList = []
-    for f in os.listdir(os.path.join(app.root_path, "static/experiments/queries")):
-        if f.endswith(".json") and f.startswith("queries-"):
-            expList.append( f[len("queries-"):len(f)-len(".json")] )
+    exp_root_path = os.path.join(app.root_path, "static/experiments/queries")
+    
+    for f0 in os.listdir(exp_root_path):
+        exp_path = os.path.join(exp_root_path, f0)
+        
+        # Query file with submenu
+        if os.path.isdir(exp_path):
+            for f1 in os.listdir(exp_path):
+                menu_entry = __exp_menu_file__(f1, f0)
+                if menu_entry != None: expList.append(menu_entry)
+        
+        # Query file without submenu
+        else:
+            menu_entry = __exp_menu_file__(f0, '')
+            if menu_entry != None: expList.append(menu_entry)
+    
     return expList
 
 def __exp_file__():
@@ -219,6 +262,7 @@ def get_history_item():
   
   else:
     return jsonify(item="", index=-1)
+
 
 def get_history_file():
   userDir = get_user_dir()
