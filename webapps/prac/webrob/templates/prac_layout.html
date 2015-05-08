@@ -1,26 +1,20 @@
-{% extends "base_layout.html" %}
+{% extends "layout.html" %}
 
 
 {% block head %}
     <title>PRAC - {% block title %}{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('download_static', filename='images/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ url_for('download_static', filename='css/style.css') }}">
-    <script type="text/javascript" src="{{ url_for('download_static', filename='script/checks.js') }}"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
       var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>        
 {% endblock %}
 
-{% block userauthL %}    
-      <ul class="menu" id="menu_left_static" style="float: left;">
-        {% block menu %}
-            {% block _menu %}{% endblock %}
-        {% endblock %}
-        
-      </ul>
-{% endblock %}
-
 {% block menu_right %}
     {% block _menu_right %}{% endblock %}
 {% endblock %}
+
+
+{% block content %}
+<div style="left: 0; right: 0; position: absolute; width: 300px; height: 100px; z-index: 1000;"><a href="{{ url_for('prac')}}"><img src="{{ url_for('download_static', filename='images/prac_logo.png') }}"></a></div>
+{% endblock  %}

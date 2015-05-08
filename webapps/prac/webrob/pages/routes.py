@@ -14,7 +14,8 @@ def register_routes():
     ])
     pracApp.app.jinja_loader = prac_loader
     pracApp.app.config['PRAC_STATIC_PATH'] = '/opt/practools/tools/prac/pracGUI/pracWEB/build'
-    praApp.app.secret_key = 'so secret!'
+
+    pracApp.app.secret_key = 'so secret!'
 
 
     from webrob.pages import log
