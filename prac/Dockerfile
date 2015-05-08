@@ -5,7 +5,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q python-all
 
 RUN mkdir /opt/practools
 WORKDIR /opt/practools
-ADD . opt/practools/
+ADD . /opt/practools/
 
 # clone prac and pracmln repos instead of copying them
 # RUN git clone https://github.com/danielnyga/prac.git $WORKDIR/tools
