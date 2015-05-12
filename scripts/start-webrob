@@ -11,7 +11,7 @@ function runContainer {
   RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
   if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then # container does not exist
     echo "No $1 container exists, creating a new one..."
-    docker run --name $1 $2
+    bash -c "docker run --name $1 $2"
   fi
   if [ "$3" == true ] && [ "$RUNNING" == 'false' ]; then # container exists, but stopped
     echo "$1 container exists, starting it..."
@@ -32,6 +32,12 @@ function stopContainer {
 if [ -z "$KNOWROB_WEB_PORT" ]
 then
    export KNOWROB_WEB_PORT=5000
+fi
+
+if [ "$1" == "debug" ]; then
+  EASE_DEBUG=true
+else
+  EASE_DEBUG=false
 fi
 
 # Stop all webapp containers
@@ -90,14 +96,20 @@ runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
 runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check if dockerbridge is running or stopped and start otherwise
-runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock knowrob/dockerbridge" true
+# Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
+stopContainer "dockerbridge"
+runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG knowrob/dockerbridge" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
 runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
 runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from knowrob_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon" true
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# start a container for the flask secret
+runContainer "ease_secret" "-v /etc/ease_secret busybox sh -c '< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 64 > /etc/ease_secret/secret'"
 
 # Wait for the postgres port to be available
 echo "Waiting for postgres container..."
@@ -121,9 +133,11 @@ fi
 echo "Creating login web app container..."
 docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     --volumes-from mesh_data \
+    --volumes-from ease_secret:ro \
     --link postgres_db:postgres \
     --link dockerbridge:dockerbridge \
     -e VIRTUAL_HOST=login \
     -e VIRTUAL_PORT=5000 \
+    -e EASE_DEBUG=$EASE_DEBUG \
     --name login \
     openease/login python runserver.py

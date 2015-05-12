@@ -35,6 +35,10 @@ The openEASE platform uses the following host directories and files:
 		- /home/ros/knowrob_data
 		Used for common data files needed in every user container and the easeapp containers, like common experiment data.
 		Used by: easeapp/knowrob container and (read-only) all easeapp/knowrob user containers.
+	ease_secret
+		- /etc/ease_secret
+		Used for storing the SECRET_KEY for the flask session.
+		Used by: All easeapp containers (read only).
 	lft_data
 		- /tmp/openEASE/dockerbridge
 		A folder, where easeapp containers temporarily stores large files and folders. Transfers of large files from the user data containers to the easeapp containers and back will are stored here.
