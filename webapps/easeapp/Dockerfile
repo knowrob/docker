@@ -5,7 +5,7 @@ MAINTAINER Moritz Tenorth, moritz@tenorth.de
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc imagemagick
 
-RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc
+RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado
 WORKDIR /opt/webapp
 
 # flag used in nginx configuration
