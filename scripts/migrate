@@ -1,0 +1,68 @@
+#!/bin/bash
+
+function createAndCopy() {
+	NAME=data_$1
+	ABSOLUTE_PATH=`pwd`/users/$1
+	RUNNING=$(docker inspect --format="{{ .State.Running }}" $NAME 2>/dev/null)
+	if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then
+		docker run --name $NAME -v /etc/rosauth knowrob/user_data true >/dev/null 2>&1
+		if [ $2 == true ]; then
+			docker run --rm --log-driver=none --volumes-from $NAME -v $ABSOLUTE_PATH:/from busybox sh -c 'cd /home/ros/user_data && cp -r /from/* . && chown 1000:1000 -R .'
+		fi
+		echo "[INFO] Migrated user data for $1 (data container $NAME) using data from $ABSOLUTE_PATH"
+	else
+		echo "[WARNING] User data container $NAME already exists, skipping migration!"
+	fi
+}
+
+function cleanup() {
+	if [ -z "$1" ]; then return 0; fi
+	echo "[INFO] Removing $1 data from user_data"
+	docker run --rm --log-driver=none --volumes-from user_data busybox sh -c 'cd /home/ros/user_data/'$1' && find . ! -name query.history ! -name . ! -name .. -maxdepth 1 -exec rm -r {} \;' >/dev/null 2>&1
+}
+
+if [ -z "$1" ]; then
+	echo "openEASE docker user data migration tool"
+	echo
+	echo "Usage: ./migrate all - Create new user data containers for all users with data in user_data and move the data to the data container"
+	echo "       ./migrate get - Only get a copy of all user data from user_data. Resulting files will be copied to the users directory"
+	echo "       ./migrate migrate - Create user data containers and copy data from the users directory to it."
+	echo "       ./migrate clean - Remove migrated data from user_data container and removes users/ directory."
+	echo
+	echo "migrate and clean require a previous get operation, they need the users directory created by it!"
+	echo "This script will only migrate users who do not already have a corresponding user data container! Make sure to run this script before you deploy the latest openEASE version!"
+	exit
+fi
+
+if [ "$1" == "all" ] || [ "$1" == "get" ]; then
+	docker run --rm --log-driver=none --volumes-from user_data busybox sh -c 'cd /home/ros/user_data && tar -c --exclude query.history -f - *' > migrate.tar 2>/dev/null
+	mkdir users && cd users && tar xf ../migrate.tar && cd .. && rm  migrate.tar
+fi
+
+if [ "$1" == "all" ] || [ "$1" == "migrate" ] || [ "$1" == "clean" ]; then
+	if [ ! -d users/ ]; then
+		echo "[ERROR] users directory does not exist at `pwd`. Exiting..."
+		exit
+	fi
+	HAS_FILES=$(ls users/)
+	if [ -z "$HAS_FILES" ]; then
+		echo "[WARNING] users directory at `pwd` is empty. Probably no data in user_data present. Exiting..."
+	else
+		for dir in users/*/
+		do
+			dir=${dir%*/}
+			HAS_FILES=$(ls $dir)
+			if [ -z "$HAS_FILES" ]; then COPY=false; else COPY=true; fi
+			dir=${dir##*/}
+			if [ "$1" == "all" ] || [ "$1" == "migrate" ]; then
+				createAndCopy $dir $COPY
+			fi
+			if [ "$1" == "all" ] || [ "$1" == "clean" ]; then
+				cleanup $dir
+			fi
+		done
+	fi
+fi
+if [ "$1" == "all" ] || [ "$1" == "clean" ]; then
+	rm -r users
+fi
