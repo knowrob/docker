@@ -1,0 +1,32 @@
+{
+    "query": [
+        {
+            "q": "",
+            "text": "----- init -----"
+        },
+        {
+            "q": "mng_db('chemlab'), owl_parse('package://knowrob_srdl/owl/PR2.owl'), register_ros_package(knowrob_chemlab).",
+            "text": "Initialize context"
+        },
+        {
+            "q": "load_experiments('/home/ros/knowrob_data/logs/chemlab/', ['dna0'], 'cram_log.owl').",
+            "text": "Load logged experiments"
+        },
+        {
+            "q": "owl_parse('package://knowrob_chemlab/owl/chemlab_map.owl'), add_object_with_children('http://knowrob.org/kb/chemlab_map.owl#SemanticEnvironmentMap_SAsdfs').",
+            "text": "Visualize semantic map"
+        },
+        {
+            "q": "",
+            "text": ""
+        },
+        {
+            "q": "",
+            "text": "----- Queries on the logged simulation -----"
+        },
+        {
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T), visualize_chemlab_scene(T).",
+            "text": "How did the scene looked at the beginning of GRASP actions?"
+        }
+    ]
+}
