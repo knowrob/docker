@@ -25,8 +25,16 @@
             "text": "----- Queries on the logged simulation -----"
         },
         {
-            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T), visualize_chemlab_scene(T).",
-            "text": "How did the scene looked at the beginning of GRASP actions?"
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.1).",
+            "text": "What was the right gripper trajectory during GRASP actions?"
+        },
+        {
+            "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-UNSCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
+            "text": "Which were the objects unscrewing was performed on?"
+        },
+        {
+            "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-SCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
+            "text": "Which were the objects screwing was performed on?"
         }
     ]
 }
