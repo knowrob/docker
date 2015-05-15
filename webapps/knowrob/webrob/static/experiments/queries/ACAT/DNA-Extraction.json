@@ -35,6 +35,10 @@
         {
             "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-SCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
             "text": "Which were the objects screwing was performed on?"
+        },
+        {
+            "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-LOADED-PIPETTE-TIP'))), rdf_has(Prev, knowrob:'nextAction', Task), subtask(Prev, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], Type), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlight(Type).",
+            "text": "Which was the tool you used for pipetting action?"
         }
     ]
 }
