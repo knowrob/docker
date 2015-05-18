@@ -25,10 +25,6 @@
             "text": "----- Queries on the logged simulation -----"
         },
         {
-            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.1).",
-            "text": "What was the right gripper trajectory during GRASP actions?"
-        },
-        {
             "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-UNSCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
             "text": "Which were the objects unscrewing was performed on?"
         },
@@ -39,6 +35,34 @@
         {
             "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-LOADED-PIPETTE-TIP'))), rdf_has(Prev, knowrob:'nextAction', Task), subtask(Prev, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], Type), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlight(Type).",
             "text": "Which was the tool you used for pipetting action?"
+        },
+        {
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'bottle_500ml'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.1), visualize_chemlab_highlights(['bottle_500ml']).",
+            "text": "What was the right gripper trajectory during bottle grasp actions?"
+        },
+        {
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'pipette'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.1), visualize_chemlab_highlights(['pipette']).",
+            "text": "What was the right gripper trajectory during pipette grasp actions?"
+        },
+        {
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'tube_15ml_0'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.1), visualize_chemlab_highlights(['tube_15ml_0']).",
+            "text": "What was the right gripper trajectory during tube grasp actions?"
+        },
+        {
+            "q": "",
+            "text": "----- Logfile statistics -----"
+        },
+        {
+            "q": "findall(_Goal, task_goal(_Task, _Goal), _G), sort(_G, _Goals), findall(_Goal-_Count, (member(_Goal, _Goals),findall(_Task, task_goal(_Task, _Goal), _Tasks), length(_Tasks, _Count)), Distrib), pairs_keys_values(Distrib, _Types, _Counts), add_diagram(countdist, 'Task Count', 'barchart', '', '', 250, 350, '12px', [[_Types,_Counts]]).",
+            "text": "Show the count of task goals"
+        },
+        {
+            "q": "findall(_Goal, task_goal(_Task, _Goal), _G), sort(_G, _Goals), findall(_Goal-_DurSum, (member(_Goal, _Goals), findall(_Duration, ( task_goal(_Task, _Goal), task_duration(_Task, _Duration) ), _Durations), sumlist(_Durations, _DurSum)), _Distrib), pairs_keys_values(_Distrib, _Types, _Dur), add_diagram(durationdist, 'Task Duration', 'barchart', '', '', 250, 350, '12px', [[_Types,_Dur]]).",
+            "text": "Show the total duration of task goals"
+        },
+        {
+            "q": "findall(_Goal, task_goal(_Task, _Goal), _G), sort(_G, _Goals), findall(_Goal-_DurAvg, (member(_Goal, _Goals), findall(_Duration, ( task_goal(_Task, _Goal), task_duration(_Task, _Duration) ), _Durations), sumlist(_Durations, _DurSum), length(_Durations, _Count), _DurAvg is _DurSum / _Count), _Distrib), pairs_keys_values(_Distrib, _Types, _Dur), add_diagram(durationavgdist, 'Task Duration Average', 'barchart', '', '', 250, 350, '12px', [[_Types,_Dur]]).",
+            "text": "Show the average duration of task goals"
         }
     ]
 }
