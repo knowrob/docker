@@ -25,11 +25,11 @@
             "text": "----- Queries on the logged simulation -----"
         },
         {
-            "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-UNSCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
+            "q": "rdfs_individual_of(_Task, knowrob:'CRAMAction'), rdf_has(_Task, knowrob:'taskContext', literal(type(_,'GOAL-UNSCREWED'))), task_screwing_objects(_Task, Cap, Container), rdf_has(_Task, knowrob:'startTime', _T), visualize_chemlab_scene(_T), visualize_chemlab_highlight(Cap, '00FF00'), visualize_chemlab_highlight(Container, 'FF0000').",
             "text": "Which were the objects unscrewing was performed on?"
         },
         {
-            "q": "rdfs_individual_of(Task, knowrob:'CRAMAction'), rdf_has(Task, knowrob:'taskContext', literal(type(_,'GOAL-SCREWED'))), findall(_Type, (subtask(Task, _Sub), rdfs_individual_of(_Sub, knowrob:'UIMAPerception'), rdf_has(_Sub, knowrob:'perceptionRequest', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type)), Types), rdf_has(Task, knowrob:'startTime', T), visualize_chemlab_scene(T), visualize_chemlab_highlights(Types).",
+            "q": "rdfs_individual_of(_Task, knowrob:'CRAMAction'), rdf_has(_Task, knowrob:'taskContext', literal(type(_,'GOAL-SCREWED'))), task_screwing_objects(_Task, Cap, Container), rdf_has(_Task, knowrob:'startTime', _T), visualize_chemlab_scene(_T), visualize_chemlab_highlight(Cap, '00FF00'), visualize_chemlab_highlight(Container, 'FF0000').",
             "text": "Which were the objects screwing was performed on?"
         },
         {
