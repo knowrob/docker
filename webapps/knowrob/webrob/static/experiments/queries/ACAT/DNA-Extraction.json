@@ -37,11 +37,11 @@
             "text": "Which was the tool you used for pipetting action?"
         },
         {
-            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'bottle_500ml'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.2), visualize_chemlab_highlights(['bottle_500ml']).",
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'bottle_500ml'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_tool_frame', T0, T1, 0.2), visualize_chemlab_highlights(['bottle_500ml']).",
             "text": "What was the right gripper trajectory during bottle grasp actions?"
         },
         {
-            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'tube_15ml_0'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_palm_link', T0, T1, 0.2), visualize_chemlab_highlights(['tube_15ml_0']).",
+            "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'tube_15ml_0'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_tool_frame', T0, T1, 0.2), visualize_chemlab_highlights(['tube_15ml_0']).",
             "text": "What was the right gripper trajectory during tube grasp actions?"
         },
         {
