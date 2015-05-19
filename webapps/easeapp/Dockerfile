@@ -14,12 +14,13 @@ ENV OPEN_EASE_WEBAPP true
 # work as user 'ros'
 RUN useradd -m -d /home/ros -p ros ros && chsh -s /bin/bash ros
 ENV HOME /home/ros
+ADD . /opt/webapp/
 RUN chown -R ros:ros /opt/webapp/
   
 USER ros
 
 ## copy this folder to the container
-ADD . /opt/webapp/
+
 # Expose volumes for maintenance
 VOLUME /opt/webapp/
 
