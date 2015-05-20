@@ -44,8 +44,8 @@
             "q": "rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GRASP'))), rdf_has(I, knowrob:'startTime', T0), rdf_has(I, knowrob:'endTime', T1), rdf_has(I, knowrob:'objectActedOn', _Desig), mng_designator(_Desig, _DesigJava), mng_designator_props(_Desig, _DesigJava, ['TYPE'], 'tube_15ml_0'), visualize_chemlab_scene(T0), add_trajectory('/r_gripper_tool_frame', T0, T1, 0.2), visualize_chemlab_highlights(['tube_15ml_0']).",
             "text": "What was the right gripper trajectory during tube grasp actions?"
         },
-	{
-            "q": "owl_individual_of(Tube, knowrob_chemlab:'Tube'),rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GOAL-PIPETTE-BUTTON-PUSHED-RELEASED'))), rdf_has(I, knowrob:'endTime', T0), inside_physical('/pipette_end_effector_frame_name', Tube, T0), visualize_chemlab_scene(T0).",
+        {
+            "q": "owl_individual_of(_Tube, knowrob_chemlab:'Tube'),rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GOAL-PIPETTE-BUTTON-PUSHED-RELEASED'))), rdf_has(I, knowrob:'endTime', T0), inside_physical('/pipette_end_effector_frame_name', _Tube, T0), rdf_has(_Tube, knowrob:'name', literal(type(_,Tube))), visualize_chemlab_scene(T0), visualize_chemlab_highlight(Tube).",
             "text": "Is the pipette inside a tube after the pipette button released? "
         },
 
