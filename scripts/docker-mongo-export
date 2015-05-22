@@ -1,0 +1,12 @@
+#!/bin/sh
+# Exports all mongo dbs to a file named mongodump.tar located in CWD.
+# mongo_db container must be running.
+
+# Dump inside of container and create archive
+docker exec mongo_db mongodump --out /mongodump
+docker exec mongo_db tar -cPvf /mongodump.tar /mongodump
+docker exec mongo_db rm -rf /mongodump
+
+# Copy from container to host
+docker cp mongo_db:/mongodump.tar .
+docker exec mongo_db rm -f /mongodump.tar

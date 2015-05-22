@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ID=`docker inspect -f '{{.Id}}' mongo_db`
+if [ "$ID" == "" ]; then
+    exit 1 # No such container
+fi
+if [ ! -e ./mongodump.tar ]; then
+    echo "No such file: ./mongodump.tar"
+    exit 1
+fi
+
+# Copy from host to container
+sudo cp ./mongodump.tar /var/lib/docker/aufs/mnt/$ID/
+sudo chmod ugo+rw /var/lib/docker/aufs/mnt/$ID/mongodump.tar
+
+# Unpack and restore inside of container
+docker exec mongo_db tar xvf /mongodump.tar
+docker exec mongo_db rm -f /mongodump.tar
+docker exec mongo_db mongorestore /mongodump
+docker exec mongo_db rm -rf /mongodump
