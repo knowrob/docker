@@ -47,7 +47,7 @@ class DockerManager(object):
             self.__client.create_container('mongo', detach=True, name='mongo_db')
             self.__client.start('mongo', volumes_from=['mongo_data'])
 
-    def start_user_container(self, application_image, user_container_name):
+    def start_user_container(self, application_image, user_container_name, limit_resources=True):
         try:
             all_containers = self.__client.containers(all=True)
             # Make sure common containers are up and running
@@ -66,8 +66,18 @@ class DockerManager(object):
                        "/opt/ros/hydro/stacks",
                        user_home_dir
             ])}
+            if limit_resources:
+                mem_limit = 256 * 1024 * 1024
+
+                # default is 1024, meaning that 4 of these containers will receive the same cpu time as one default
+                # container. decrease this further if you want to increase the maximum amount of users on the host.
+                cpu_shares = 256
+            else:
+                mem_limit = 0
+                cpu_shares = 1024  # Default value
             self.__client.create_container(application_image, detach=True, tty=True, environment=env,
-                                           name=user_container_name)
+                                           name=user_container_name, mem_limit=mem_limit, cpu_shares=cpu_shares,
+                                           memswap_limit=mem_limit*4)
                 
             # Read links and volumes from webapp_container ENV
             inspect = self.__client.inspect_image(application_image)
