@@ -42,7 +42,10 @@
             },
             south: {
               paneSelector: "#mjpeg",
-              minSize: 150
+              minSize: 150,
+              onresize: function() {
+                $('#mjpeg').resize();
+              }
             }
           }
         }

@@ -125,8 +125,6 @@ def menu():
     exp_selection = __exp_file__()
     if exp_selection is None: exp_selection = "Experiment"
     
-    app.logger.info('knowrob menu')
-    
     exp_choices_map =  {}
     for (submenu,exp) in __exp_list__():
         # Find exp url
