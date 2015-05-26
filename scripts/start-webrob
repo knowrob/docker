@@ -62,11 +62,9 @@ runContainer "user_data" "knowrob/user_data true"
 # Check if mesh_data container exists and create otherwise
 runContainer "mesh_data" "-v /home/ros/mesh_data ubuntu chmod -R ugo+rw /home/ros/mesh_data"
 
-########### TODO: Remove data container below, when migration of summary data to user data container is finished. It is unsafe!
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if summary_data container exists and create otherwise
-runContainer "summary_data" "-v /home/ros/summary_data ubuntu chmod -R 777 /home/ros/summary_data"
-########### TODO: Remove data container above, when migration of summary data to user data container is finished. It is unsafe!
+runContainer "summary_data" "knowrob/summary_data true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_data container exists and create otherwise
