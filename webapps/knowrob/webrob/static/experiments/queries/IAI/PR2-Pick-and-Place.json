@@ -86,6 +86,14 @@
         },
         {
             "q": "",
+            "text": "----- Videos -----"
+        },
+        {
+            "q": "experiment_videos('iai/pick-and-place', Videos), member(V,Videos), video_play(V).",
+            "text": "Play available videos "
+        },
+        {
+            "q": "",
             "text": "----- Logfile statistics -----"
         },
         {

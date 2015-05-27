@@ -48,7 +48,14 @@
             "q": "owl_individual_of(_Tube, knowrob_chemlab:'Tube'),rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GOAL-PIPETTE-BUTTON-PUSHED-RELEASED'))), rdf_has(I, knowrob:'endTime', T0), inside_physical('/pipette_end_effector_frame_name', _Tube, T0), rdf_has(_Tube, knowrob:'name', literal(type(_,Tube))), visualize_chemlab_scene(T0), visualize_chemlab_highlight(Tube).",
             "text": "Is the pipette inside a tube after the pipette button released? "
         },
-
+	{
+            "q": "",
+            "text": "----- Videos -----"
+        },
+        {
+            "q": "experiment_videos('acat', Videos), member(V,Videos), video_play(V).",
+            "text": "Play available videos "
+        },
         {
             "q": "",
             "text": "----- Logfile statistics -----"

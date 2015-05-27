@@ -67,6 +67,14 @@
         {
             "q": "findall(_Size,  (task_goal(_PostAction, 'REPLACEABLE-FUNCTION-ROLL-OBJECT'), rdf_has(_PostAction, knowrob:'previousAction', _PreAction), designator_between(_Designator, _PreAction, _PostAction), get_designator_contour_size(_Designator, ['DOUGH', 'CONTOUR'],_Size))  ,Sizes),!,add_barchart('doughchart_id', 'Dough Size', [[[1,2,3,4,5,6,7,8,9,10,11],Sizes]]).",
             "text": "How did the size of dough changed over time(cm*cm)"
+        },
+        {
+            "q": "",
+            "text": "----- Videos -----"
+        },
+        {
+            "q": "experiment_videos('robohow/pizza-rolling', Videos), member(V,Videos), video_play(V).",
+            "text": "Play available videos "
         }
     ]
 }

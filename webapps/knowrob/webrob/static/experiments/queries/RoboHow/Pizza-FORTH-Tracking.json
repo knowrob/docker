@@ -50,6 +50,14 @@
         },
         {
             "q": "",
+            "text": "----- Videos -----"
+        },
+        {
+            "q": "experiment_videos('robohow/human-tracking', Videos), member(V,Videos), video_play(V).",
+            "text": "Play available videos "
+        },
+        {
+            "q": "",
             "text": "-----Queries on statistics-----"
         },
         {
