@@ -22,6 +22,8 @@ illegal_containername = re.compile('[^a-zA-Z0-9_\\-]+')
 
 #disallow all characters that are uncommon in image names
 illegal_imagename = re.compile('[^a-zA-Z0-9_\\-\\.:/]+')
+#only allow images with these prefixes
+allowed_imageprefixes = ['knowrob/', 'openease/']
 
 #disallow absolute paths, parent folders, &&, ||, semicolon and spaces without preceding backslash
 illegal_pathname = re.compile('(?:^/|\\.\\./|/\\.\\.|&&|\|\||;|[^\\\\] )+')
@@ -35,6 +37,10 @@ def check_containername(input, paramname):
 
 def check_imagename(input, paramname):
     result = illegal_imagename.search(input)
+    notallowed = not filter(lambda image: input.startswith(image), allowed_imageprefixes)
+    if notallowed:
+        raise SecurityException('The specified image in '+paramname+' must start with one of ' +
+                                str(allowed_imageprefixes))
     if result:
         raise SecurityException(paramname, result.group())
 
