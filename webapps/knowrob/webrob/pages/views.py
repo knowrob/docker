@@ -39,12 +39,9 @@ def download_summary_image(filename):
 def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
-    host_url = docker_interface.get_container_ip('tutorials')
-    # host_url = urlparse(request.host_url).hostname
-    container_name = 'tutorials'
+    host_url = urlparse(request.host_url).hostname
     ip = docker_interface.get_container_ip('tutorials')
-    print 'ip', ip
-    print 'hosturl', host_url
+    container_name = session['user_container_name']
     show_south_pane = True
 
     tut = read_tutorial_page(cat_id, page)
