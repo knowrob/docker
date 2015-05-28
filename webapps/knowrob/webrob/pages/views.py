@@ -11,6 +11,7 @@ from urlparse import urlparse
 from webrob.app_and_db import app, db
 from webrob.user.knowrob_user import read_tutorial_page
 from webrob.docker.docker_application import ensure_application_started
+from webrob.docker import docker_interface
 
 from utility import *
 
@@ -38,8 +39,12 @@ def download_summary_image(filename):
 def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
-    host_url = urlparse(request.host_url).hostname
+    host_url = docker_interface.get_container_ip('tutorials')
+    # host_url = urlparse(request.host_url).hostname
     container_name = 'tutorials'
+    ip = docker_interface.get_container_ip('tutorials')
+    print 'ip', ip
+    print 'hosturl', host_url
     show_south_pane = True
 
     tut = read_tutorial_page(cat_id, page)
