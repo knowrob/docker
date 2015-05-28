@@ -1,10 +1,12 @@
 
-INSERT INTO Tutorial VALUES(5,'getting_started','Getting started','The user interface','The user interface consists of four panes with different purposes.
+INSERT INTO Tutorial VALUES(5,'getting_started','Getting started','The user interface','The user interface consists of six panes with different purposes.
 
-  * The *Prolog interaction pane* allows the user to type Prolog queries and commands and see the answers to these queries. Queries are to be typed in the lower area, the results will be shown in the box above.
-  * A list of prepared queries with English translation is provided in the *query list pane* in the bottom left. If you click on an entry in this library, the corresponding Prolog query will be added to the query field.
-  * The *3D display pane* in the upper right can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
-  * The *visual analytics pane* in the lower right can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization panes with the results of queries.
+  * The *Prolog interaction pane* in the upper left allows the user to type Prolog queries and commands and see the answers to these queries. Queries are to be typed in the lower area, the results will be shown in the box above.
+  * A list of prepared queries with English translation is provided in the *query list pane* in the bottom left. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field*.
+  * The *3D display pane* in the upper middle can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
+  * The *visual analytics pane* in the lower middle can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization panes with the results of queries.
+  * The *belief pane* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
+  * The *image pane* in the lower right is used for displaying images caputed by the robot''s camera.
 
 **Note:** 
 If the 3D display pane does not yet show a grid in the background, your knowledge
