@@ -1,31 +1,97 @@
 {% extends "knowrob.html" %}
 
-
 {% block content %}
+  <script type="text/javascript">
 
-  <div id="console" class="black_border" style="position:absolute; top:50px; width:495px; height:460px;">
-    <div id="history" style="position:relative; top:0px; height:330px; padding:5px;"></div>
-    <script>
-      var history = setupHistoryField();
-    </script>
+    $(document).ready(function () {
+      var knowrobLayout = $('#container').layout({
+        stateManagement__enabled: true,
+        south: {
+          minSize: 60
+        },
+        west: {
+          minSize: 250,
+          size: 500,
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#console",
+              onresize: function() {
+                ace.edit("history").resize(true);
+                ace.edit("user_query").resize(true);
+              },
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#library",
+              minSize: 150
+            }
+          }
+        },
+        center: {},
+        east: {
+          minSize: 250,
+          size: 500,
+          initClosed: true,
+          // INNER-LAYOUT
+          childOptions: {
+            center: {
+              paneSelector: "#designator",
+              minSize: 250
+            },
+            south: {
+              paneSelector: "#mjpeg",
+              minSize: 150
+            }
+          }
+        }
+      });
+      centerLayout = $('#editor-container').layout({
+            center: {
+              paneSelector: "#markers",
+              minSize: 50
+            },
+            south: {
+              paneSelector: "#chart",
+              initClosed: true,
+              minSize: 50
+            }
+      });
+      
+      $('#designator').change(function() { knowrobLayout.open('east'); });
+      $('#mjpeg').change(function() { knowrobLayout.open('east'); });
+      $('#chart').change(function() { centerLayout.open('south'); });
+    });
+  </script>
 
-    <div id="user_query" style="position:relative; top:0px; height:115px; border-top:1px solid black;">member(A, [a,b,c]).</div>
-    <script>
-      var user_query = setupQueryField();
-    </script>
+  <div class="ui-layout-center" id="editor-container">
+    <div id="markers"></div>
+    <div id="chart"></div>	
   </div>
 
-  <div id="markers" class="black_border" style="position:absolute; left:520px; top:50px; width:820px; height:460px;"></div>
-
-  
-  <div id="library" class="black_border" style="position:relative; left:0px; top:470px; width:1295px; font-size:10pt; padding:5px 15px; overflow:auto; margin-top:10px;">
+  <div class="ui-layout-west">
+    <div id="console">
+      <div id="console_top">
+        <div id="history" style="font-size:20px;"></div>
+        <div id="user_query" style="font-size:20px;">member(A, [a,b,c]).</div>
+      </div>
+      <div id="console_bottom">
+        <div id="query_buttons">
+          <ul class="query_button_group">
+            <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
+            <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <div id="library" class="black_border" style="position:relative; left:0px; top:470px; width:auto; font-size:10pt; padding:5px 15px; overflow:auto; margin-top:10px;">
     <h2>{{ tut.cat_title }}</h2>
     <h4>{{tut.page}}. {{ tut.title }}</h4>
     {{ content }}
 
 
     <!-- Bottom navigation: prev and next tutorials -->
-    <div style="position:relative; bottom:0; width:1295px; height:25px; padding-bottom:10px;">
+    <div style="position:relative; bottom:0; width:auto; height:25px; padding-bottom:10px;">
       {% if prev %}
 	<div style="float:left;">
 	  <a href="{{ url_for('tutorials', cat_id=prev.cat_id, page=prev.page) }}">Previous: {{prev.title}}</a>
@@ -38,5 +104,11 @@
       {% endif %}
     </div>
   </div>
-
+  </div>
+  
+  <div class="ui-layout-east">
+    <div id="designator"></div>
+    <div id="mjpeg"></div>
+  </div>
+  
 {% endblock %}
