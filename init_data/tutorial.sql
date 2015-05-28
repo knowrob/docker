@@ -34,8 +34,8 @@ ENTER`). Prolog will return the first result, the variable assignment
 A = a
 </pre>
                             
-If you would like to retrieve more results, you need to press `CRTL + ;`
-(on Mac: `CMD + ;`), and Prolog will return the next solutions to your query:
+If you would like to retrieve more results, you need to press `CRTL + n`
+(on Mac: `CMD + n`), and Prolog will return the next solutions to your query:
 
 <pre>
 A = a 
