@@ -8,10 +8,10 @@ INSERT INTO Tutorial VALUES(0,'getting_started','Getting started','The user inte
   * The *belief pane hl_designator* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
   * The *image pane hl_mjpeg* in the lower right is used for displaying images caputed by the robot''s camera.
 
-All Panes except for the *3d display pane hl_markers* can be opened or closed by clicking the dark *grey bars hlc_ui-layout-toggler* on the edges or resized by dragging them.
+All Panes except for the *3D display pane hl_markers* can be opened or closed by clicking the dark *grey bars hlc_ui-layout-toggler* on the edges or resized by dragging them.
 
 **Note:** 
-If the 3D display pane does not yet show a grid in the background, your knowledge
+If the *3D display pane hl_markers* does not yet show a grid in the background, your knowledge
 base has not yet been loaded completely. In this case, please wait a moment and
 reload the page.',1);
 INSERT INTO Tutorial VALUES(1,'getting_started','Getting started','Sending queries','The query language used in OpenEASE is Prolog, a logical programming language.
@@ -27,14 +27,14 @@ The `member` predicate associates the variable A given as first argument (in
 Prolog, variables start with an uppercase letter) to all elements of the list
 that is given as second argument. In this example, the list consists of three
 constants a, b, and c (constants start with a lowercase letter).
-You can send the query with the key combination `CTRL + ENTER` (on Mac: `CMD +
+You can send the query with the *query button hl_btn&#95;query* or the key combination `CTRL + ENTER` (on Mac: `CMD +
 ENTER`). Prolog will return the first result, the variable assignment
 
 <pre>
 A = a
 </pre>
                             
-If you would like to retrieve more results, you need to press `CRTL + n`
+If there are more solutions available, the *Next solutions button hl_btn&#95;query&#95;next* will be enabled. To retrieve more results, use this button or press `CRTL + n`
 (on Mac: `CMD + n`), and Prolog will return the next solutions to your query:
 
 <pre>
@@ -72,7 +72,7 @@ w.r.t. a ROS package.
 
     owl_parse(''package://knowrob_srdl/owl/PR2.owl'').
                             
-Using the query highlighted above, you can load the model of the PR2. The visualization of the model will be explained in the next step of this tutorial.',3);
+Using the query above, you can load the model of the PR2 robot. This will not update the 3D visualization yet. The visualization of loaded data will be explained in the next step of this tutorial.',3);
 INSERT INTO Tutorial VALUES(3,'getting_started','Getting started','Visualizing results','The query language has been extended by a set of special predicates that have
 the side-effect of updating one or more of the visualization panels. They can simply
 be appended to a query with a comma. Usually, they receive an object identifier,
