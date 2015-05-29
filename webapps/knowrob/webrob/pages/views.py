@@ -47,28 +47,17 @@ def tutorials(cat_id='getting_started', page=1):
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut.text, fenced_code=True)
 
-    print 'marked down content: '
-    print content
-
     # automatically add event handler for highlighting panes
     tmp = re.findall('<em>(.*?)</em>', str(content))
     for t in tmp:
         if 'hl_' in t:
             text = t.split(' hl_')[0]
             idname = t.split(' hl_')[1]
-            print 'text, idname: ', text, idname
-            print
-            print 'substituting <em>{} hl_{}</em> by'.format(text, idname), '<em onmouseover="knowrob.highlight_element(&#39;{0}&#39;, &#39;class&#39;, true)" onmouseout="knowrob.highlight_element(&#39;{0}&#39;, &#39;id&#39;, false)">{1}</em>'.format(idname, text)
-            print
             content = re.sub('<em>{} hl_{}</em>'.format(text, idname), '<em onmouseover="knowrob.highlight_element(&#39;{0}&#39;, &#39;id&#39;, true)" onmouseout="knowrob.highlight_element(&#39;{0}&#39;, &#39;id&#39;, false)">{1}</em>'.format(idname, text), str(content))
         elif 'hlc_' in t:
             text = t.split(' hlc_')[0]
             classname = t.split(' hlc_')[1]
-            print 'text, classname: ', text, classname
-            print
-            print 'substituting <em>{} hlc_{}</em> by'.format(text, classname), '<em onmouseover="knowrob.highlight_element(&#39;{0}&#39;, &#39;class&#39;, true)" onmouseout="knowrob.highlight_element(&#39;{0}&#39;, &#39;id&#39;, false)">{1}</em>'.format(classname, text)
-            print
-            content = re.sub('<em>{} hlc_{}</em>'.format(text, classname), '<em onmouseover="knowrob.highlight_element(&#39;{0}&#39;, &#39;class&#39;, true)" onmouseout="knowrob.highlight_element(&#39;{0}&#39;, &#39;id&#39;, false)">{1}</em>'.format(classname, text), str(content))
+            content = re.sub('<em>{} hlc_{}</em>'.format(text, classname), '<em onmouseover="knowrob.highlight_element(&#39;{0}&#39;, &#39;class&#39;, true)" onmouseout="knowrob.highlight_element(&#39;{0}&#39;, &#39;class&#39;, false)">{1}</em>'.format(classname, text), str(content))
 
     # automatically add "ask as query" links after code blocks
     content = re.sub('</code>(\s)?</pre>', "</code></pre><div class='show_code'><a href='#' class='show_code'>Ask as query</a></div>", str(content))
