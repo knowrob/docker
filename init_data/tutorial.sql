@@ -1,8 +1,8 @@
 
 INSERT INTO Tutorial VALUES(0,'getting_started','Getting started','The user interface','The user interface consists of six panes with different purposes.
 
-  * The *Prolog interaction pane hl_console* in the upper left allows the user to type Prolog queries and commands and see the answers to these queries. Queries are to be typed in the *query field hl_user_query*, the history of the queries with their respective results will be shown in the *history pane hl_history*.
-  * A list of prepared queries with English translation is provided in the *query list pane hl_library* in the bottom left. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field hl_user_query*.
+  * The *Prolog interaction pane hl_console* in the upper left allows the user to type Prolog queries and commands and see the answers to these queries. Queries are to be typed in the *query field hl_user&#95;query*, the history of the queries with their respective results will be shown in the *history pane hl_history*.
+  * The pane in which this tutorial text is now displayed, the *query list pane hl_library*, usually contains a list of prepared queries with English translation. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field hl_user&#95;query*.
   * The *3D display pane hl_markers* in the upper middle can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
   * The *visual analytics pane hl_chart* in the lower middle can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization pane with the results of queries.
   * The *belief pane hl_designator* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
