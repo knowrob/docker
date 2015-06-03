@@ -137,5 +137,7 @@ docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     -e VIRTUAL_HOST=login \
     -e VIRTUAL_PORT=5000 \
     -e EASE_DEBUG=$EASE_DEBUG \
+    -e OPENEASE_MAIL_USERNAME=$OPENEASE_MAIL_USERNAME \
+    -e OPENEASE_MAIL_PASSWORD=$OPENEASE_MAIL_PASSWORD \
     --name login \
     openease/login python runserver.py
