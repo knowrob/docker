@@ -37,6 +37,11 @@ def download_summary_image(filename):
 @app.route('/knowrob/tutorials/<cat_id>/')
 @app.route('/knowrob/tutorials/<cat_id>/<page>')
 def tutorials(cat_id='getting_started', page=1):
+    session['video'] = 0
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+        return redirect(url_for('/knowrob/tutorials/'))
+    
+    error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     # host_url = urlparse(request.host_url).hostname
@@ -51,7 +56,7 @@ def tutorials(cat_id='getting_started', page=1):
     tut = read_tutorial_page(cat_id, page)
     content = markdown(tut.text, fenced_code=True)
 
-    # automatically add event handler for highlighting panes
+    # automatically add event handler for highlighting DOM elements
     tmp = re.findall('<em>(.*?)</em>', str(content))
     for t in tmp:
         if 'hl_' in t:

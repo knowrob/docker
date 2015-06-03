@@ -82,8 +82,9 @@
       var videoFile = libraryFile.replace(new RegExp('queries', 'g'), 'video');
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-      var auth = {{ authentication }};
+      var auth = '{{ authentication }}';
       console.log('auth', auth);
+      console.log('typeof auth', typeof auth);
       knowrob = new Knowrob({
             ros_url: rosUrl,
             library_file: libraryFile,
