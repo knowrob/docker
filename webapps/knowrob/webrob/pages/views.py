@@ -36,6 +36,7 @@ def download_summary_image(filename):
 @app.route('/knowrob/tutorials/')
 @app.route('/knowrob/tutorials/<cat_id>/')
 @app.route('/knowrob/tutorials/<cat_id>/<page>')
+# @login_required
 def tutorials(cat_id='getting_started', page=1):
     session['video'] = 0
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
@@ -44,9 +45,6 @@ def tutorials(cat_id='getting_started', page=1):
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
-    # host_url = urlparse(request.host_url).hostname
-    # container_name = session['user_container_name']
-    ip = docker_interface.get_container_ip('tutorials')
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name'] # 'tutorials'
     show_south_pane = False
