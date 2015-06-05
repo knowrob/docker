@@ -1,3 +1,3 @@
 [submodule "webapps/easeapp/webrob/static/lib"]
 	path = webapps/easeapp/webrob/static/lib
-	url = git@github.com:code-iai/knowrob_webtools.git
+	url = git@github.com:code-iai/knowrob_webtools.git 
