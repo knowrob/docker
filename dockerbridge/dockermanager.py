@@ -77,7 +77,8 @@ class DockerManager(object):
                 cpu_shares = 1024  # Default value
             self.__client.create_container(application_image, detach=True, tty=True, environment=env,
                                            name=user_container_name, mem_limit=mem_limit, cpu_shares=cpu_shares,
-                                           memswap_limit=mem_limit*4)
+                                           memswap_limit=mem_limit*4,
+                                           entrypoint=['/opt/ros/hydro/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
                 
             # Read links and volumes from webapp_container ENV
             inspect = self.__client.inspect_image(application_image)

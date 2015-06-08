@@ -45,7 +45,7 @@ def tutorials(cat_id='getting_started', page=1):
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-    container_name = session['user_container_name'] # 'tutorials'
+    container_name = 'tutorials'
     show_south_pane = False
     readonly = True
     authentication = False

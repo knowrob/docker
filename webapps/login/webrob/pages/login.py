@@ -42,9 +42,10 @@ def select_application(application_name):
 
 @app.route('/')
 def show_user_data():
-    # TODO: I don't think that's needed in compination with login_required decorator
     if not current_user.is_authenticated():
         return redirect(url_for('user.login'))
+    if not 'user_container_name' in session:
+        return redirect(url_for('user.logout'))
     
     error=""
     # determine hostname/IP we are currently using
