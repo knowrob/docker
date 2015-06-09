@@ -92,7 +92,7 @@ runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if postgres_db is running or stopped and start otherwise
 runContainer "tutorials_data" "--name tutorials_data knowrob/tutorials_data true"
-runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db --volumes-from tutorials_data knowrob/postgres" true
+runContainer "postgres_db" "-d -p 5432:5432 -e POSTGRES_USER=docker --volumes-from user_db --volumes-from tutorials_data knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately

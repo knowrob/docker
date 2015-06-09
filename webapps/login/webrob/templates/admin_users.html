@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block menu %}
+{% block _menu %}{% endblock %}
+{% endblock %}
+{% block menu_right %}
+{% block _menu_right %}{% endblock %}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.dataviz.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.dataviz.default.min.css" />
+    <script src="//cdn.kendostatic.com/2014.1.318/js/kendo.all.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="example">
+    <div id="grid"></div>
+    
+    <script>
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/admin/user_list",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    }
+                },
+                schema: {
+                    data: 'users',
+                    model: {
+                        id: "id",
+                        fields: {
+                            id: { type: "number", editable: false, nullable: false },
+                            username: { type: "string", editable: true },
+                            email: { type: "string", editable: true }
+                        }
+                    }
+                }
+            },
+            save: function(e) {
+                $.ajax({
+                    url: "/admin/user_save",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        id: e.model.id,
+                        username: e.model.username,
+                        email: e.model.email
+                    }),  
+                    dataType: "json"
+                }).done( function (request) {})
+            },
+            columns: [
+                { field: "id", title: "ID" },
+                { field: "username", title: "Name" },
+                { field: "email", title: "Mail" },
+                { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+            ],
+            editable: "inline",
+            pageable: true,
+            sortable: true
+        });
+    });
+    </script>
+</div>
+{% endblock %}

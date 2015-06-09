@@ -27,3 +27,8 @@ class User(db.Model, UserMixin):
     # Relationships
     roles = db.relationship('Role', secondary=user_roles,
             backref=db.backref('users', lazy='dynamic'))
+    
+    def has_role(self, role_name):
+        for role in self.roles:
+            if role.name == role_name: return True
+        return False

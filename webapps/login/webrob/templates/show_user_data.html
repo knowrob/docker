@@ -23,6 +23,7 @@
 		<dl>
 		<dt>Username: </dt><dd>{{ current_user.username }}</dd>
 		<dt>Email: </dt><dd>{{ current_user.email }}</dd>
+        <dt>Roles: </dt><dd>{{ role_names }}</dd>
 		<dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
 		</dl>
 	</div>

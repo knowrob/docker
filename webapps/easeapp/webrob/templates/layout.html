@@ -122,6 +122,10 @@
     };
     
     function add_common_menu_items(left_menu, right_menu, application_name, application_list) {
+        {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
+            add_menu_item(left_menu, "Admin", "{{ url_for('log') }}");
+        {% endif %}
+        
         if(left_menu) {
             add_menu_item(left_menu, "Log", "{{ url_for('log') }}");
         }

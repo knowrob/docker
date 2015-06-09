@@ -3,6 +3,7 @@ from flask import session, request, redirect, url_for, render_template, jsonify
 from flask.ext.user.signals import user_logged_in
 from flask.ext.user.signals import user_logged_out
 from flask_user import current_user
+from flask_user import current_app
 from flask_user import login_required
 
 from urlparse import urlparse
@@ -53,5 +54,6 @@ def show_user_data():
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
     application_names = docker_interface.get_application_image_names()
+    role_names = map(lambda x: str(x.name), current_user.roles)
 
     return render_template('show_user_data.html', **locals())
