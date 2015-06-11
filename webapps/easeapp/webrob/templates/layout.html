@@ -123,7 +123,10 @@
     
     function add_common_menu_items(left_menu, right_menu, application_name, application_list) {
         {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
-            add_menu_item(left_menu, "Admin", "{{ url_for('log') }}");
+            handle_webapp_menu(left_menu, ["CHOICES", ["Admin", [
+                    ["Roles", "/admin/roles"],
+                    ["Users", "/admin/users"]
+            ]]]);
         {% endif %}
         
         if(left_menu) {

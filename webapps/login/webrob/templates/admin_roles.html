@@ -20,66 +20,57 @@
 <div id="example">
     <div id="grid"></div>
     
+    <script id="create_template" type="text/x-kendo-template">
+        <a class="k-button" href="\#" onclick="return new_role()">Create new record</a>
+    </script>
     <script>
-    $(document).ready(function () {
-        var _roleDataSource = new kendo.data.DataSource({
-            transport: {
-                read: {
-                    url: "/admin/role_list",
-                    dataType: "json",
-                    type: "POST",
-                    contentType: "application/json"
+    function new_role() {
+        var roleName = prompt("Please enter a role name", "");
+        if(roleName) {
+            $.ajax({
+                url: "/admin/role_new",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({name: roleName}),  
+                dataType: "json",
+                success: function (data) {
+                    console.log("Role created!");
+                    $('#grid').data('kendoGrid').dataSource.read();
+                    $('#grid').data('kendoGrid').refresh();
                 }
-            },
-            schema: {
-                data: function(reply) { return reply.roles; }
-            }
-        });
-        function roleDropDown(container, options) {
-            $("<input data-bind='value:role' />")
-                .attr("id", "ddl_role")
-                .appendTo(container)
-                .kendoDropDownList({
-                    dataSource: _roleDataSource,
-                    dataTextField: "name",
-                    dataValueField: "name",
-                    template: "<span data-id='${data.id}'>${data.name}</span>"
-                });
+            }).done( function (request) {});
         }
-
+    }
+    $(document).ready(function () {
         $("#grid").kendoGrid({
             dataSource: {
                 transport: {
                     read: {
-                        url: "/admin/user_list",
+                        url: "/admin/role_list",
                         dataType: "json",
                         type: "POST",
                         contentType: "application/json"
-                    }
+                    },
                 },
                 schema: {
-                    data: 'users',
+                    data: 'roles',
                     model: {
                         id: "id",
                         fields: {
                             id: { type: "number", editable: false, nullable: false },
-                            username: { type: "string", editable: true },
-                            email: { type: "string", editable: true },
-                            role: { type: "string", editable: true }
+                            name: { type: "string", editable: true }
                         }
                     }
                 }
             },
             save: function(e) {
                 $.ajax({
-                    url: "/admin/user_save",
+                    url: "/admin/role_save",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
                         id: e.model.id,
-                        username: e.model.username,
-                        email: e.model.email,
-                        role: e.model.role
+                        name: e.model.name
                     }),  
                     dataType: "json",
                     success: function (data) {
@@ -88,12 +79,29 @@
                     }
                 }).done( function (request) {})
             },
+            remove: function(e) {
+                $.ajax({
+                    url: "/admin/role_remove",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        id: e.model.id,
+                        name: e.model.name
+                    }),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
+            toolbar: [
+                { template: kendo.template($("#create_template").html()) }
+            ],
             columns: [
                 { field: "id", title: "ID" },
-                { field: "username", title: "Name" },
-                { field: "email", title: "Mail" },
-                { field: "role", title: "Role", editor: roleDropDown},
-                { command: ["edit"], title: "&nbsp;" }
+                { field: "name", title: "Name" },
+                { command: ["edit", "destroy"], title: "&nbsp;" }
             ],
             editable: "popup",
             sortable: true
