@@ -8,11 +8,13 @@
 
 from logging.handlers import SMTPHandler
 import os
+import datetime
+
 from flask_mail import Mail
 from flask_user import UserManager, SQLAlchemyAdapter
 from flask.ext.babel import Babel
-from webrob.pages.utility import random_string
 
+from webrob.pages.utility import random_string
 from webrob.startup.init_db import *
 from webrob.pages.routes import register_routes
 from webrob.models.users import Role
@@ -29,6 +31,7 @@ def init_admin_user(user_manager):
     db_adapter = user_manager.db_adapter
     users = db_adapter.find_all_objects(db_adapter.UserClass)
     user_names = map(lambda r: r.username, users)
+    
     # admin user already exists
     if "admin" in user_names: return
         
@@ -37,15 +40,42 @@ def init_admin_user(user_manager):
     if len(user_names)>0:
         new_user_id = max(map(lambda r: r.id, users))+1
     
-    # FIXME: does not work, i guess password hash must be used instead
-    db_adapter.add_object(db_adapter.UserClass,
-        id=new_user_id,
-        username="admin",
-        email="openease.iai@gmail.com",
-        password=generate_password_hash('test') # TODO: read from env
-    )
-    user_handle = db_adapter.get_object(db_adapter.UserClass, new_user_id)
-    user_handle.roles.append(get_role_by_name(db_adapter, "ADMIN"))
+    user_fields = {}
+    user_auth_fields = {}
+    
+    user_fields['id'] = new_user_id
+    user_fields['username'] = 'admin'
+    user_fields['email'] = 'openease.iai@gmail.com'
+    
+    # Enable user account
+    if db_adapter.UserProfileClass:
+        if hasattr(db_adapter.UserProfileClass, 'active'):
+            user_auth_fields['active'] = True
+        elif hasattr(db_adapter.UserProfileClass, 'is_enabled'):
+            user_auth_fields['is_enabled'] = True
+        else:
+            user_auth_fields['is_active'] = True
+    else:
+        if hasattr(db_adapter.UserClass, 'active'):
+            user_fields['active'] = True
+        elif hasattr(db_adapter.UserClass, 'is_enabled'):
+            user_fields['is_enabled'] = True
+        else:
+            user_fields['is_active'] = True
+    
+    hashed_password = user_manager.hash_password(os.environ.get('OPENEASE_MAIL_PASSWORD'))
+    if db_adapter.UserAuthClass:
+        user_auth_fields['password'] = hashed_password
+    else:
+        user_fields['password'] = hashed_password
+    
+    user = db_adapter.add_object(User, **user_fields)
+    user.roles.append(get_role_by_name(db_adapter, "ADMIN"))
+    db_adapter.update_object(user, confirmed_at=datetime.datetime.utcnow())
+    
+    if db_adapter.UserAuthClass:
+        user_auth = db_adapter.add_object(db_adapter.UserAuthClass, **user_auth_fields)
+
 
 def init_user_roles(user_manager):
     db_adapter = user_manager.db_adapter
@@ -92,7 +122,7 @@ def init_app(app, db, extra_config_settings={}):
     
     # Initialize DB content
     init_user_roles(user_manager)
-    #init_admin_user(user_manager)
+    init_admin_user(user_manager)
     db_adapter.commit()
 
     # Load all models.py files to register db.Models with SQLAlchemy

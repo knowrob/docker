@@ -88,12 +88,28 @@
                     }
                 }).done( function (request) {})
             },
+            remove: function(e) {
+                $.ajax({
+                    url: "/admin/user_remove",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        id: e.model.id,
+                        name: e.model.username
+                    }),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
             columns: [
                 { field: "id", title: "ID" },
                 { field: "username", title: "Name" },
                 { field: "email", title: "Mail" },
                 { field: "role", title: "Role", editor: roleDropDown},
-                { command: ["edit"], title: "&nbsp;" }
+                { command: ["edit", "destroy"], title: "&nbsp;" }
             ],
             editable: "popup",
             sortable: true

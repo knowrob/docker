@@ -73,6 +73,19 @@ def admin_user_save():
     
     return jsonify(result=None)
 
+@app.route('/admin/user_remove', methods=['POST'])
+@admin_required
+def admin_user_remove():
+    db_adapter = current_app.user_manager.db_adapter
+    user_del = json.loads(request.data)
+    user_db = db_adapter.get_object(db_adapter.UserClass, user_del['id'])
+    
+    app.logger.info("Removing user: " + str(user_db.username) + "[" + str(user_db.id) + "]."  + "\n")
+    db_adapter.delete_object(user_db)
+    db_adapter.commit()
+    
+    return jsonify(result=None)
+
 @app.route('/admin/role_save', methods=['POST'])
 @admin_required
 def admin_role_save():
