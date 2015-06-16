@@ -27,13 +27,13 @@ def get_role_by_name(db_adapter, role_name):
         if str(r.name) == role_name: return r
     return None
 
-def init_admin_user(user_manager):
+def init_admin_user(app, user_manager):
     db_adapter = user_manager.db_adapter
     users = db_adapter.find_all_objects(db_adapter.UserClass)
     user_names = map(lambda r: r.username, users)
     
-    # admin user already exists
     if "admin" in user_names: return
+    app.logger.info("Creating 'admin' user...")
         
     # Find next id
     new_user_id = 1
@@ -119,11 +119,6 @@ def init_app(app, db, extra_config_settings={}):
     from webrob.models.users import User
     db_adapter = SQLAlchemyAdapter(db, User)
     user_manager = UserManager(db_adapter, app)     # Init Flask-User and bind to app
-    
-    # Initialize DB content
-    init_user_roles(user_manager)
-    init_admin_user(user_manager)
-    db_adapter.commit()
 
     # Load all models.py files to register db.Models with SQLAlchemy
     from webrob.models import users
@@ -133,6 +128,12 @@ def init_app(app, db, extra_config_settings={}):
     register_routes()
 
     init_db(app, db)
+    
+    # Initialize DB content
+    init_user_roles(user_manager)
+    init_admin_user(app, user_manager)
+    db_adapter.commit()
 
+    app.logger.info("Webapp started.")
     return app
 
