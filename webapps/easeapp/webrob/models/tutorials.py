@@ -8,3 +8,6 @@ class Tutorial(db.Model):
     title = db.Column(db.String(), nullable=False)
     text = db.Column(db.String(), nullable=False)
     page = db.Column(db.Integer(), nullable=False)
+
+def read_tutorial_page(ecat, page):
+    return Tutorial.query.filter_by(cat_id=cat,page=page).first()

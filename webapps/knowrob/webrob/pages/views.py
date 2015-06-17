@@ -9,7 +9,7 @@ import json
 from urlparse import urlparse
 
 from webrob.app_and_db import app, db
-from webrob.user.knowrob_user import read_tutorial_page
+from webrob.models.tutorials import read_tutorial_page
 from webrob.docker.docker_application import ensure_application_started
 from webrob.docker import docker_interface
 

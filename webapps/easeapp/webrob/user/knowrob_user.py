@@ -1,4 +1,3 @@
-from webrob.models.tutorials import Tutorial
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # DB stuff
@@ -92,9 +91,4 @@ def get_user_data(username):
 #    cur = db.execute('select * from tutorial where cat_id=? and page=?', [cat, page])
 #    tut = cur.fetchone()
 #    return tut
-
-
-def read_tutorial_page(cat, page):
-    next_page = Tutorial.query.filter_by(cat_id=cat,page=page).first()
-    return next_page
  
