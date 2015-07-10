@@ -134,7 +134,10 @@ def menu():
     menu_left = [
         ('Knowledge Base',      knowrobUrl),
         ('Robot Memory Replay', knowrobUrl+'video'),
-        ('Editor',              knowrobUrl+'editor')
+        ('Editor',              knowrobUrl+'editor'),
+        ('CHOICES', ('Admin', [('CHOICES', ('Knowrob >>', [
+            ('Tutorials', '/knowrob/admin/tutorials')
+        ]))]))
     ]
     
     exp_selection = __exp_file__()

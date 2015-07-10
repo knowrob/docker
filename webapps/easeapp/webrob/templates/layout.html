@@ -110,6 +110,15 @@
     };
     
     function add_submenu(menu, value) {
+        // Try to find existing submenu
+        for(var i=0; i<menu.childElementCount; ++i) {
+            var _li = menu.childNodes[i];
+            var _item = _li.childNodes[0];
+            if(_item.childNodes[0].nodeValue == value) {
+                return _li.childNodes[1];
+            }
+        }
+    
         var submenu = document.createElement("ul");
         var li = document.createElement("li");
         var item = document.createElement("a");
