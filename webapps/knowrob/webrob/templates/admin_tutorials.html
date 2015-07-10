@@ -87,14 +87,18 @@
             columns: [
                 { field: "id", title: "ID", width: 40 },
                 { field: "cat_title", title: "Category", width: 100 },
-                { field: "page", title: "Page", width: 50 },
+                { field: "page", title: "Page", width: 75 },
                 { field: "title", title: "Title", width: 100 },
-                { field: "text", title: "Text" },
+                { field: "text", title: "Text", encoded: false, editor: textareaEditor },
                 { command: ["edit", "destroy"], title: "&nbsp;", width: 100 }
             ],
-            editable: "popup",
-            sortable: true
+            editable: "inline",
+            sortable: true,
+            autoHeight:true
         });
+        function textareaEditor(container, options) {
+            $('<textarea class="tut_textarea" data-bind="value: ' + options.field + '"></textarea>').appendTo(container);
+        }
     });
     </script>
 </div>

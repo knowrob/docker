@@ -1,5 +1,5 @@
 
-from flask import render_template, jsonify
+from flask import request, render_template, jsonify
 from flask_user import current_app
 import json
 
@@ -27,14 +27,19 @@ def admin_tutorial_list():
     }, tutorials)
     return jsonify(tutorials=tut_list)
 
+def find_cat_id(title):
+    db_adapter = current_app.user_manager.db_adapter
+    tutorials = db_adapter.find_all_objects(Tutorial)
+    for t in tutorials:
+        if str(t.cat_title) == title: return str(t.cat_id)
+    return None
+
 @app.route('/knowrob/admin/tutorial_save', methods=['POST'])
 @admin_required
 def admin_tutorial_save():
     db_adapter = current_app.user_manager.db_adapter
     tut_update = json.loads(request.data)
     tut_db = db_adapter.get_object(Tutorial, tut_update['id'])
-    
-    app.logger.info("Updating tutorial: " + str(tut_db.name) + "[" + str(tut_db.id) + "]."  + "\n")
     
     db_adapter.update_object(tut_db,
         cat_id = find_cat_id( tut_update['cat_title'] ),
