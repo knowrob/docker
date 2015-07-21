@@ -36,6 +36,7 @@ def init_admin_user(app, user_manager):
     app.logger.info("Creating 'admin' user...")
         
     # Find next id
+    # FIXME: Issue with user ID! Seems it's not allowed to just take a free one.
     new_user_id = 1
     if len(user_names)>0:
         new_user_id = max(map(lambda r: r.id, users))+1
@@ -131,7 +132,8 @@ def init_app(app, db, extra_config_settings={}):
     
     # Initialize DB content
     init_user_roles(user_manager)
-    init_admin_user(app, user_manager)
+    # FIXME: Issue with user ID! Seems it's not allowed to just take a free one.
+    #init_admin_user(app, user_manager)
     db_adapter.commit()
 
     app.logger.info("Webapp started.")
