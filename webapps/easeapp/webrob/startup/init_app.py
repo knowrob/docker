@@ -33,20 +33,19 @@ def init_admin_user(app, user_manager):
     user_names = map(lambda r: r.username, users)
     
     if "admin" in user_names: return
+    
+    if not 'OPENEASE_MAIL_PASSWORD' in os.environ:
+        app.logger.info("No admin password defined. Please set OPENEASE_MAIL_PASSWORD environment variable.")
+        return
+    
     app.logger.info("Creating 'admin' user...")
         
-    # Find next id
-    # FIXME: Issue with user ID! Seems it's not allowed to just take a free one.
-    new_user_id = 1
-    if len(user_names)>0:
-        new_user_id = max(map(lambda r: r.id, users))+1
     
     user_fields = {}
     user_auth_fields = {}
     
-    user_fields['id'] = new_user_id
     user_fields['username'] = 'admin'
-    user_fields['email'] = 'openease.iai@gmail.com'
+    user_fields['email'] = os.environ.get('OPENEASE_MAIL_USERNAME')
     
     # Enable user account
     if db_adapter.UserProfileClass:
@@ -84,15 +83,9 @@ def init_user_roles(user_manager):
     role_names = map(lambda r: r.name, roles)
     init_role_names = [ "ADMIN", "USER", "EDITOR", "REVIEWER" ]
         
-    # Find next id
-    new_role_id = 1
-    if len(role_names)>0:
-        new_role_id = max(map(lambda r: r.id, roles))+1
-        
     for role_name in init_role_names:
         if not role_name in role_names:
-            db_adapter.add_object(Role, id=new_role_id, name=role_name)
-            new_role_id += 1
+            db_adapter.add_object(Role,  name=role_name)
 
 
 def init_app(app, db, extra_config_settings={}):
@@ -130,11 +123,11 @@ def init_app(app, db, extra_config_settings={}):
 
     init_db(app, db)
     
-    # Initialize DB content
-    init_user_roles(user_manager)
-    # FIXME: Issue with user ID! Seems it's not allowed to just take a free one.
-    #init_admin_user(app, user_manager)
-    db_adapter.commit()
+    if str(app.name) == 'login':
+        # Initialize DB content
+        init_user_roles(user_manager)
+        init_admin_user(app, user_manager)
+        db_adapter.commit()
 
     app.logger.info("Webapp started.")
     return app
