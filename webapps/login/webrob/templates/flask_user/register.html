@@ -18,22 +18,25 @@
     </div>
 
     {# Username or Email #}
-    <div id="user-field" class="form-group">
+    {% set field = form.username %}
+    <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
         <input placeholder="Name" class="form-control" id="username" name="username" type="text" value="" required autofocus />
     </div>
     
     {% if user_manager.enable_email and user_manager.enable_username %}
-        <div id="user-field" class="form-group">
+        {% set field = form.email %}
+        <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
             <input placeholder="Email" class="form-control" id="email" name="email" type="text" value="" required />
         </div>
     {% endif %}
 
     {# Password field #}
-    <div id="pw-field" class="form-group">
+    {% set field = form.password %}
+    <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
         <input placeholder="Password" class="form-control" id="password" name="password" type="password" value="" required />
     </div>
     {% if user_manager.enable_retype_password %}
-        <div id="pw-field" class="form-group">
+        <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
             <input placeholder="Retype Password" class="form-control" id="retype_password" name="retype_password" type="password" value="" required />
         </div>
     {% endif %}
