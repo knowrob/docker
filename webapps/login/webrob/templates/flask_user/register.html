@@ -3,46 +3,46 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field %}
 
-<div class="login-box">
-  <h1>{%trans%}Register{%endtrans%}</h1>
+<div class="login-box"><div class="login-box-inner">
+  <h1>{%trans%}Please sign up{%endtrans%}</h1>
   <form action="" method="POST" novalidate formnovalidate class="form" role="form">
     {{ form.hidden_tag() }}
 
-    {# Username or Email #}
-    {% set field = form.username if user_manager.enable_username else form.email %}
-    <div class="form-group {% if field.errors %}has-error{% endif %}">
-        {# Label on left, "Already registered? Sign in." on right #}
-        <div class="row">
-            <div class="col-xs-6">
-                <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
-            </div>
-            <div class="col-xs-6 text-right">
-                {% if user_manager.enable_register %}
-                    <a href="{{ url_for('user.login') }}" tabindex='290'>
+    <div class="row">
+        <div class="text-right" id="already-registered-link">
+            {% if user_manager.enable_forgot_password %}
+                <a href="{{ url_for('user.login') }}" tabindex='195'>
                         {%trans%}Already registered? Sign in.{%endtrans%}</a>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
-        {{ field(class_='form-control', tabindex=210) }}
-        {% if field.errors %}
-            {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
-            {% endfor %}
-        {% endif %}
     </div>
 
+    {# Username or Email #}
+    <div id="user-field" class="form-group">
+        <input placeholder="Name" class="form-control" id="username" name="username" type="text" value="" required autofocus />
+    </div>
+    
     {% if user_manager.enable_email and user_manager.enable_username %}
-        {{ render_field(form.email, tabindex=220) }}
+        <div id="user-field" class="form-group">
+            <input placeholder="Email" class="form-control" id="email" name="email" type="text" value="" required />
+        </div>
     {% endif %}
 
-    {{ render_field(form.password, tabindex=230) }}
-
+    {# Password field #}
+    <div id="pw-field" class="form-group">
+        <input placeholder="Password" class="form-control" id="password" name="password" type="password" value="" required />
+    </div>
     {% if user_manager.enable_retype_password %}
-        {{ render_field(form.retype_password, tabindex=240) }}
+        <div id="pw-field" class="form-group">
+            <input placeholder="Retype Password" class="form-control" id="retype_password" name="retype_password" type="password" value="" required />
+        </div>
     {% endif %}
 
-    {{ render_submit_field(form.submit, tabindex=280) }}
+    <button id="register-button" class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
   </form>
-</div>
+</div></div>
+<div class="video-box"><div class="video-box-inner">
+  <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
+</div></div>
 
 {% endblock %}
