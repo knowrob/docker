@@ -3,6 +3,7 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field %}
 
+<div class="content-box">
 <div class="login-box"><div class="login-box-inner">
   <h1>{%trans%}Please sign up{%endtrans%}</h1>
   <form action="" method="POST" novalidate formnovalidate class="form" role="form">
@@ -47,5 +48,6 @@
 <div class="video-box"><div class="video-box-inner">
   <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
 </div></div>
+</div>
 
 {% endblock %}
