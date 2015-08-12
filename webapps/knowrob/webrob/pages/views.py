@@ -134,11 +134,14 @@ def menu():
     menu_left = [
         ('Knowledge Base',      knowrobUrl),
         ('Robot Memory Replay', knowrobUrl+'video'),
-        ('Editor',              knowrobUrl+'editor'),
-        ('CHOICES', ('Admin', [('CHOICES', ('Knowrob >>', [
-            ('Tutorials', '/knowrob/admin/tutorials')
-        ]))]))
+        ('Editor',              knowrobUrl+'editor')
     ]
+    
+    if current_user.has_role('ADMIN'):
+        menu_left.append(
+            ('CHOICES', ('Admin', [('CHOICES', ('Knowrob >>', [
+                ('Tutorials', '/knowrob/admin/tutorials')]))]))
+        )
     
     exp_selection = __exp_file__()
     if exp_selection is None: exp_selection = "Experiment"

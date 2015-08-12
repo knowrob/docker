@@ -41,7 +41,7 @@
     </div>
     <div class="metanav_right">
       {% if not current_user.is_authenticated() %}
-        <a href="{{ url_for('user.login') }}">log in</a>
+        <a href="{{ url_for('user.login') }}">Sign in</a>
       {% else %}
         <ul class="menu" id="menu_right" style="float: right;">
         </ul>
@@ -139,18 +139,19 @@
         {% endif %}
         
         if(left_menu) {
+        {% if current_user.is_authenticated() %}
             add_menu_item(left_menu, "Log", "{{ url_for('log') }}");
+        {% endif %}
         }
         
         if(right_menu) {
-            var application_selection = application_name;
-            if(!application_selection) application_selection = "Application";
-            
-            var application_choices = [];
-            for(var i in application_list) {
-                application_choices.push([application_list[i], "/application/"+application_list[i]]);
-            }
-            handle_webapp_menu(right_menu, ["CHOICES", [application_selection, application_choices]]);
+            //var application_selection = application_name;
+            //if(!application_selection) application_selection = "Application";
+            //var application_choices = [];
+            //for(var i in application_list) {
+            //    application_choices.push([application_list[i], "/application/"+application_list[i]]);
+            //}
+            //handle_webapp_menu(right_menu, ["CHOICES", [application_selection, application_choices]]);
             
             add_menu_item(right_menu, "Logout {{ current_user.username }}", "{{ url_for('user.logout') }}");
         }

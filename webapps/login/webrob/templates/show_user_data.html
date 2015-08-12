@@ -7,16 +7,17 @@
     <h1>{%trans%}Welcome to openEASE{%endtrans%}</h1>
     <div class="text-field">
         You successfully logged into openEASE!<br><br>
-        We provide access to comprehensive episodic memory
-        of bleeding edge autonomous robotic experiments performed in realistic environments through this web interface.
+        Through this web interface, we provide access to comprehensive episodic memory
+        of bleeding edge autonomous robotic experiments performed in realistic environments.
         The episodic memory is represented based on predicate logics using the
-        programming language Prolog.
+        programming language <a href="http://www.swi-prolog.org/">Prolog</a>.
         Please consider stepping through the <a href="knowrob/tutorials">query language tutorials</a>
-        and watching the tutorial video linked at the bottom of this page
-        before investigating one of the experiments.<br><br>
-        To access the experiments, please click on the &quot;Knowledge Base&quot; button at the bottom left of this page.
-        This button will redirect you to the <a href="knowrob">main user interface</a> of openEASE.
-        There you can select one of the experiments in the menu bar at the top of the page.
+        and watching the <a href="http://www.youtube-nocookie.com/embed/iu_Y7mxDjgA">tutorial video</a>
+        linked at the bottom of this page before investigating one of the experiments.<br><br>
+        The experiments are ordered according to their corresponding research projects.
+        To access the experiments, please click on the <a href="knowrob">Knowledge Base</a> menu entry at the top left of this page
+        or select one of the experiments directly from the menu at the top right of this page.
+        This will redirect you to the <a href="knowrob">main user interface</a> of openEASE.
     </div></div>
 
     <div id="user_content">
@@ -30,7 +31,7 @@
                 <dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
             </dl>
             </div>
-            <a id="kb-button" class="btn btn-lg btn-primary btn-block" href="knowrob">Knowledge Base</a>
+            <!-- <a id="kb-button" class="btn btn-lg btn-primary btn-block" href="knowrob">Knowledge Base</a> -->
         </div></div>
         <div class="video-box"><div class="video-box-inner">
             <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
