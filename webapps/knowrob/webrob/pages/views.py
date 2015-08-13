@@ -132,9 +132,9 @@ def menu():
     knowrobUrl = '/knowrob/'
     
     menu_left = [
-        ('Knowledge Base',      knowrobUrl),
-        ('Robot Memory Replay', knowrobUrl+'video'),
-        ('Editor',              knowrobUrl+'editor')
+        ('Knowledge Base', knowrobUrl),
+        ('Memory Replay',  knowrobUrl+'video'),
+        ('Prolog Editor',  knowrobUrl+'editor')
     ]
     
     if current_user.has_role('ADMIN'):
@@ -146,39 +146,56 @@ def menu():
     exp_selection = __exp_file__()
     if exp_selection is None: exp_selection = "Experiment"
     
+    # Maps projects to list of experiments
     exp_choices_map =  {}
     for (submenu,exp) in __exp_list__():
         # Find exp url
         exp_url = knowrobUrl
-        if __is_video__():
-            exp_url += 'video/'
+        if __is_video__(): exp_url += 'video/'
         exp_url += 'exp/'
-        if len(submenu)>0:
-            exp_url += submenu + '/'
+        if len(submenu)>0: exp_url += submenu + '/'
         exp_url += exp
         
         menu = ''
-        if len(submenu)>0:
-            menu = submenu
+        if len(submenu)>0: menu = submenu
         if not menu in exp_choices_map:
             exp_choices_map[menu] = []
         
         exp_choices_map[menu].append((exp, exp_url))
     
-    exp_choices = []
-    exp_map_keys = exp_choices_map.keys()
-    exp_map_keys.sort()
+    exp_page = '<div class="mega_menu">'
+    for proj in exp_choices_map.keys():
+        exp_page += '<div class="mega_menu_column">'
+        exp_page += '<h3><img height="48" src="static/icons/'+proj+'.png" />'+proj+'</h3>'
+        
+        #exp_page += '<ul>'
+        for (exp,url) in exp_choices_map[proj]:
+            #exp_page += '<li>'
+            exp_page += '<a href="'+ url +'">'+exp+'</a>'
+            #exp_page += '</br>'
+            #exp_page += '</li>'
+        #exp_page += '</ul>'
+        exp_page += '</div>'
+        
+    exp_page += '</div>'
     
-    for key in exp_map_keys:
-        if key == '': continue
-        exp_choices_map[key].sort()
-        exp_choices.append(('CHOICES', (key+' >>', exp_choices_map[key])))
-    if '' in exp_map_keys:
-        exp_choices_map[''].sort()
-        exp_choices += exp_choices_map['']
+    #exp_choices = []
+    #exp_map_keys = exp_choices_map.keys()
+    #exp_map_keys.sort()
     
+    #for key in exp_map_keys:
+    #    if key == '': continue
+    #    exp_choices_map[key].sort()
+    #    exp_choices.append(('CHOICES', (key+' >>', exp_choices_map[key])))
+    #if '' in exp_map_keys:
+    #    exp_choices_map[''].sort()
+    #    exp_choices += exp_choices_map['']
+    
+    #menu_right = [
+    #    ('CHOICES', (exp_selection, exp_choices))
+    #]
     menu_right = [
-        ('CHOICES', (exp_selection, exp_choices))
+        ('CHOICES', ('Experiment', [('DIV', exp_page)]))
     ]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)

@@ -215,9 +215,9 @@
                   li.style.width = "100%";
                   var item = document.createElement("a");
                   item.onclick = function() {
-		      activate_pkg(pkg);
+                      activate_pkg(pkg);
                       document.getElementById("pkg-value").innerHTML = pkg;
-		  };
+                  };
                   item.style.width = "100%";
                   item.style.textAlign = "center";
                   item.appendChild(document.createTextNode(pkg));
@@ -556,10 +556,10 @@
   <div class="ui-layout-west">
     <div>
       <ul class="menu">
-	<li style="width:100%;">
-	  <a id='pkg-value'></a>
-	  <ul id='pkg-selection'></ul>
-	</li>
+      <li style="width:100%;">
+        <a id='pkg-value'></a>
+        <ul id='pkg-selection'></ul>
+      </li>
       </ul>
     </div>
     <div>

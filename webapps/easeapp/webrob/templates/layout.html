@@ -49,7 +49,7 @@
     </div>
   </div>
   
-  <div class="container" id="container" style="padding-left:15px; margin-top: 59px;">
+  <div class="container" id="container">
     {% block content %}{% endblock %}
     
     {% if show_south_pane %}
@@ -101,10 +101,15 @@
   <script type="text/javascript">
     function add_menu_item(menu, value, href) {
         var li = document.createElement("li");
-        var item = document.createElement("a");
-        item.href = href;
-        item.appendChild(document.createTextNode(value));
-        li.appendChild(item);
+        if(value == 'DIV') {
+            li.innerHTML = href;
+        }
+        else {
+            var item = document.createElement("a");
+            item.href = href;
+            item.appendChild(document.createTextNode(value));
+            li.appendChild(item);
+        }
         menu.appendChild(li);
         return li;
     };
