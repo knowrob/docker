@@ -166,34 +166,13 @@ def menu():
     exp_page = '<div class="mega_menu">'
     for proj in exp_choices_map.keys():
         exp_page += '<div class="mega_menu_column">'
-        exp_page += '<h3><img height="48" src="static/icons/'+proj+'.png" />'+proj+'</h3>'
+        exp_page += '<h3><img height="48" src="/knowrob/static/icons/'+proj+'.png" />'+proj+'</h3>'
         
-        #exp_page += '<ul>'
         for (exp,url) in exp_choices_map[proj]:
-            #exp_page += '<li>'
             exp_page += '<a href="'+ url +'">'+exp+'</a>'
-            #exp_page += '</br>'
-            #exp_page += '</li>'
-        #exp_page += '</ul>'
         exp_page += '</div>'
-        
     exp_page += '</div>'
     
-    #exp_choices = []
-    #exp_map_keys = exp_choices_map.keys()
-    #exp_map_keys.sort()
-    
-    #for key in exp_map_keys:
-    #    if key == '': continue
-    #    exp_choices_map[key].sort()
-    #    exp_choices.append(('CHOICES', (key+' >>', exp_choices_map[key])))
-    #if '' in exp_map_keys:
-    #    exp_choices_map[''].sort()
-    #    exp_choices += exp_choices_map['']
-    
-    #menu_right = [
-    #    ('CHOICES', (exp_selection, exp_choices))
-    #]
     menu_right = [
         ('CHOICES', ('Experiment', [('DIV', exp_page)]))
     ]
