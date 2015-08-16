@@ -3,51 +3,53 @@
 {% block content_inner %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field %}
 
-<div class="content-box">
-<div class="login-box"><div class="login-box-inner">
-  <h1>{%trans%}Please sign up{%endtrans%}</h1>
-  <form action="" method="POST" novalidate formnovalidate class="form" role="form">
-    {{ form.hidden_tag() }}
+<div class="page-centered">
+    <div id="page-body">
+        <div class="content-box" id="register-box">
+            <h1 class="content-box-header">{%trans%}Please fill out{%endtrans%}</h1>
+            <form action="" method="POST" novalidate formnovalidate class="form" role="form">
+                {{ form.hidden_tag() }}
 
-    <div class="row">
-        <div class="text-right" id="already-registered-link">
-            {% if user_manager.enable_forgot_password %}
-                <a href="{{ url_for('user.login') }}" tabindex='195'>
-                        {%trans%}Already registered? Sign in.{%endtrans%}</a>
-            {% endif %}
+                <div class="row">
+                    <div class="field-hint" id="already-registered-link">
+                        {% if user_manager.enable_forgot_password %}
+                            <a href="{{ url_for('user.login') }}" tabindex='195'>
+                                    {%trans%}Already registered? Sign in.{%endtrans%}</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Username or Email #}
+                {% set field = form.username %}
+                <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                    <input placeholder="Name" class="form-control" id="username" name="username" type="text" value="" required autofocus />
+                </div>
+                
+                {% if user_manager.enable_email and user_manager.enable_username %}
+                    {% set field = form.email %}
+                    <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                        <input placeholder="Email" class="form-control" id="email" name="email" type="text" value="" required />
+                    </div>
+                {% endif %}
+
+                {# Password field #}
+                {% set field = form.password %}
+                <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                    <input placeholder="Password" class="form-control" id="password" name="password" type="password" value="" required />
+                </div>
+                {% if user_manager.enable_retype_password %}
+                    <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                        <input placeholder="Retype Password" class="form-control" id="retype_password" name="retype_password" type="password" value="" required />
+                    </div>
+                {% endif %}
+
+                <button id="register-button" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+            </form>
+        </div>
+        <div id="video-box">
+            <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
         </div>
     </div>
-
-    {# Username or Email #}
-    {% set field = form.username %}
-    <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
-        <input placeholder="Name" class="form-control" id="username" name="username" type="text" value="" required autofocus />
-    </div>
-    
-    {% if user_manager.enable_email and user_manager.enable_username %}
-        {% set field = form.email %}
-        <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
-            <input placeholder="Email" class="form-control" id="email" name="email" type="text" value="" required />
-        </div>
-    {% endif %}
-
-    {# Password field #}
-    {% set field = form.password %}
-    <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
-        <input placeholder="Password" class="form-control" id="password" name="password" type="password" value="" required />
-    </div>
-    {% if user_manager.enable_retype_password %}
-        <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
-            <input placeholder="Retype Password" class="form-control" id="retype_password" name="retype_password" type="password" value="" required />
-        </div>
-    {% endif %}
-
-    <button id="register-button" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-  </form>
-</div></div>
-<div class="video-box"><div class="video-box-inner">
-  <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
-</div></div>
 </div>
 
 {% endblock %}

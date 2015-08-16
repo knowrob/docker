@@ -4,6 +4,37 @@
   <script type="text/javascript">
     
     var isStreaming = false;
+    var videoQuery;
+    var videoFile;
+    
+    function init_video_divs () {
+      try{
+        videoFile = "{% if exp_query_file
+            %}{{ '/knowrob/static/experiments/video/'+exp_query_file }}{%
+        else
+            %}{{ '/knowrob/static/experiments/video/queries.json' }}{%
+        endif %}";
+        videoQuery = new XMLHttpRequest
+        videoQuery.open("GET", videoFile, false);
+        videoQuery.send(null);
+        if(videoQuery.responseText == '' ||  videoQuery.responseText == null || videoQuery.status == 404 || videoQuery.status == 403)
+        {
+          videoQuery.open("GET", '/knowrob/static/experiments/video/video.json', false);
+          videoQuery.send(null);
+        }
+
+        var querylist = JSON.parse(videoQuery.responseText);
+        var episodeSelect = document.getElementById('replay-episode-selection');
+        if (episodeSelect !== null) {
+           for (var i = 0; i < querylist.video.length; i++) {
+            episodeSelect.options[episodeSelect.options.length] = new Option(querylist.video[i].name, i);
+          }
+        }
+      }
+      catch(e) {
+        console.warn(e);
+      }
+    };
     
     function setup_video_query() {
         var userQuery = ace.edit('user_query');
@@ -24,7 +55,67 @@
             highlightGutterLine: false,
             enableBasicAutocompletion: true
         });
-    }
+    };
+
+    // fill the video divs with json data from url
+    function update_video_divs() {
+      try{
+        var pictureUrl = '/knowrob/summary_data/' + videoFile.replace('/knowrob/static/experiments/video/', '').replace('.json', '.jpg');
+        var querylist = JSON.parse(videoQuery.responseText);
+
+        var sumdiv = document.getElementById('summary');
+        var sumheaderdiv = document.getElementById('summary_header');
+        
+        var initdiv = document.getElementById('init_query');
+        var userdiv = document.getElementById('user_query');
+        var firstrange = document.getElementById('replay-start-time');
+        var secondrange = document.getElementById('replay-end-time');
+        var expselect = document.getElementById('replay-episode-selection');
+        var selectedExperiment = expselect.options[expselect.selectedIndex].value;
+        if(selectedExperiment > -1){
+          if(initdiv !== null) {
+            ace.edit('init_query').setValue(querylist.video[selectedExperiment].init);
+          }
+          if(initdiv !== null && userdiv !== null) {
+            ace.edit('user_query').setValue(querylist.video[selectedExperiment].user);
+          }
+          if(firstrange !== null) {
+            firstrange.min = querylist.video[selectedExperiment].start;
+            firstrange.max = querylist.video[selectedExperiment].end;
+            firstrange.value = querylist.video[selectedExperiment].start;
+          }
+          if(secondrange !== null) {
+            secondrange.min = querylist.video[selectedExperiment].start;
+            secondrange.max = querylist.video[selectedExperiment].end;
+            secondrange.value = querylist.video[selectedExperiment].end;
+          }
+          
+          update_start_time();
+          update_end_time();
+          
+          if(sumdiv !== null && typeof(querylist.video[selectedExperiment].summary) != "undefined" ) {
+            var http = new XMLHttpRequest();
+            http.open('HEAD', pictureUrl, false);
+            http.send();
+            if (http.status !== 404){
+               sumheaderdiv.innerHTML = 'Summary';
+               sumdiv.innerHTML = '<img class="picture" src="'+pictureUrl+'" width="205" height="180"/>';
+            }
+            else if(typeof(querylist.video[selectedExperiment].summary) != "undefined" ){
+               var image_creator_prolog_engine = this.new_pl_client();
+               var regQuery = querylist.video[selectedExperiment].summary;
+               image_creator_prolog_engine.jsonQuery(regQuery, function(result) {
+                  sumheaderdiv.innerHTML = 'Summary';
+                  sumdiv.innerHTML = '<img class="picture" src="'+pictureUrl+'" width="205" height="180"/>'; 
+               }); 
+            }
+          }
+        }
+      }
+      catch(e) {
+        console.warn(e);
+      }
+    };
     
     function format_date(unix_timestamp) {
         // create a new javascript Date object based on the timestamp
@@ -36,14 +127,26 @@
         var minutes = "0" + date.getMinutes();
         // seconds part from the timestamp
         var seconds = "0" + date.getSeconds();
-
         // will display time in 10:30:23 format
         return hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
-    }
+    };
+    
+    function update_start_time() {
+        document.getElementById("replay-start-value").innerHTML =
+            format_date(document.getElementById("replay-start-time").value);
+    };
+    function update_end_time() {
+        document.getElementById("replay-end-value").innerHTML =
+            format_date(document.getElementById("replay-end-time").value);
+    };
+    function update_time_values() {
+        update_start_time();
+        update_end_time();
+    };
     
     function start_streaming() {
-      var t0  = parseInt(document.getElementById("start_time").value, 10);
-      var t1  = parseInt(document.getElementById("end_time").value, 10);
+      var t0  = parseInt(document.getElementById("replay-start-time").value, 10);
+      var t1  = parseInt(document.getElementById("replay-end-time").value, 10);
       var t = t0;
       
       // Clear the canvas and perform a initial prolog query (for spawning the semantic map, ...)
@@ -55,7 +158,7 @@
         isStreaming = true;
       
         var video_query = ace.edit('user_query').getValue();
-        var fps = parseInt(document.getElementById("fps").value, 10);
+        var fps = parseInt(document.getElementById("replay-fps").value, 10);
         var step_sec = 1.0/fps;
         var frame_number = 1;
       
@@ -147,16 +250,31 @@
     
     function stop_streaming() {
       isStreaming = false;
-    }
+    };
+    
+    function toggle_content(imageId, divId) {
+      var obj = document.getElementById(divId);
+      var img = document.getElementById(imageId);
+      if(obj.className == "form hidden-form") {
+        obj.className = "form";
+        img.src = "/static/images/shade.png";
+      }
+      else {
+        obj.className = "form hidden-form";
+        img.src = "/static/images/unshade.png";
+      }
+    };
 
     $(document).ready(function () {
       knowrob.setup_query_field();
       setup_video_query();
-      document.getElementById("currentRange").value = document.getElementById("start_time").value + " - " + document.getElementById("end_time").value;
+      init_video_divs();
+      update_start_time();
+      update_end_time();
+      
       //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
 
-      
-      $('#container').layout({
+      $('#page').layout({
         stateManagement__enabled: true,
         south: {
           minSize: 60
@@ -188,32 +306,29 @@
           }
         }
       });
-      $("#start_time").on("change", 
-   	function(){
-		if(document.getElementById("start_time").value > document.getElementById("end_time").value)
-		{
-			document.getElementById("start_time").value = document.getElementById("end_time").value - 1;
-		}
-		$( "#currentRange" ).val(document.getElementById("start_time").value + " - " + document.getElementById("end_time").value )
-	});
-      $("#end_time").on("change", 
-   	function(){
-		if(document.getElementById("start_time").value > document.getElementById("end_time").value)
-		{
-			document.getElementById("end_time").value = document.getElementById("start_time").value + 1;
-		}
-		$( "#currentRange" ).val(document.getElementById("start_time").value + " - " + document.getElementById("end_time").value )
-	});
+      
+      $("#replay-start-time").on("change", function(){
+        if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value){
+            document.getElementById("replay-start-time").value = document.getElementById("replay-end-time").value - 1;
+        }
+        update_start_time();
+      });
+      $("#replay-end-time").on("change", function(){
+        if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value) {
+            document.getElementById("replay-end-time").value = document.getElementById("replay-start-time").value + 1;
+        }
+        update_end_time();
+      });
       knowrob.resize_canvas();
     });
   </script>
   
-    <div class="ui-layout-center" id="editor-container">
+  <div class="ui-layout-center" id="replay-canvas">
       <div id="markers"></div>
       <div id="tasktree"></div> 
-    </div>
+  </div>
 
-    <div class="ui-layout-west" style="background-color:#dadada;">
+  <div class="ui-layout-west" id="replay-layout-west">
       <div id="console" style="display: none;">
         <div id="console_top">
           <div id="history"></div>
@@ -227,93 +342,80 @@
           </div>
         </div>
       </div>
+      
       <div id="library" style="display: none;">
         <select onclick="knowrob.add_selected_to_queryform('examplequery')" 
-          size="20" name="examplequery" id="examplequery"><option value=0></option>
+          size="20" name="examplequery" id="examplequery">
+          <option value=0></option>
         </select>
       </div>
-      <div id="vid_properties">
-        <table id="vid_table">
-        <tr> 
-	  <th><label for="experiment_select">Plan:</label>
-	  <select id="experiment_select" onchange="knowrob.update_video_divs(knowrob.experimentSelect, knowrob.initQueryDiv, knowrob.userQueryDiv, knowrob.minTimeRange, knowrob.maxTimeRange, knowrob.videoFile, knowrob.summaryImageDiv, knowrob.summaryHeaderDiv)">
-              <option value=-1>Choose a plan execution</option>
-          </select>
-	</tr>
-        <tr> 
-	  <th><label for="amount">Time range:</label>
-	  <input type="text" id="currentRange" readonly style="border:0; color:#f6931f; font-weight:bold;"></th>
-	</tr>
-        <tr>
-          <th>Start Time</th>
-        </tr>
-        <tr>
-	  <td><input id="start_time" type="range" min="0" max="0" value="0"></td>
-          <!--
-          <td><input type="number" id="startTime" value="1398864739"></td>
-          -->
-          <!--<td><input type="number" id="startTime" value="1396512584"></td>
-	  -->
-        </tr>
-        <tr>
-          <th>End Time</th>
-        </tr>
-        <tr>
-	  <td><input id="end_time" type="range" min="0" max="0" value="0"></td>
-          <!--
-          <td><input type="number" id="endTime" value="1398864737"></td>
-          -->
-	  <!--
-          <td><input type="number" id="endTime" value="1396512603"></td>
-	  -->
-        </tr>
-        <tr>
-          <th>Frames Per Second</th>
-        </tr>
-        <tr>
-          <td><input type="number" id="fps" value="6"></td>
-        </tr>
-        <tr>
-          <th>Initial Query</th>
-        </tr>
-        <tr>
-<!--
-          <td><div id="init_query">mng_db('mocap'),
-owl_parse('package://iai_semantic_maps/owl/room.owl'),
-owl_parse('package://knowrob_srdl/owl/xsens-human.owl'),
-load_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl'),
-add_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j').</div></td>
--->
-          <td><div id="init_query"></div></td>
-        </tr>
-        <tr>
-          <th>Animation Query</th>
-        </tr>
-        <tr>
-<!--
-          <td><div id="user_query">add_stickman_visualization(xsens:'XSensHuman1', T).</div></td>
--->
-          <td><div id="user_query"></div></td>
-        </tr>
-        <tr>
-           <th><div id="hidden_tasktree_img_div"></div></th>
-        </tr>
-	<tr>
-           <th><div id="summary_header"></div></th>
-        </tr>
-	<tr>
-	    <td><div id="summary"></div></td>
-	</tr>
-        </table>
+   
+      <!-- Replay Confiduration area -->
+      <div class="content-box replay-box" id="replay-selection-box">
+          <h1 class="content-box-header" onclick="toggle_content('replay-selection-toggle', 'replay-episode-form')">
+            <image src="/static/images/shade.png"
+                   class="content-box-toggle"
+                   id="replay-selection-toggle"/> 
+            <a href="#">Episode Selection</a>
+          </h1>
+          <form id="replay-episode-form" action="" class="form" role="form">
+              <div id="user-field" class="form-group">
+                  <select id="replay-episode-selection" onchange="update_video_divs()">
+                    <option value=-1>Choose a plan execution</option>
+                  </select>
+              </div>
+          </form>
       </div>
-      <div id="vid_bottom">
-        <div id="vid_buttons">
-          <ul class="query_button_group vid_button_group">
-            <li><a href="#" class="vid_button" id="btn_play" onclick="start_streaming()">Start</a></li>
-            <li><a href="#" class="vid_button" id="btn_stop" onclick="stop_streaming()">Stop</a></li>
-          </ul>
-        </div>
+          
+      <div class="content-box replay-box" id="replay-configuration-box">
+          <h1 class="content-box-header" onclick="toggle_content('replay-configuration-toggle', 'replay-configuration-form')">
+            <image src="/static/images/unshade.png"
+                   class="content-box-toggle"
+                   id="replay-configuration-toggle"/>
+            <a href="#">Replay Configuration</a>
+          </h1>
+          <form id="replay-configuration-form" action="" class="form hidden-form" role="form" onsubmit="return false">
+              <div id="user-field" class="form-group">
+                  <label for="replay-start-time">Start Time</label>
+                  <input id="replay-start-time" type="range" min="0" max="0" value="0" oninput="update_start_time()">
+                  <div id="replay-start-value">00:00</div>
+              </div>
+              
+              <div id="user-field" class="form-group">
+                  <label for="replay-end-time">End Time</label>
+                  <input id="replay-end-time" type="range" min="0" max="0" value="0" oninput="update_end_time()">
+                  <div id="replay-end-value">00:00</div>
+              </div>
+              
+              <div id="user-field" class="form-group">
+                  <label for="replay-fps">Frames Per Second</label>
+                  <input id="replay-fps" type="number" id="fps" value="6">
+              </div>
+              
+              <div id="user-field" class="form-group">
+                  <label for="init_query">Initial Query</label>
+                  <div id="init_query"></div>
+              </div>
+              
+              <div id="user-field" class="form-group">
+                  <label for="user_query">Animation Query</label>
+                  <div id="user_query"></div>
+              </div>
+          </form>
       </div>
-    </div>
+          
+      <div class="content-box replay-box" id="replay-panel-box">
+          <h1 class="content-box-header" onclick="toggle_content('replay-panel-toggle', 'replay-panel-form')">
+            <image src="/static/images/unshade.png"
+                   class="content-box-toggle"
+                   id="replay-panel-toggle"/>
+            <a href="#">Replay Panel</a>
+          </h1>
+          <form id="replay-panel-form" action="" class="form hidden-form" role="form" onsubmit="return false">
+              <button class="btn btn-lg btn-primary btn-block" onclick="start_streaming()">Start</button>
+              <button class="btn btn-lg btn-primary btn-block" onclick="stop_streaming()">Stop</button>
+          </form>
+      </div>
   </div>
+
 {% endblock %}

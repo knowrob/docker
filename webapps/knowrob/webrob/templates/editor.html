@@ -14,7 +14,7 @@
   <script type="text/javascript">
     $(document).ready(function () {
       init();
-      $('#container').layout({
+      $('#page').layout({
         south: {
           minSize: 75
         },
@@ -214,6 +214,7 @@
                   var li = document.createElement("li");
                   li.style.width = "100%";
                   var item = document.createElement("a");
+                  item.href = "#";
                   item.onclick = function() {
                       activate_pkg(pkg);
                       document.getElementById("pkg-value").innerHTML = pkg;
@@ -528,14 +529,14 @@
 {% endblock %}
 
 {% block _menu %}
-  <li><a>Package</a><ul>
+  <li class="submenu"><a>Package</a><ul>
     <li><a href="#" onclick="new_pkg();">New</a></li>
     <li><a href="#" onclick="upload_pkg();">Upload</a></li>
     <li><a href="#" onclick="download_pkg();">Download</a></li>
     <li><a href="#" onclick="delete_pkg();">Delete</a></li>
     <li><a href="#" onclick="consult_pkg();">Consult</a></li>
   </ul></li>
-  <li><a>File</a><ul>
+  <li class="submenu"><a>File</a><ul>
     <li><a href="#" onclick="new_file();">New</a></li>
     <li><a href="#" onclick="upload_file();">Upload</a></li>
     <li><a href="#" onclick="save_file();">Save</a></li>
@@ -555,12 +556,10 @@
 
   <div class="ui-layout-west">
     <div>
-      <ul class="menu">
-      <li style="width:100%;">
-        <a id='pkg-value'></a>
+      <ul class="menu pkg-menu"><li>
+        <a href="#" id='pkg-value'></a>
         <ul id='pkg-selection'></ul>
-      </li>
-      </ul>
+      </li></ul>
     </div>
     <div>
       <ul id="file-list"></ul>

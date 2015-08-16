@@ -133,13 +133,13 @@ def menu():
     
     menu_left = [
         ('Knowledge Base', knowrobUrl),
-        ('Memory Replay',  knowrobUrl+'video'),
+        ('Episode Replay',  knowrobUrl+'video'),
         ('Prolog Editor',  knowrobUrl+'editor')
     ]
     
     if current_user.has_role('ADMIN'):
         menu_left.append(
-            ('CHOICES', ('Admin', [('CHOICES', ('Knowrob >>', [
+            ('CHOICES', ('Admin', [('CHOICES', ('Knowrob', [
                 ('Tutorials', '/knowrob/admin/tutorials')]))]))
         )
     
@@ -163,18 +163,27 @@ def menu():
         
         exp_choices_map[menu].append((exp, exp_url))
     
-    exp_page = '<div class="mega_menu">'
+    exp_page = '<div class="mega_menu" id="episode_selection">'
     for proj in exp_choices_map.keys():
-        exp_page += '<div class="mega_menu_column">'
-        exp_page += '<h3><img height="48" src="/knowrob/static/icons/'+proj+'.png" />'+proj+'</h3>'
+        exp_page += '<div class="mega_menu_column" id="episodes_'+proj+'">'
+        exp_page += '<h3 id="project_title"><img height="48" src="/knowrob/static/icons/'+proj+'.png" />'+proj+'</h3>'
         
-        for (exp,url) in exp_choices_map[proj]:
-            exp_page += '<a href="'+ url +'">'+exp+'</a>'
+        platform_and_name = map(lambda (s,url): (s.split('-'),url), exp_choices_map[proj])
+        platforms = map(lambda (s,_): s[0].split(','), platform_and_name)
+        platforms_flat = list(set([val for sublist in platforms for val in sublist]))
+        platforms_flat.sort()
+        for p in platforms_flat:
+            exp_page += '<h4 id="platform_title">'+p+'</h4>'
+            for i in range(len(platform_and_name)):
+                if not p in platforms[i]: continue
+                (name,url) = platform_and_name[i]
+                exp_page += '<a href="'+ url +'">'+'-'.join(name[1:])+'</a>'
+        
         exp_page += '</div>'
     exp_page += '</div>'
     
     menu_right = [
-        ('CHOICES', ('Experiment', [('DIV', exp_page)]))
+        ('CHOICES', ('Episode Selection', [('DIV', exp_page)]))
     ]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)

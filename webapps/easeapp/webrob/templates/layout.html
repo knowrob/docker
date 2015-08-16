@@ -32,9 +32,9 @@
   <div class="metanav">
     <div class="metanav_left">
     {% if current_user.is_authenticated() %}
-      <ul class="menu" id="menu_left" style="float: left;">
+      <ul class="menu aligned-left" id="dynamic-menu-left">
       </ul>
-      <ul class="menu" id="menu_left_static" style="float: left;">
+      <ul class="menu aligned-left" id="static-menu-left">
         {% block menu %}{% endblock %}
       </ul>
     {% endif %}
@@ -43,13 +43,13 @@
       {% if not current_user.is_authenticated() %}
         <a href="{{ url_for('user.login') }}">Sign in</a>
       {% else %}
-        <ul class="menu" id="menu_right" style="float: right;">
+        <ul class="menu aligned-right" id="dynamic-menu-right">
         </ul>
       {% endif %}
     </div>
   </div>
   
-  <div class="container" id="container">
+  <div class="page" id="page">
     {% block content %}{% endblock %}
     
     {% if show_south_pane %}
@@ -103,6 +103,8 @@
         var li = document.createElement("li");
         if(value == 'DIV') {
             li.innerHTML = href;
+            li.className = 'zero_size';
+            menu.style.border = 'none';
         }
         else {
             var item = document.createElement("a");
@@ -127,6 +129,7 @@
         var submenu = document.createElement("ul");
         var li = document.createElement("li");
         var item = document.createElement("a");
+        li.className = 'submenu';
         item.href = "#";
         item.appendChild(document.createTextNode(value));
         li.appendChild(item);
@@ -137,10 +140,10 @@
     
     function add_common_menu_items(left_menu, right_menu, application_name, application_list) {
         {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
-            handle_webapp_menu(left_menu, ["CHOICES", ["Admin", [
+            handle_webapp_menu(left_menu, ["CHOICES", ["Admin", [[ "CHOICES", ["User Management", [
                     ["Roles", "/admin/roles"],
                     ["Users", "/admin/users"]
-            ]]]);
+            ]]]]]]);
         {% endif %}
         
         if(left_menu) {
@@ -178,11 +181,11 @@
     };
     
     function update_menu(application_name, application_list) {
-        var left_menu  = document.getElementById("menu_left");
-        var right_menu = document.getElementById("menu_right");
+        var left_menu  = document.getElementById("dynamic-menu-left");
+        var right_menu = document.getElementById("dynamic-menu-right");
         
-        if(left_menu)  $('#menu_left').empty();
-        if(right_menu) $('#menu_right').empty();
+        if(left_menu)  $('#dynamic-menu-left').empty();
+        if(right_menu) $('#dynamic-menu-right').empty();
         
         if(application_name) {
             $.ajax({
@@ -203,6 +206,55 @@
                         }
                     }
                     add_common_menu_items(left_menu, right_menu, application_name, application_list);
+                    
+                    // Resize menus
+                    var menus = document.getElementsByClassName('mega_menu');
+                    for(var i = 0; i < menus.length; i++) {
+                        var m = menus[i];
+                        var padding = 12; // TODO: lookup from CSS
+                        var absWidth = padding;
+                        var numRows = Math.trunc(Math.sqrt(m.childNodes.length));
+                        
+                        for(var j = 0; j < m.childNodes.length; j++) {
+                            absWidth += m.childNodes[j].clientWidth;
+                        }
+                        absWidth /= numRows;
+                        // TODO ensure that absWidth is less then window width
+                        
+                        var targetWidth = padding;
+                        for(var j = 0; j < m.childNodes.length; j++) {
+                            targetWidth += m.childNodes[j].clientWidth;
+                            if(targetWidth>=absWidth) break;
+                        }
+                        document.getElementById(m.id).style.width = targetWidth+'px';
+                        
+                        var menuBar = m.parentNode.parentNode.parentNode;
+                        var menuBarWidth = -menuBar.clientWidth;
+                        document.getElementById(m.id).style.right = menuBarWidth+'px';
+                        console.log($(menuBar).css('margin-right'));
+                        
+                        // Set row heights
+                        targetWidth = padding;
+                        var maxRowHeight = 0;
+                        var rowStartIndex = 0;
+                        var setHeights = function(i, j, height) {
+                            for(var k = i; k <= j; k++) {
+                                document.getElementById(m.childNodes[k].id).style.height = height+'px';
+                            }
+                        };
+                        for(var j = 0; j < m.childNodes.length; j++) {
+                            targetWidth += m.childNodes[j].clientWidth;
+                            maxRowHeight = Math.max(maxRowHeight, m.childNodes[j].clientHeight);
+                            if(targetWidth>=absWidth) {
+                                targetWidth = padding;
+                                setHeights(rowStartIndex, j, maxRowHeight);
+                                rowStartIndex = j+1;
+                                maxRowHeight = 0;
+                            }
+                        }
+                        setHeights(rowStartIndex, j-1, maxRowHeight);
+                        
+                    }
                 }
             }).done( function (request) {});
         }
