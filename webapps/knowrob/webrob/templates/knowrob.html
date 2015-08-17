@@ -76,7 +76,7 @@
       var libraryFile = "{% if exp_query_file
           %}{{ '/knowrob/static/experiments/queries/'+exp_query_file }}{%
       else
-          %}{{ '/knowrob/static/experiments/queries/queries.json' }}{%
+          %}{{ undefined }}{%
       endif %}";
       
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');

@@ -24,10 +24,23 @@
         }
 
         var querylist = JSON.parse(videoQuery.responseText);
-        var episodeSelect = document.getElementById('replay-episode-selection');
+        var episodeSelect = document.getElementById('replay-episode-list');
         if (episodeSelect !== null) {
            for (var i = 0; i < querylist.video.length; i++) {
-            episodeSelect.options[episodeSelect.options.length] = new Option(querylist.video[i].name, i);
+                  var episode = querylist.video[i].name;
+                  var li = document.createElement("li");
+                  li.style.width = "100%";
+                  var item = document.createElement("a");
+                  item.href = "#";
+                  item.onclick = function() {
+                      document.getElementById("replay-episode-value").innerHTML = episode;
+                      replay_plan_selected();
+                  };
+                  item.style.width = "100%";
+                  item.style.textAlign = "center";
+                  item.appendChild(document.createTextNode(episode));
+                  li.appendChild(item);
+                  episodeSelect.appendChild(li);
           }
         }
       }
@@ -61,7 +74,6 @@
     function update_video_divs() {
       try{
         var pictureUrl = '/knowrob/summary_data/' + videoFile.replace('/knowrob/static/experiments/video/', '').replace('.json', '.jpg');
-        var querylist = JSON.parse(videoQuery.responseText);
 
         var sumdiv = document.getElementById('summary');
         var sumheaderdiv = document.getElementById('summary_header');
@@ -70,30 +82,40 @@
         var userdiv = document.getElementById('user_query');
         var firstrange = document.getElementById('replay-start-time');
         var secondrange = document.getElementById('replay-end-time');
-        var expselect = document.getElementById('replay-episode-selection');
-        var selectedExperiment = expselect.options[expselect.selectedIndex].value;
-        if(selectedExperiment > -1){
+        var expselect = document.getElementById('replay-episode-value');
+        var selectedExperiment = expselect.innerHTML;
+        
+        var selection = undefined;
+        var querylist = JSON.parse(videoQuery.responseText);
+        for(var i=0; i<querylist.video.length; i++) {
+            if(querylist.video[i].name == selectedExperiment) {
+                selection = querylist.video[i];
+                break;
+            }
+        }
+        
+        if(selection){
           if(initdiv !== null) {
-            ace.edit('init_query').setValue(querylist.video[selectedExperiment].init);
+            ace.edit('init_query').setValue(selection.init);
           }
           if(initdiv !== null && userdiv !== null) {
-            ace.edit('user_query').setValue(querylist.video[selectedExperiment].user);
+            ace.edit('user_query').setValue(selection.user);
           }
           if(firstrange !== null) {
-            firstrange.min = querylist.video[selectedExperiment].start;
-            firstrange.max = querylist.video[selectedExperiment].end;
-            firstrange.value = querylist.video[selectedExperiment].start;
+            firstrange.min = selection.start;
+            firstrange.max = selection.end;
+            firstrange.value = selection.start;
           }
           if(secondrange !== null) {
-            secondrange.min = querylist.video[selectedExperiment].start;
-            secondrange.max = querylist.video[selectedExperiment].end;
-            secondrange.value = querylist.video[selectedExperiment].end;
+            secondrange.min = selection.start;
+            secondrange.max = selection.end;
+            secondrange.value = selection.end;
           }
           
           update_start_time();
           update_end_time();
           
-          if(sumdiv !== null && typeof(querylist.video[selectedExperiment].summary) != "undefined" ) {
+          if(sumdiv !== null && typeof(selection.summary) != "undefined" ) {
             var http = new XMLHttpRequest();
             http.open('HEAD', pictureUrl, false);
             http.send();
@@ -101,9 +123,9 @@
                sumheaderdiv.innerHTML = 'Summary';
                sumdiv.innerHTML = '<img class="picture" src="'+pictureUrl+'" width="205" height="180"/>';
             }
-            else if(typeof(querylist.video[selectedExperiment].summary) != "undefined" ){
+            else if(typeof(selection.summary) != "undefined" ){
                var image_creator_prolog_engine = this.new_pl_client();
-               var regQuery = querylist.video[selectedExperiment].summary;
+               var regQuery = selection.summary;
                image_creator_prolog_engine.jsonQuery(regQuery, function(result) {
                   sumheaderdiv.innerHTML = 'Summary';
                   sumdiv.innerHTML = '<img class="picture" src="'+pictureUrl+'" width="205" height="180"/>'; 
@@ -264,6 +286,20 @@
         img.src = "/static/images/unshade.png";
       }
     };
+    
+    function show_replay_box(divId) {
+      var obj = document.getElementById(divId);
+      obj.className = "content-box replay-box";
+    };
+    function hide_replay_box(divId) {
+      var obj = document.getElementById(divId);
+      obj.className = "content-box replay-box replay-box-hidden";
+    };
+    function replay_plan_selected() {
+        show_replay_box('replay-configuration-box');
+        show_replay_box('replay-panel-box');
+        update_video_divs();
+    };
 
     $(document).ready(function () {
       knowrob.setup_query_field();
@@ -282,7 +318,7 @@
         west: {
           minSize: 250,
           maxSize: 750,
-          size: 500,
+          size: 300,
           onresize: function() {
             ace.edit("init_query").resize(true);
             ace.edit("user_query").resize(true);
@@ -350,66 +386,66 @@
         </select>
       </div>
    
-      <!-- Replay Confiduration area -->
       <div class="content-box replay-box" id="replay-selection-box">
           <h1 class="content-box-header" onclick="toggle_content('replay-selection-toggle', 'replay-episode-form')">
             <image src="/static/images/shade.png"
                    class="content-box-toggle"
                    id="replay-selection-toggle"/> 
-            <a href="#">Episode Selection</a>
+            <a href="#">Plan Selection</a>
           </h1>
           <form id="replay-episode-form" action="" class="form" role="form">
-              <div id="user-field" class="form-group">
-                  <select id="replay-episode-selection" onchange="update_video_divs()">
-                    <option value=-1>Choose a plan execution</option>
-                  </select>
+              <div id="replay-episode-field" class="form-group">
+                  <ul class="menu pkg-menu" id="replay-episode-selection"><li>
+                      <a href="#" id='replay-episode-value'>Choose an episode</a>
+                      <ul id='replay-episode-list'></ul>
+                  </li></ul>
               </div>
           </form>
       </div>
           
-      <div class="content-box replay-box" id="replay-configuration-box">
+      <div class="content-box replay-box replay-box-hidden" id="replay-configuration-box">
           <h1 class="content-box-header" onclick="toggle_content('replay-configuration-toggle', 'replay-configuration-form')">
             <image src="/static/images/unshade.png"
                    class="content-box-toggle"
                    id="replay-configuration-toggle"/>
-            <a href="#">Replay Configuration</a>
+            <a href="#">Settings</a>
           </h1>
           <form id="replay-configuration-form" action="" class="form hidden-form" role="form" onsubmit="return false">
-              <div id="user-field" class="form-group">
+              <div id="replay-start-time-field" class="form-group">
                   <label for="replay-start-time">Start Time</label>
                   <input id="replay-start-time" type="range" min="0" max="0" value="0" oninput="update_start_time()">
                   <div id="replay-start-value">00:00</div>
               </div>
               
-              <div id="user-field" class="form-group">
+              <div id="replay-end-time-field" class="form-group">
                   <label for="replay-end-time">End Time</label>
                   <input id="replay-end-time" type="range" min="0" max="0" value="0" oninput="update_end_time()">
                   <div id="replay-end-value">00:00</div>
               </div>
               
-              <div id="user-field" class="form-group">
+              <div id="replay-fps-field" class="form-group">
                   <label for="replay-fps">Frames Per Second</label>
                   <input id="replay-fps" type="number" id="fps" value="6">
               </div>
               
-              <div id="user-field" class="form-group">
+              <div id="init_query-field" class="form-group">
                   <label for="init_query">Initial Query</label>
                   <div id="init_query"></div>
               </div>
               
-              <div id="user-field" class="form-group">
+              <div id="user_query-field" class="form-group">
                   <label for="user_query">Animation Query</label>
                   <div id="user_query"></div>
               </div>
           </form>
       </div>
           
-      <div class="content-box replay-box" id="replay-panel-box">
+      <div class="content-box replay-box replay-box-hidden" id="replay-panel-box">
           <h1 class="content-box-header" onclick="toggle_content('replay-panel-toggle', 'replay-panel-form')">
             <image src="/static/images/unshade.png"
                    class="content-box-toggle"
                    id="replay-panel-toggle"/>
-            <a href="#">Replay Panel</a>
+            <a href="#">Replay</a>
           </h1>
           <form id="replay-panel-form" action="" class="form hidden-form" role="form" onsubmit="return false">
               <button class="btn btn-lg btn-primary btn-block" onclick="start_streaming()">Start</button>
