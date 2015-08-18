@@ -4,49 +4,27 @@
   <script type="text/javascript">
     
     var isStreaming = false;
-    var videoQuery;
-    var videoFile;
     
     function init_video_divs () {
-      try{
-        videoFile = "{% if exp_query_file
-            %}{{ '/knowrob/static/experiments/video/'+exp_query_file }}{%
-        else
-            %}{{ '/knowrob/static/experiments/video/queries.json' }}{%
-        endif %}";
-        videoQuery = new XMLHttpRequest
-        videoQuery.open("GET", videoFile, false);
-        videoQuery.send(null);
-        if(videoQuery.responseText == '' ||  videoQuery.responseText == null || videoQuery.status == 404 || videoQuery.status == 403)
-        {
-          videoQuery.open("GET", '/knowrob/static/experiments/video/video.json', false);
-          videoQuery.send(null);
-        }
-
-        var querylist = JSON.parse(videoQuery.responseText);
         var episodeSelect = document.getElementById('replay-episode-list');
-        if (episodeSelect !== null) {
-           for (var i = 0; i < querylist.video.length; i++) {
-                  var episode = querylist.video[i].name;
+        if (episodeSelect !== null && episodeData) {
+            for (var i = 0; i < episodeData.video.length; i++) {
+                  var episode = episodeData.video[i].name;
                   var li = document.createElement("li");
                   li.style.width = "100%";
                   var item = document.createElement("a");
                   item.href = "#";
                   item.onclick = function() {
                       document.getElementById("replay-episode-value").innerHTML = episode;
-                      replay_plan_selected();
+                      replay_episode_selected();
                   };
                   item.style.width = "100%";
                   item.style.textAlign = "center";
                   item.appendChild(document.createTextNode(episode));
                   li.appendChild(item);
                   episodeSelect.appendChild(li);
-          }
+            }
         }
-      }
-      catch(e) {
-        console.warn(e);
-      }
     };
     
     function setup_video_query() {
@@ -70,30 +48,21 @@
         });
     };
 
-    // fill the video divs with json data from url
-    function update_video_divs() {
-      try{
-        var pictureUrl = '/knowrob/summary_data/' + videoFile.replace('/knowrob/static/experiments/video/', '').replace('.json', '.jpg');
+    function selected_video_episode() {
+        var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
+        for(var i=0; i<episodeData.video.length; i++) {
+            if(querylist.video[i].name == selectedEpisode) return episodeData.video[i];
+        }
+        return undefined;
+    }
 
-        var sumdiv = document.getElementById('summary');
-        var sumheaderdiv = document.getElementById('summary_header');
-        
+    function update_video_divs() {
         var initdiv = document.getElementById('init_query');
         var userdiv = document.getElementById('user_query');
         var firstrange = document.getElementById('replay-start-time');
         var secondrange = document.getElementById('replay-end-time');
-        var expselect = document.getElementById('replay-episode-value');
-        var selectedExperiment = expselect.innerHTML;
         
-        var selection = undefined;
-        var querylist = JSON.parse(videoQuery.responseText);
-        for(var i=0; i<querylist.video.length; i++) {
-            if(querylist.video[i].name == selectedExperiment) {
-                selection = querylist.video[i];
-                break;
-            }
-        }
-        
+        var selection = selected_video_episode();
         if(selection){
           if(initdiv !== null) {
             ace.edit('init_query').setValue(selection.init);
@@ -114,6 +83,16 @@
           
           update_start_time();
           update_end_time();
+        }
+    };
+    
+    function update_summary_divs() {
+        // FIXME: Re-implement
+        /*
+        var pictureUrl = '/knowrob/summary_data/' + videoFile.replace('/knowrob/static/experiments/video/', '').replace('.json', '.jpg');
+
+        var sumdiv = document.getElementById('summary');
+        var sumheaderdiv = document.getElementById('summary_header');
           
           if(sumdiv !== null && typeof(selection.summary) != "undefined" ) {
             var http = new XMLHttpRequest();
@@ -132,11 +111,7 @@
                }); 
             }
           }
-        }
-      }
-      catch(e) {
-        console.warn(e);
-      }
+          */
     };
     
     function format_date(unix_timestamp) {
@@ -295,10 +270,11 @@
       var obj = document.getElementById(divId);
       obj.className = "content-box replay-box replay-box-hidden";
     };
-    function replay_plan_selected() {
+    function replay_episode_selected() {
         show_replay_box('replay-configuration-box');
         show_replay_box('replay-panel-box');
         update_video_divs();
+        update_summary_divs();
     };
 
     $(document).ready(function () {

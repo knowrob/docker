@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "date": "2015-07-18T12:00:00",
+        "name": "Motion Capturing of Pizza Preparation",
+        "description": "Lorem Ipsum.",
+        "platforms": ["Motion Capturing"],
+        "environment": "iai-kitchen",
+        "projects": ["RoboHow"],
+        "ieee-tags": [],
+        "technologies": []
+    },
     "query": [
         {
             "q": "",
@@ -65,5 +75,15 @@
             "text": "How much time is spent by human to make the experiment ?"
         }
         
-    ]
+    ],
+    "video":[
+        {
+            "name": "Motion Capturing of Pizza Preparation",
+            "initialization": "mng_db('robohow-forth'), \nregister_ros_package(knowrob_robohow), \nrdf_register_ns(forth_human, 'http://knowrob.org/kb/forth_human.owl#', [keep(true)]), \nowl_parse('package://knowrob_srdl/owl/forth_human.owl'), \nload_experiment('/home/ros/knowrob_data/logs/humans/forth/robohow/pizza0/labels.owl'), \nowl_parse('package://iai_semantic_maps/owl/kitchen.owl'), \nadd_object_with_children('http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j'), \nvisualize_forth_experiment(T).",
+            "animation": "visualize_forth_experiment(T).",
+            "start": 1430209573,
+            "end": 1430209656,
+            "summary": "true"
+        }
+     ]
 }

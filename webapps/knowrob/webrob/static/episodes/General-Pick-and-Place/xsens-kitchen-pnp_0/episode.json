@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "date": "2015-07-18T12:00:00",
+        "name": "XSENS Kitchen Pick and Place",
+        "description": "The long-term fetch and place knowledge base contains activity episodes of humans setting a table.",
+        "platforms": ["Motion Capturing"],
+        "environment": "iai-kitchen",
+        "projects": [],
+        "ieee-tags": [],
+        "technologies": []
+    },
     "query": [
         {
             "q": "",
@@ -48,5 +58,14 @@
             "q": "owl_individual_of(OBJ, knowrob:'DinnerPlate'), owl_has(EVENT, knowrob:'objectActedOn', OBJ),  owl_individual_of(EVENT, knowrob:'TakingSomething'), owl_has(EVENT,knowrob:'startTime',T0), owl_has(EVENT,knowrob:'endTime',T1), owl_has(EVENT,knowrob:'bodyPartsUsed',PART), owl_individual_of(PART, knowrob:'AnimalBodyPart'), owl_has(PART, srdl2comp:'urdfName', literal(URDF)), add_trajectory(URDF, T0, T1, 0.1).",
             "text": "What was the trajectory of endeffectors for dinner plate taking events?"
         }
+    ],
+    "video": [
+       {
+         "name": "XSENS Kitchen Pick and Place",
+         "initialization": "mng_db('mocap'), owl_parse('package://knowrob_srdl/owl/xsens-human.owl'), \nrdf_register_ns(xsens, 'http://knowrob.org/kb/xsens.owl#', [keep(true)]), \nload_experiment('/home/ros/knowrob_data/logs/humans/xsens/test/xsens.owl'), \nowl_parse('package://iai_semantic_maps/owl/room.owl'), \nadd_object_with_children('http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap_PM580j'), \nadd_stickman_visualization(xsens:'XSensHuman1', T).",
+         "animation": "add_stickman_visualization(xsens:'XSensHuman1', T).",
+         "start": 1398864710,
+         "end": 1398864753
+       }
     ]
 }

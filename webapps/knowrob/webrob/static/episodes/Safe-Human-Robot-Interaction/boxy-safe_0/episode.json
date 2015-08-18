@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "date": "2015-07-18T12:00:00",
+        "name": "Safe Boxy-Human Interaction",
+        "description": "Lorem Ipsum.",
+        "platforms": ["Boxy", "Motion Capturing"],
+        "environment": "iai-laboratory",
+        "projects": ["SAPHARI"],
+        "ieee-tags": [],
+        "technologies": []
+    },
     "query": [
         {
             "q": "",

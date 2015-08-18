@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "date": "2015-07-18T12:00:00",
+        "name": "Pancake Making Simulation",
+        "description": "Lorem Ipsum.",
+        "platforms": ["Simulation"],
+        "environment": "gazebo",
+        "projects": [],
+        "ieee-tags": [],
+        "technologies": []
+    },
     "query": [
         {
             "q": "",

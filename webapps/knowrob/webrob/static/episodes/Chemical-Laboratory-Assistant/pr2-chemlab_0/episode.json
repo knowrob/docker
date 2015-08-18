@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "date": "2015-07-18T12:00:00",
+        "name": "PR2 Chemical Assistant",
+        "description": "Our robot successfully performed several steps of a DNA extraction procedure for “Ocean Sampling Day”, an event organized by “Micro B3″, a project aiming to stimulate the analysis and indexation of the whole planetary ocean DNA.",
+        "platforms": ["PR2"],
+        "environment": "iai-chemlab",
+        "projects": ["ACAT"],
+        "ieee-tags": [],
+        "technologies": []
+    },
     "query": [
         {
             "q": "",
@@ -48,7 +58,7 @@
             "q": "owl_individual_of(_Tube, knowrob_chemlab:'Tube'),rdfs_individual_of(I, knowrob:'CRAMAction'), rdf_has(I, knowrob:'taskContext', literal(type(_,'GOAL-PIPETTE-BUTTON-PUSHED-RELEASED'))), rdf_has(I, knowrob:'endTime', T0), inside_physical('/pipette_end_effector_frame_name', _Tube, T0), rdf_has(_Tube, knowrob:'name', literal(type(_,Tube))), visualize_chemlab_scene(T0), visualize_chemlab_highlight(Tube).",
             "text": "Is the pipette inside a tube after the pipette button released? "
         },
-	{
+        {
             "q": "",
             "text": "----- Videos -----"
         },
@@ -72,5 +82,15 @@
             "q": "findall(_Goal, task_goal(_Task, _Goal), _G), sort(_G, _Goals), findall(_Goal-_DurAvg, (member(_Goal, _Goals), findall(_Duration, ( task_goal(_Task, _Goal), task_duration(_Task, _Duration) ), _Durations), sumlist(_Durations, _DurSum), length(_Durations, _Count), _DurAvg is _DurSum / _Count), _Distrib), pairs_keys_values(_Distrib, _Types, _Dur), add_diagram(durationavgdist, 'Task Duration Average', 'barchart', '', '', 350, 350, '12px', [[_Types,_Dur]]).",
             "text": "Show the average duration of task goals"
         }
-    ]
+    ],
+    "video": [
+        {
+            "name": "PR2 Chemical Assistant",
+            "initialization": "mng_db('chemlab'), \nowl_parse('package://knowrob_srdl/owl/PR2.owl'), register_ros_package(knowrob_chemlab), \nload_experiment('/home/ros/knowrob_data/logs/chemlab/dna0/cram_log.owl'), \nowl_parse('package://knowrob_chemlab/owl/chemlab_map.owl'), add_object_with_children('http://knowrob.org/kb/chemlab_map.owl#SemanticEnvironmentMap_SAsdfs'), visualize_chemlab_scene(T).",
+            "animation": "visualize_chemlab_scene(T), !, task(Tsk, T), rdf_has(Tsk, knowrob:'perceptionRequest', _Desig), \nmng_designator_props(_Desig, _DesigJava, ['TYPE'], _Type), visualize_chemlab_highlights([_Type]).",
+            "end": 1431800772,
+            "start": 1431799435,
+            "summary": "true"
+        }
+     ]
 }

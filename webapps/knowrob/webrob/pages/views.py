@@ -20,18 +20,30 @@ MAX_HISTORY_LINES = 50
 @app.route('/knowrob/static/<path:filename>')
 @login_required
 def download_static(filename):
-  return send_from_directory(os.path.join(app.root_path, "static"), filename)
+    return send_from_directory(os.path.join(app.root_path, "static"), filename)
 
 @app.route('/knowrob/knowrob_data/<path:filename>')
 @login_required
 def download_logged_image(filename):
-  return send_from_directory('/home/ros/knowrob_data/', filename)
+    return send_from_directory('/home/ros/knowrob_data/', filename)
 
 @app.route('/knowrob/summary_data/<path:filename>')
 @login_required
 def download_summary_image(filename):
-  # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
-  return send_from_directory('/home/ros/summary_data/', filename)
+    # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
+    return send_from_directory('/home/ros/summary_data/', filename)
+
+@app.route('/knowrob/episode_data/<category>/<episode>')
+@login_required
+def episode_data(category, episode):
+    return send_from_directory(os.path.join(app.root_path, "static") +
+        "/episodes/"+category+"/"+episode+"/episode.json")
+
+def load_episode_data(category, episode):
+    episode_file = os.path.join(app.root_path, "static") + "/episodes/"+category+"/"+episode+"/episode.json"
+    data = None
+    with open(episode_file) as data_file: data = json.load(data_file)
+    return data
 
 @app.route('/knowrob/tutorials/')
 @app.route('/knowrob/tutorials/<cat_id>/')
@@ -75,11 +87,31 @@ def tutorials(cat_id='getting_started', page=1):
 
     return render_template('knowrob_tutorial.html', **locals())
 
+def get_episode_url(category, episode):
+    if category is not None and episode is not None:
+        episode_url = '/knowrob/'
+        if __is_video__(): episode_url += 'video/'
+        episode_url += 'episode/'
+        if len(category)>0: episode_url += category + '/'
+        episode_url += episode
+        return episode_url
+    else:
+        return None
+
+def get_episode_download_url():
+    if 'episode-category' in session and 'episode' in session:
+        episode_url = '/knowrob/static/episodes/'
+        if len(session['episode-category'])>0: episode_url += session['episode-category'] + '/'
+        episode_url += session['episode'] + '/episode.json'
+        return episode_url
+    else:
+        return None
+    
 @app.route('/knowrob/')
 @app.route('/knowrob/hydro-knowrob-daemon')
-@app.route('/knowrob/exp/<path:exp_path>')
+@app.route('/knowrob/episode/<category>/<episode>')
 @login_required
-def knowrob(exp_path=None):
+def knowrob(category=None, episode=None):
     session['video'] = 0
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
@@ -90,22 +122,19 @@ def knowrob(exp_path=None):
     host_url = urlparse(request.host_url).hostname
 
     container_name = session['user_container_name']
-    show_south_pane = True
-    # Remember experiment selection
-    if exp_path is not None: session['exp'] = exp_path
-    # Select a query file
-    exp_query_file = None
-    if 'exp' in session:
-        exp = session['exp']
-        if exp is not None: exp_query_file = exp + '.json'
-    # TODO: Allow to select html template using a experiment configuration file
+    if category is not None:
+        session['episode-category'] = category.replace("%20", " ")
+    if episode is not None:
+        session['episode'] = episode
+    episode_url = get_episode_download_url()
+    app.logger.warn("episode URL " + str(episode_url))
 
     return render_template('knowrob_simple.html', **locals())
 
 @app.route('/knowrob/video')
-@app.route('/knowrob/video/exp/<path:exp_path>')
+@app.route('/knowrob/video/episode/<category>/<episode>')
 @login_required
-def video(exp_path=None):
+def video(category=None, episode=None):
     session['video'] = 1
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
@@ -116,13 +145,11 @@ def video(exp_path=None):
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
 
-    # Remember experiment selection
-    if exp_path is not None: session['exp'] = exp_path
-    # Select a query file
-    exp_query_file = None
-    if 'exp' in session:
-        exp = session['exp']
-        if exp is not None: exp_query_file = exp + '.json'
+    if category is not None:
+        session['episode-category'] = category.replace("%20", " ")
+    if episode is not None:
+        session['episode'] = episode
+    episode_url = get_episode_download_url()
     
     return render_template('video.html', **locals())
 
@@ -143,80 +170,85 @@ def menu():
                 ('Tutorials', '/knowrob/admin/tutorials')]))]))
         )
     
-    exp_selection = __exp_file__()
-    if exp_selection is None: exp_selection = "Experiment"
-    
     # Maps projects to list of experiments
-    exp_choices_map =  {}
-    for (submenu,exp) in __exp_list__():
-        # Find exp url
-        exp_url = knowrobUrl
-        if __is_video__(): exp_url += 'video/'
-        exp_url += 'exp/'
-        if len(submenu)>0: exp_url += submenu + '/'
-        exp_url += exp
+    episode_choices_map =  {}
+    for (category,episode) in __episode_list__():
+        episode_url = get_episode_url(category,episode)
         
         menu = ''
-        if len(submenu)>0: menu = submenu
-        if not menu in exp_choices_map:
-            exp_choices_map[menu] = []
+        if len(category)>0: menu = category
+        if not menu in episode_choices_map:
+            episode_choices_map[menu] = []
         
-        exp_choices_map[menu].append((exp, exp_url))
+        episode_choices_map[menu].append((episode, episode_url))
     
-    exp_page = '<div class="mega_menu" id="episode_selection">'
-    for proj in exp_choices_map.keys():
-        exp_page += '<div class="mega_menu_column" id="episodes_'+proj+'">'
-        exp_page += '<h3 id="project_title"><img height="48" src="/knowrob/static/icons/'+proj+'.png" />'+proj+'</h3>'
+    episode_page = '<div class="mega_menu" id="episode-selection">'
+    for category in episode_choices_map.keys():
+        cat_episodes = episode_choices_map[category]
+        cat_episodes = sorted(cat_episodes, key=lambda tup: tup[0])
+        episode_page += '<div class="mega_menu_column">'
+        episode_page += '<h3 id="category-title">'+category+'</h3>'
         
-        platform_and_name = map(lambda (s,url): (s.split('-'),url), exp_choices_map[proj])
-        platforms = map(lambda (s,_): s[0].split(','), platform_and_name)
-        platforms_flat = list(set([val for sublist in platforms for val in sublist]))
-        platforms_flat.sort()
-        for p in platforms_flat:
-            exp_page += '<h4 id="platform_title">'+p+'</h4>'
-            for i in range(len(platform_and_name)):
-                if not p in platforms[i]: continue
-                (name,url) = platform_and_name[i]
-                exp_page += '<a href="'+ url +'">'+'-'.join(name[1:])+'</a>'
+        # TODO: make this nicer
+        for (episode,url) in cat_episodes:
+            data = load_episode_data(category, episode)
+            if data is None:
+                app.logger.warn("Failed to load episode " + str((category, episode)))
+                break
+            if "meta" not in data:
+                app.logger.warn("No meta data for episode " + str((category, episode)))
+                break
+            meta = data['meta']
+            if "name" not in meta:
+                app.logger.warn("No name for episode " + str((category, episode)))
+                break
+            episode_page += '<a href="'+ url +'">'+meta['name']+'</a>'
         
-        exp_page += '</div>'
-    exp_page += '</div>'
+        episode_page += '</div>'
+    episode_page += '</div>'
+        
+    
+    #episode_page = '<div class="mega_menu" id="episode_selection">'
+    #for proj in episode_choices_map.keys():
+    #    episode_page += '<div class="mega_menu_column" id="episodes_'+proj+'">'
+    #    episode_page += '<h3 id="project_title"><img height="48" src="/knowrob/static/icons/'+proj+'.png" />'+proj+'</h3>'
+    #    
+    #    platform_and_name = map(lambda (s,url): (s.split('-'),url), episode_choices_map[proj])
+    #    platforms = map(lambda (s,_): s[0].split(','), platform_and_name)
+    #    platforms_flat = list(set([val for sublist in platforms for val in sublist]))
+    #    platforms_flat.sort()
+    #    for p in platforms_flat:
+    #        episode_page += '<h4 id="platform_title">'+p+'</h4>'
+    #        for i in range(len(platform_and_name)):
+    #            if not p in platforms[i]: continue
+    #            (name,url) = platform_and_name[i]
+    #            episode_page += '<a href="'+ url +'">'+'-'.join(name[1:])+'</a>'
+    #    
+    #    episode_page += '</div>'
+    #episode_page += '</div>'
     
     menu_right = [
-        ('CHOICES', ('Episode Selection', [('DIV', exp_page)]))
+        ('CHOICES', ('Episode Selection', [('DIV', episode_page)]))
     ]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)
-
-def __exp_menu_file__(f, category):
-    if f.endswith(".json"):
-        return (category, f[0:len(f)-len(".json")])
-    else:
-        return None
  
-def __exp_list__():
-    expList = []
-    exp_root_path = os.path.join(app.root_path, "static/experiments/queries")
+def __episode_list__():
+    episode_list = []
+    episode_root_path = os.path.join(app.root_path, "static/episodes")
     
-    for f0 in os.listdir(exp_root_path):
-        exp_path = os.path.join(exp_root_path, f0)
+    for category in os.listdir(episode_root_path):
+        category_path = os.path.join(episode_root_path, category)
+        if not os.path.isdir(category_path): continue
         
-        # Query file with submenu
-        if os.path.isdir(exp_path):
-            for f1 in os.listdir(exp_path):
-                menu_entry = __exp_menu_file__(f1, f0)
-                if menu_entry != None: expList.append(menu_entry)
-        
-        # Query file without submenu
-        else:
-            menu_entry = __exp_menu_file__(f0, '')
-            if menu_entry != None: expList.append(menu_entry)
+        for episode in os.listdir(category_path):
+            episode_list.append((category,episode))
     
-    return expList
+    return episode_list
 
-def __exp_file__():
-    if 'exp' in session:
-        return session['exp']
+def __episode_file__():
+    if 'episode' in session:
+        return session['episode']
     else:
         return None
 
@@ -226,11 +258,11 @@ def __is_video__():
     else:
         return 0
     
-@app.route('/knowrob/exp_set', methods=['POST'])
+@app.route('/knowrob/episode_set', methods=['POST'])
 @login_required
-def exp_set():
-    expName = json.loads(request.data)['experimentName']
-    session['exp'] = expName
+def episode_set():
+    episodeName = json.loads(request.data)['episodeName']
+    session['episode'] = expName
     return jsonify(result=None)
 
 @app.route('/knowrob/add_history_item', methods=['POST'])
