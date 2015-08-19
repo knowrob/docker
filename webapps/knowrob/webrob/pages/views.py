@@ -183,28 +183,39 @@ def menu():
         episode_choices_map[menu].append((episode, episode_url))
     
     episode_page = '<div class="mega_menu" id="episode-selection">'
-    for category in episode_choices_map.keys():
+    for category in sorted(episode_choices_map.keys()):
         cat_episodes = episode_choices_map[category]
         cat_episodes = sorted(cat_episodes, key=lambda tup: tup[0])
-        episode_page += '<div class="mega_menu_column">'
-        episode_page += '<h3 id="category-title">'+category+'</h3>'
+        div_id = category.lower().replace(' ', '-')
+        episode_page += '<div class="mega_menu_column" id="'+div_id+'">'
+        episode_page += '<h3 class="category-title">'+category.replace('-',' ')+'</h3>'
+        episode_page += '<div class="category-episodes">'
         
         # TODO: make this nicer
+        technology_episodes = {}
         for (episode,url) in cat_episodes:
             data = load_episode_data(category, episode)
             if data is None:
                 app.logger.warn("Failed to load episode " + str((category, episode)))
                 break
             if "meta" not in data:
-                app.logger.warn("No meta data for episode " + str((category, episode)))
+                app.logger.warn("Meta data missing for episode " + str((category, episode)))
                 break
             meta = data['meta']
-            if "name" not in meta:
-                app.logger.warn("No name for episode " + str((category, episode)))
+            if "name" not in meta or "technologies" not in meta:
+                app.logger.warn("Meta data missing for episode " + str((category, episode)))
                 break
-            episode_page += '<a href="'+ url +'">'+meta['name']+'</a>'
+            
+            for t in meta['technologies'].keys():
+                if t not in technology_episodes.keys(): technology_episodes[t] = []
+                technology_episodes[t].append((meta['name'], url))
         
-        episode_page += '</div>'
+        for t in sorted(technology_episodes.keys()):
+            episode_page += '<h4 class="technology-title">'+t+'</h4>'
+            for (name,url) in technology_episodes[t]:
+                episode_page += '<a href="'+ url +'">'+name+'</a>'
+        
+        episode_page += '</div></div>'
     episode_page += '</div>'
         
     

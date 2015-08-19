@@ -1,13 +1,18 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "PR2 Chemical Assistant",
+        "name": "PR2 assists in IAI chemlab",
         "description": "Our robot successfully performed several steps of a DNA extraction procedure for “Ocean Sampling Day”, an event organized by “Micro B3″, a project aiming to stimulate the analysis and indexation of the whole planetary ocean DNA.",
-        "platforms": ["PR2"],
-        "environment": "iai-chemlab",
         "projects": ["ACAT"],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Robotic Agents": [
+                {
+                    "model": "PR2",
+                    "version": "0.0"
+                }
+            ]
+        }
     },
     "query": [
         {

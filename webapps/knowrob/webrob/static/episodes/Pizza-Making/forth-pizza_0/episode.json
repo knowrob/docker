@@ -1,13 +1,28 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "Motion Capturing of Pizza Preparation",
+        "name": "A human makes a pizza",
         "description": "Lorem Ipsum.",
-        "platforms": ["Motion Capturing"],
-        "environment": "iai-kitchen",
         "projects": ["RoboHow"],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Motion Capturing": [
+                {
+                    "hardware": [
+                        {
+                            "name": "Kinect",
+                            "version": "0.0"
+                        }
+                    ],
+                    "software": [
+                        {
+                            "name": "FORTH",
+                            "version": "0.0"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "query": [
         {

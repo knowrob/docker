@@ -1,13 +1,34 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "Safe Boxy-Human Interaction",
+        "name": "Boxy at a workspace with a human co-worker",
         "description": "Lorem Ipsum.",
-        "platforms": ["Boxy", "Motion Capturing"],
-        "environment": "iai-laboratory",
         "projects": ["SAPHARI"],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Robotic Agents": [
+                {
+                    "model": "Boxy",
+                    "version": "0.0"
+                }
+            ],
+            "Motion Capturing": [
+                {
+                    "hardware": [
+                        {
+                            "name": "Kinect",
+                            "version": "0.0"
+                        }
+                    ],
+                    "software": [
+                        {
+                            "name": "IAI",
+                            "version": "0.0"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "query": [
         {

@@ -1,13 +1,22 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "Simulation of Pizza Preparation",
+        "name": "A human makes a pizza in simulation",
         "description": "Lorem Ipsum.",
-        "platforms": ["Simulation"],
-        "environment": "gazebo",
         "projects": ["RoboHow"],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Simulation": [
+                {
+                    "software": [
+                        {
+                            "name": "gazebo",
+                            "version": "0.0"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "query": [
         {

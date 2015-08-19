@@ -1,13 +1,28 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "XSENS Kitchen Pick and Place",
+        "name": "A human picks and places kitchen items",
         "description": "The long-term fetch and place knowledge base contains activity episodes of humans setting a table.",
-        "platforms": ["Motion Capturing"],
-        "environment": "iai-kitchen",
         "projects": [],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Motion Capturing": [
+                {
+                    "hardware": [
+                        {
+                            "name": "XSENS",
+                            "version": "0.0"
+                        }
+                    ],
+                    "software": [
+                        {
+                            "name": "XSENS",
+                            "version": "0.0"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "query": [
         {

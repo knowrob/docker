@@ -1,13 +1,18 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "Boxy Pizza Dough Rolling",
+        "name": "Boxy rolls out pizza dough",
         "description": "Lorem Ipsum.",
-        "platforms": ["Boxy"],
-        "environment": "gazebo",
         "projects": ["RoboHow"],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Robotic Agents": [
+                {
+                    "model": "Boxy",
+                    "version": "0.0"
+                }
+            ]
+        }
     },
     "query": [
         {

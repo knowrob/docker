@@ -1,13 +1,21 @@
 {
     "meta": {
         "date": "2015-07-18T12:00:00",
-        "name": "Pancake Making Simulation",
+        "name": "A human makes pancake in simulation",
         "description": "Lorem Ipsum.",
-        "platforms": ["Simulation"],
-        "environment": "gazebo",
-        "projects": [],
         "ieee-tags": [],
-        "technologies": []
+        "technologies": {
+            "Simulation": [
+                {
+                    "software": [
+                        {
+                            "name": "Gazebo",
+                            "version": "0.0"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "query": [
         {
