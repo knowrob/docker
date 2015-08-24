@@ -84,7 +84,11 @@ runContainer "ftpd_server" "-d --volumes-from ftp_data -p 21:21 stilliard/pure-f
 #docker exec -i ftpd_server pure-pw useradd openease -u ftpuser -d /home/ftpusers/openease
 #docker exec ftpd_server pure-pw mkdb
 
-runContainer "episode_data" "-v /episodes --volumes-from ftp_data busybox ln -s /home/ftpusers/openease/episodes /episodes/data"
+runContainer "episode_data" "-d --privileged \
+	-e OPENEASE_FTP_HOST=$OPENEASE_FTP_HOST \
+	-e OPENEASE_FTP_USERNAME=$OPENEASE_FTP_USERNAME \
+	-e OPENEASE_FTP_PASSWORD=$OPENEASE_FTP_PASSWORD \
+	openease/episode_data"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if nginx is running or stopped and start otherwise
