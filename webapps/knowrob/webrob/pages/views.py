@@ -36,11 +36,10 @@ def download_summary_image(filename):
 @app.route('/knowrob/episode_data/<category>/<episode>')
 @login_required
 def episode_data(category, episode):
-    return send_from_directory(os.path.join(app.root_path, "static") +
-        "/episodes/"+category+"/"+episode+"/episode.json")
+    return send_from_directory("/episodes/data/"+category+"/"+episode+"/episode.json")
 
 def load_episode_data(category, episode):
-    episode_file = os.path.join(app.root_path, "static") + "/episodes/"+category+"/"+episode+"/episode.json"
+    episode_file = "/episodes/data/"+category+"/"+episode+"/episode.json"
     data = None
     with open(episode_file) as data_file: data = json.load(data_file)
     return data

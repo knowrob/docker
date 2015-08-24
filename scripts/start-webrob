@@ -75,6 +75,18 @@ runContainer "mongo_data" "-v /data/db busybox true"
 runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_data container exists and create otherwise
+runContainer "ftp_data" "-v /home busybox true"
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if mongo_db is running or stopped and start otherwise
+runContainer "ftpd_server" "-d --volumes-from ftp_data -p 21:21 stilliard/pure-ftpd" true
+#docker exec -i ftpd_server pure-pw useradd openease -u ftpuser -d /home/ftpusers/openease
+#docker exec ftpd_server pure-pw mkdb
+
+runContainer "episode_data" "-v /episodes --volumes-from ftp_data busybox ln -s /home/ftpusers/openease/episodes /episodes/data"
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if nginx is running or stopped and start otherwise
 runContainer "nginx" "-d -p 80:80 -p 443:443 -v /etc/nginx -v $DIR/../nginx-proxy/certs:/etc/nginx/certs -t nginx" true
 

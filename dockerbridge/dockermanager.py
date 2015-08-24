@@ -127,8 +127,7 @@ class DockerManager(object):
                 self.__client.create_container(webapp_image,
                                                detach=True, tty=True, stdin_open=True,
                                                environment=env,
-                                               name=container_name,
-                                               command='python runserver.py')
+                                               name=container_name)
                 
                 # Read links and volumes from webapp_image ENV
                 inspect = self.__client.inspect_image(webapp_image)
