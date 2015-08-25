@@ -27,22 +27,22 @@ def download_static(filename):
 def download_logged_image(filename):
     return send_from_directory('/home/ros/knowrob_data/', filename)
 
+@app.route('/knowrob/episode_data/<category>/<episode>')
+@login_required
+def episode_data(category, episode):
+    return send_from_directory("/episodes/"+category+"/"+episode+"/episode.json")
+
+def load_episode_data(category, episode):
+    episode_file = "/episodes/"+category+"/"+episode+"/episode.json"
+    data = None
+    with open(episode_file) as data_file: data = json.load(data_file)
+    return data
+
 @app.route('/knowrob/summary_data/<path:filename>')
 @login_required
 def download_summary_image(filename):
     # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
     return send_from_directory('/home/ros/summary_data/', filename)
-
-@app.route('/knowrob/episode_data/<category>/<episode>')
-@login_required
-def episode_data(category, episode):
-    return send_from_directory("/episodes/data/"+category+"/"+episode+"/episode.json")
-
-def load_episode_data(category, episode):
-    episode_file = "/episodes/data/"+category+"/"+episode+"/episode.json"
-    data = None
-    with open(episode_file) as data_file: data = json.load(data_file)
-    return data
 
 @app.route('/knowrob/tutorials/')
 @app.route('/knowrob/tutorials/<cat_id>/')
