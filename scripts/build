@@ -67,10 +67,6 @@ if [ "${BUILDOPTS["webapps"]}" == true ] || [ "${BUILDOPTS["default"]}" == true 
 	build webapps/knowrob openease/knowrob
 fi
 
-if [ "${BUILDOPTS["episode_data"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then
-	build episode_data openease/episode_data
-fi
-
 if [ "${BUILDOPTS["stopcache"]}" == true ]; then
 	echo "Stopping caching containers..."
 	docker stop -t 3 apt-cacher-run nexus-run

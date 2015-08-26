@@ -12,6 +12,8 @@ from webrob.app_and_db import app, db
 from webrob.models.tutorials import read_tutorial_page
 from webrob.docker.docker_application import ensure_application_started
 from webrob.docker import docker_interface
+from webrob.pages.utility import admin_required
+from webrob.pages.experiments import *
 
 from utility import *
 
@@ -25,18 +27,24 @@ def download_static(filename):
 @app.route('/knowrob/knowrob_data/<path:filename>')
 @login_required
 def download_logged_image(filename):
-    return send_from_directory('/home/ros/knowrob_data/', filename)
+    return send_from_directory('/episodes/', filename)
 
 @app.route('/knowrob/episode_data/<category>/<episode>')
 @login_required
 def episode_data(category, episode):
-    return send_from_directory("/episodes/"+category+"/"+episode+"/episode.json")
+    return send_from_directory('/episodes/'+category+'/'+episode, 'queries.json')
 
-def load_episode_data(category, episode):
-    episode_file = "/episodes/"+category+"/"+episode+"/episode.json"
-    data = None
-    with open(episode_file) as data_file: data = json.load(data_file)
-    return data
+@app.route('/knowrob/episode_save/', methods=['POST'])
+@admin_required
+def episode_save():
+    if 'episode-category' in session and 'episode' in session:
+        category = session['episode-category']
+        episode = session['episode']
+        episodeDataNew = json.loads(request.data)
+        episodeDataOld = load_episode_data(category, episode)
+        episodeDataOld.update(episodeDataNew)
+        experiment_save_queries(category, episode, episodeDataNew)
+    return jsonify(result=None)
 
 @app.route('/knowrob/summary_data/<path:filename>')
 @login_required
@@ -85,26 +93,6 @@ def tutorials(cat_id='getting_started', page=1):
     prev = read_tutorial_page(cat_id, int(page)-1)
 
     return render_template('knowrob_tutorial.html', **locals())
-
-def get_episode_url(category, episode):
-    if category is not None and episode is not None:
-        episode_url = '/knowrob/'
-        if __is_video__(): episode_url += 'video/'
-        episode_url += 'episode/'
-        if len(category)>0: episode_url += category + '/'
-        episode_url += episode
-        return episode_url
-    else:
-        return None
-
-def get_episode_download_url():
-    if 'episode-category' in session and 'episode' in session:
-        episode_url = '/knowrob/static/episodes/'
-        if len(session['episode-category'])>0: episode_url += session['episode-category'] + '/'
-        episode_url += session['episode'] + '/episode.json'
-        return episode_url
-    else:
-        return None
     
 @app.route('/knowrob/')
 @app.route('/knowrob/hydro-knowrob-daemon')
@@ -125,7 +113,7 @@ def knowrob(category=None, episode=None):
         session['episode-category'] = category.replace("%20", " ")
     if episode is not None:
         session['episode'] = episode
-    episode_url = get_episode_download_url()
+    episode_url = get_experiment_download_url()
     app.logger.warn("episode URL " + str(episode_url))
 
     return render_template('knowrob_simple.html', **locals())
@@ -148,7 +136,7 @@ def video(category=None, episode=None):
         session['episode-category'] = category.replace("%20", " ")
     if episode is not None:
         session['episode'] = episode
-    episode_url = get_episode_download_url()
+    episode_url = get_experiment_download_url()
     
     return render_template('video.html', **locals())
 
@@ -171,8 +159,8 @@ def menu():
     
     # Maps projects to list of experiments
     episode_choices_map =  {}
-    for (category,episode) in __episode_list__():
-        episode_url = get_episode_url(category,episode)
+    for (category,episode) in get_experiment_list():
+        episode_url = get_experiment_url(category,episode)
         
         menu = ''
         if len(category)>0: menu = category
@@ -193,7 +181,7 @@ def menu():
         # TODO: make this nicer
         technology_episodes = {}
         for (episode,url) in cat_episodes:
-            data = load_episode_data(category, episode)
+            data = experiment_load_queries(category, episode)
             if data is None:
                 app.logger.warn("Failed to load episode " + str((category, episode)))
                 break
@@ -201,11 +189,11 @@ def menu():
                 app.logger.warn("Meta data missing for episode " + str((category, episode)))
                 break
             meta = data['meta']
-            if "name" not in meta or "technologies" not in meta:
+            if "name" not in meta or "platforms" not in meta:
                 app.logger.warn("Meta data missing for episode " + str((category, episode)))
                 break
             
-            for t in meta['technologies'].keys():
+            for t in meta['platforms'].keys():
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
                 technology_episodes[t].append((meta['name'], url))
         
@@ -242,19 +230,6 @@ def menu():
     ]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)
- 
-def __episode_list__():
-    episode_list = []
-    episode_root_path = os.path.join(app.root_path, "static/episodes")
-    
-    for category in os.listdir(episode_root_path):
-        category_path = os.path.join(episode_root_path, category)
-        if not os.path.isdir(category_path): continue
-        
-        for episode in os.listdir(category_path):
-            episode_list.append((category,episode))
-    
-    return episode_list
 
 def __episode_file__():
     if 'episode' in session:
