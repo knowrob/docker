@@ -41,9 +41,9 @@ def episode_save():
         category = session['episode-category']
         episode = session['episode']
         episodeDataNew = json.loads(request.data)
-        episodeDataOld = load_episode_data(category, episode)
+        episodeDataOld = experiment_load_queries(category, episode)
         episodeDataOld.update(episodeDataNew)
-        experiment_save_queries(category, episode, episodeDataNew)
+        experiment_save_queries(category, episode, episodeDataOld)
     return jsonify(result=None)
 
 @app.route('/knowrob/summary_data/<path:filename>')
@@ -184,14 +184,14 @@ def menu():
             data = experiment_load_queries(category, episode)
             if data is None:
                 app.logger.warn("Failed to load episode " + str((category, episode)))
-                break
+                continue
             if "meta" not in data:
                 app.logger.warn("Meta data missing for episode " + str((category, episode)))
-                break
+                continue
             meta = data['meta']
             if "name" not in meta or "platforms" not in meta:
                 app.logger.warn("Meta data missing for episode " + str((category, episode)))
-                break
+                continue
             
             for t in meta['platforms'].keys():
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
@@ -236,12 +236,6 @@ def __episode_file__():
         return session['episode']
     else:
         return None
-
-def __is_video__():
-    if 'video' in session:
-        return session['video']
-    else:
-        return 0
     
 @app.route('/knowrob/episode_set', methods=['POST'])
 @login_required

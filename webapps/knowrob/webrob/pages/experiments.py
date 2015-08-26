@@ -1,4 +1,15 @@
 
+from flask import session
+import os
+import json
+from webrob.app_and_db import app
+
+def __is_video__():
+    if 'video' in session:
+        return session['video']
+    else:
+        return 0
+
 def get_experiment_url(category, episode):
     if category is not None and episode is not None:
         episode_url = '/knowrob/'
