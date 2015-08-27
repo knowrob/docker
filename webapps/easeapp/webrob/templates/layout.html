@@ -22,6 +22,11 @@
 
 
 <body{% block bodyargs %}{% endblock %}>
+  <script type="text/javascript">
+    var LEFT_MENU_LIST=[];
+    var RIGHT_MENU_LIST=[];
+  </script>
+  
   <div class="header">
     <nav id="navbar-tool">
       <a class="navbar-tool-brand" href="http://www.open-ease.org"><img src="//www.open-ease.org/wp-content/themes/openease_wp/img/oe-logo-small.svg"> openEASE</a>
@@ -99,56 +104,84 @@
   
   
   <script type="text/javascript">
-    function add_menu_item(menu, value, href) {
+    function create_menu_item(item) {
+        var a = document.createElement("a");
+        a.href = item.href ? item.href : '#';
+        var x = '';
+        x += item.text;
+        // TODO handle item.icon and item.shortcut
+        //if(item.shortcut) x += '<div class="menu_item_shortcut">' + item.shortcut + '</div>';
+        a.innerHTML = x;
+        //a.appendChild(document.createTextNode(item.text));
+        if(item.onclick) a.onclick = item.onclick;
+        return a;
+    };
+    
+    function add_menu_item(menu, item) {
         var li = document.createElement("li");
-        if(value == 'DIV') {
-            li.innerHTML = href;
+        if(item.submenu_page) {
+            li.innerHTML = item.submenu_page;
             li.className = 'zero_size';
             menu.style.border = 'none';
         }
         else {
-            var item = document.createElement("a");
-            item.href = href;
-            item.appendChild(document.createTextNode(value));
-            li.appendChild(item);
+            li.appendChild(create_menu_item(item));
         }
         menu.appendChild(li);
         return li;
     };
     
-    function add_submenu(menu, value) {
+    function add_submenu(menu, item) {
         // Try to find existing submenu
         for(var i=0; i<menu.childElementCount; ++i) {
             var _li = menu.childNodes[i];
             var _item = _li.childNodes[0];
-            if(_item.childNodes[0].nodeValue == value) {
+            if(_item.childNodes[0].nodeValue == item.text) {
                 return _li.childNodes[1];
             }
         }
     
         var submenu = document.createElement("ul");
         var li = document.createElement("li");
-        var item = document.createElement("a");
         li.className = 'submenu';
-        item.href = "#";
-        item.appendChild(document.createTextNode(value));
-        li.appendChild(item);
+        li.appendChild(create_menu_item(item));
         li.appendChild(submenu);
         menu.appendChild(li);
         return submenu;
     };
     
-    function add_common_menu_items(left_menu, right_menu, application_name, application_list) {
+    function add_common_menu_items(left_menu, right_menu) {
         {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
-            handle_webapp_menu(left_menu, ["CHOICES", ["Admin", [[ "CHOICES", ["User Management", [
-                    ["Roles", "/admin/roles"],
-                    ["Users", "/admin/users"]
-            ]]]]]]);
+            handle_webapp_menu(left_menu, {
+                text: 'Admin',
+                submenu: [
+                    {
+                        text: 'User Management',
+                        submenu: [
+                            {
+                                text: 'Roles',
+                                href: '/admin/roles'
+                            },
+                            {
+                                text: 'Users',
+                                href: '/admin/users'
+                            }
+                        ]
+                    },
+                    {
+                        text: "Mongo",
+                        href: "/knowrob/admin/mongo"
+                    }
+                ]
+            });
         {% endif %}
         
         if(left_menu) {
         {% if current_user.is_authenticated() %}
-            add_menu_item(left_menu, "Log", "{{ url_for('log') }}");
+            add_menu_item(left_menu, {
+                text: 'Log',
+                href: "{{ url_for('log') }}"
+            });
         {% endif %}
         }
         
@@ -161,117 +194,112 @@
             //}
             //handle_webapp_menu(right_menu, ["CHOICES", [application_selection, application_choices]]);
             
-            add_menu_item(right_menu, "Logout {{ current_user.username }}", "{{ url_for('user.logout') }}");
+            add_menu_item(right_menu, {
+                text: "Logout {{ current_user.username }}",
+                href: "{{ url_for('user.logout') }}"
+            });
         }
     };
     
     function handle_webapp_menu(menu_root, item) {
-        if(item[0] == "CHOICES") {
-            var selection = item[1][0];
-            var choices = item[1][1];
-            var submenu = add_submenu(menu_root, selection);
-            for(var i in choices) {
-                handle_webapp_menu(submenu, choices[i]);
+        if(item.submenu) {
+            var submenu = add_submenu(menu_root, item);
+            for(var i in item.submenu) {
+                handle_webapp_menu(submenu, item.submenu[i]);
             }
             return submenu;
         }
         else {
-            return add_menu_item(menu_root, item[0], item[1]);
+            return add_menu_item(menu_root, item);
         }
     };
     
-    function update_menu(application_name, application_list) {
+    function resize_menus() {
+        var menus = document.getElementsByClassName('mega_menu');
+        for(var i = 0; i < menus.length; i++) {
+            var m = menus[i];
+            var padding = 10; // TODO: lookup from CSS
+            var absWidth = padding;
+            var numRows = Math.trunc(Math.sqrt(m.childNodes.length));
+            
+            for(var j = 0; j < m.childNodes.length; j++) {
+                absWidth += m.childNodes[j].clientWidth;
+            }
+            absWidth /= numRows;
+            // TODO ensure that absWidth is less then window width
+            
+            var targetWidth = padding;
+            for(var j = 0; j < m.childNodes.length; j++) {
+                targetWidth += m.childNodes[j].clientWidth;
+                if(targetWidth>=absWidth) break;
+            }
+            document.getElementById(m.id).style.width = targetWidth+'px';
+            
+            var menuBar = m.parentNode.parentNode.parentNode;
+            var menuBarWidth = -menuBar.clientWidth;
+            document.getElementById(m.id).style.right = menuBarWidth+'px';
+            
+            // Set row heights
+            targetWidth = padding;
+            var maxRowHeight = 0;
+            var rowStartIndex = 0;
+            var setHeights = function(i, j, height) {
+                for(var k = i; k <= j; k++) {
+                    document.getElementById(m.childNodes[k].id).style.height = height+'px';
+                }
+            };
+            for(var j = 0; j < m.childNodes.length; j++) {
+                targetWidth += m.childNodes[j].clientWidth;
+                maxRowHeight = Math.max(maxRowHeight, m.childNodes[j].clientHeight);
+                if(targetWidth>=absWidth) {
+                    targetWidth = padding;
+                    setHeights(rowStartIndex, j, maxRowHeight);
+                    rowStartIndex = j+1;
+                    maxRowHeight = 0;
+                }
+            }
+            setHeights(rowStartIndex, j-1, maxRowHeight);
+        }
+    }
+    
+    function update_menu(application_name) {
         var left_menu  = document.getElementById("dynamic-menu-left");
         var right_menu = document.getElementById("dynamic-menu-right");
         
         if(left_menu)  $('#dynamic-menu-left').empty();
         if(right_menu) $('#dynamic-menu-right').empty();
         
-        if(application_name) {
-            $.ajax({
-                url: "/"+application_name+"/menu",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({}),  
-                dataType: "json",
-                success: function (data) {
-                    if(left_menu) {
-                        for(var i in data.menu_left) {
-                            handle_webapp_menu(left_menu, data.menu_left[i]);
-                        }
+        $.ajax({
+            url: "/knowrob/menu",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({}),  
+            dataType: "json",
+            success: function (data) {
+                if(left_menu) {
+                    for(var i in data.menu_left) {
+                        handle_webapp_menu(left_menu, data.menu_left[i]);
                     }
-                    if(right_menu) {
-                        for(var i in data.menu_right) {
-                            handle_webapp_menu(right_menu, data.menu_right[i]);
-                        }
-                    }
-                    add_common_menu_items(left_menu, right_menu, application_name, application_list);
-                    
-                    // Resize menus
-                    var menus = document.getElementsByClassName('mega_menu');
-                    for(var i = 0; i < menus.length; i++) {
-                        var m = menus[i];
-                        var padding = 10; // TODO: lookup from CSS
-                        var absWidth = padding;
-                        var numRows = Math.trunc(Math.sqrt(m.childNodes.length));
-                        
-                        for(var j = 0; j < m.childNodes.length; j++) {
-                            absWidth += m.childNodes[j].clientWidth;
-                        }
-                        absWidth /= numRows;
-                        // TODO ensure that absWidth is less then window width
-                        
-                        var targetWidth = padding;
-                        for(var j = 0; j < m.childNodes.length; j++) {
-                            targetWidth += m.childNodes[j].clientWidth;
-                            if(targetWidth>=absWidth) break;
-                        }
-                        document.getElementById(m.id).style.width = targetWidth+'px';
-                        
-                        var menuBar = m.parentNode.parentNode.parentNode;
-                        var menuBarWidth = -menuBar.clientWidth;
-                        document.getElementById(m.id).style.right = menuBarWidth+'px';
-                        console.log($(menuBar).css('margin-right'));
-                        
-                        // Set row heights
-                        targetWidth = padding;
-                        var maxRowHeight = 0;
-                        var rowStartIndex = 0;
-                        var setHeights = function(i, j, height) {
-                            for(var k = i; k <= j; k++) {
-                                document.getElementById(m.childNodes[k].id).style.height = height+'px';
-                            }
-                        };
-                        for(var j = 0; j < m.childNodes.length; j++) {
-                            targetWidth += m.childNodes[j].clientWidth;
-                            maxRowHeight = Math.max(maxRowHeight, m.childNodes[j].clientHeight);
-                            if(targetWidth>=absWidth) {
-                                targetWidth = padding;
-                                setHeights(rowStartIndex, j, maxRowHeight);
-                                rowStartIndex = j+1;
-                                maxRowHeight = 0;
-                            }
-                        }
-                        setHeights(rowStartIndex, j-1, maxRowHeight);
-                        
+                    for(var i in LEFT_MENU_LIST) {
+                        handle_webapp_menu(left_menu, LEFT_MENU_LIST[i]);
                     }
                 }
-            }).done( function (request) {});
-        }
-        else {
-            add_common_menu_items(left_menu, right_menu, application_name, application_list);
-        }
+                if(right_menu) {
+                    for(var i in data.menu_right) {
+                        handle_webapp_menu(right_menu, data.menu_right[i]);
+                    }
+                    for(var i in RIGHT_MENU_LIST) {
+                        handle_webapp_menu(right_menu, RIGHT_MENU_LIST[i]);
+                    }
+                }
+                add_common_menu_items(left_menu, right_menu, application_name);
+                resize_menus();
+            }
+        }).done( function (request) {});
     };
       
     $(document).ready(function () {
-      $.ajax({
-          url: "/application_names",
-          type: "POST",
-          contentType: "application/json",
-          data: JSON.stringify({}),  
-          dataType: "json",
-          success: function (data) { update_menu(data.selection, data.result); }
-      }).done( function (request) {});
+      update_menu();
     });
   </script>
 
