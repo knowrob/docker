@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block menu %}
+{% block _menu %}{% endblock %}
+{% endblock %}
+{% block menu_right %}
+{% block _menu_right %}{% endblock %}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.dataviz.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2014.1.318/styles/kendo.dataviz.default.min.css" />
+    <script src="//cdn.kendostatic.com/2014.1.318/js/kendo.all.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<script>
+    function synchronizeDB(e) {
+        var grid = $("#grid").data("kendoGrid");
+        var rowIndex = grid.select().index();
+        var rowData = grid._data[rowIndex];
+        var url = "/knowrob/admin/mongo_update/"+rowData.cat+"/"+rowData.exp;
+        var updateInProgress = true;
+        var updateResult = undefined;
+        var msg = 'Importing episodes for '+rowData.cat+'/'+rowData.exp;
+        console.log(msg);
+        
+        iosOverlay({
+              text: msg
+            , spinner: createSpinner()
+            , isSpinning: function() { return updateInProgress; }
+            , onhide: function() { alert(updateResult); window.location.reload(); }
+        });
+        $.post(url, {}, function(data) {
+            updateInProgress = false;
+            updateResult = data;
+        });
+        
+        delete source;
+    };
+    
+    $(document).ready(function () {
+        var grid_data = [];
+        {% for db_name in db_info %}
+        grid_data.push({
+            cat: "{{ file_info[db_name].category }}",
+            exp: "{{ file_info[db_name].experiment }}",
+            db_size: "{{ db_info[db_name].size }} MB",
+            db_objects: {{ db_info[db_name].objects }},
+            file_size: "{{ file_info[db_name].size }} MB",
+            episodes: {{ file_info[db_name].episodes }}
+        });
+        {% endfor %}
+        var dataSource = new kendo.data.DataSource({
+                data: grid_data,
+                sort: { field: "cat", dir: "asc" }
+        });
+        dataSource.read();
+
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            columns: [
+                { field: "cat", title: "Category", width: "100px" },
+                { field: "exp", title: "Experiment", width: "100px" },
+                { field: "db_size", title: "DB Size", width: "50px" },
+                { field: "db_objects", title: "DB Objects", width: "50px" },
+                { field: "file_size", title: "FS Size", width: "50px" },
+                { field: "episodes", title: "FS Episodes", width: "50px" },
+                { command: { text: "Import", click: synchronizeDB }, title: " ", width: "50px" }
+            ],
+            selectable: true,
+            sortable: true
+        });
+    });
+</script>
+<div id="mng_admin_panel">
+    <div id="grid"> </div>
+</div>
+{% endblock %}

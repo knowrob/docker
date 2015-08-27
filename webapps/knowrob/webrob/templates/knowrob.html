@@ -73,8 +73,8 @@
     
     $(document).ready(function () {
       // The file that contains example queries
-      var episode_url = "{% if episode_url
-          %}{{ episode_url }}{%
+      var exp_url = "{% if exp_url
+          %}{{ exp_url }}{%
       else
           %}{{ undefined }}{%
       endif %}";
@@ -84,7 +84,7 @@
       var auth = '{{ authentication }}';
       knowrob = new Knowrob({
             ros_url: rosUrl,
-            episode_url: episode_url,
+            episode_url: exp_url,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
             meshPath: '/meshes/'

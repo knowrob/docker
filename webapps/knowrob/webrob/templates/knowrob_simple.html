@@ -4,6 +4,37 @@
 {% block content %}
   <script type="text/javascript">
     {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
+    LEFT_MENU_LIST.push({ "text": "Admin", "submenu": [
+        {
+            text: "Query Library",
+            submenu: [
+                {
+                    text: "Save Library",
+                    onclick: save_queries
+                },
+                {
+                    text: "Rename Selected",
+                    onclick: set_query_text
+                },
+                {
+                    text: "Move Selected Up",
+                    onclick: query_up,
+                    shortcut: "u"
+                },
+                {
+                    text: "Move Selected Down",
+                    onclick: query_down,
+                    shortcut: "d"
+                },
+                {
+                    text: "Insert After Selected",
+                    onclick: add_query,
+                    shortcut: "a"
+                }
+            ]
+        }
+    ]});
+    
     function ensure_selected() {
         if(document.getElementById("examplequery").selectedIndex<1) {
             window.alert("Please select a query.");
@@ -34,15 +65,21 @@
         if(!ensure_selected()) return None;
         return x.options[x.selectedIndex].value;
     }
-    function new_query() {
+    function add_query() {
         var x = document.getElementById("examplequery");
+        var i = selected_query_index()+1;
         var text = window.prompt("Please enter natural language "+
             "representation for the Prolog query","");
         if(text) {
             var opt = document.createElement('option');
             opt.value = '';
             opt.innerHTML = text;
-            x.appendChild(opt);
+            if(x.selectedIndex+1 < x.options.length) {
+                x.insertBefore(opt, x.options[x.selectedIndex+1]);
+            }
+            else {
+                x.appendChild(opt);
+            }
         }
     }
     function delete_query() {
@@ -61,6 +98,7 @@
         if(!ensure_selected()) return;
         var x = document.getElementById("examplequery");
         var selIndex = x.selectedIndex;
+        if(selIndex + increment <= 0) return;
         var selValue = x.options[selIndex].value;
         var selText = x.options[selIndex].text;
         x.options[selIndex].value = x.options[selIndex + increment].value;
@@ -73,9 +111,6 @@
     function query_down() { query_move(1); }
     
     function save_queries() {
-        var category=undefined;
-        var experiment=undefined;
-        
         var experimentData = { query: [] };
         var x = document.getElementById("examplequery");
         for(var i=1; i<x.options.length; i++) {
@@ -84,18 +119,42 @@
                 text: x.options[i].text
             });
         };
-        
         $.ajax({
-            url: "/knowrob/episode_save/",
+            url: "/knowrob/exp_save",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(experimentData),  
             dataType: "json",
             success: function (data) {}
-        }).done( function (request) {})
+        }).done( function (request) {});
     }
-    
     {% endif %}
+    
+    function query_select_key_event(event) {
+        if (event.key == ' ') { // ENTER
+            knowrob.query();
+            return false;
+        }
+    {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
+        else if(event.keyCode == 46) { // DEL
+            delete_query();
+            return false;
+        }
+        else if(event.key == 'u') { // UP
+            query_up();
+            return false;
+        }
+        else if(event.key == 'd') { // DOWN
+            query_down();
+            return false;
+        }
+        else if(event.key == 'a') { // ADD
+            add_query();
+            return false;
+        }
+    {% endif %}
+        return true;
+    };
 
     $(document).ready(function () {
       var knowrobLayout = $('#page').layout({
@@ -162,6 +221,8 @@
       $('#designator').change(function() { knowrobLayout.open('east'); });
       $('#mjpeg').change(function() { knowrobLayout.open('east'); });
       $('#chart').change(function() { centerLayout.open('south'); });
+      
+      $('#examplequery').keyup(query_select_key_event);
     });
   </script>
 
@@ -190,26 +251,13 @@
       </div>
     </div>
     <div id="library">
-      {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
-        <div id="query_admin_buttons">
-          <ul class="query_button_group">
-            <li><a href="#" class="query_button admin_button" id="btn_query_delete" onclick="save_queries()">Save All</a></li>
-            <li><a href="#" class="query_button admin_button" id="btn_query_delete" onclick="delete_query()">Delete</a></li>
-            <li><a href="#" class="query_button admin_button" id="btn_query_new" onclick="new_query()">New</a></li>
-            <li><a href="#" class="query_button admin_button" id="btn_query_up" onclick="query_up()">Up</a></li>
-            <li><a href="#" class="query_button admin_button" id="btn_query_down" onclick="query_down()">Down</a></li>
-          </ul>
-          <div class="clear">&nbsp;</div>
-        </div>
-      {% endif %}
-      <div id="query_select">
-      <select onclick="knowrob.add_selected_to_queryform('examplequery')"
+      <select name="examplequery" id="examplequery"
       {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
         ondblclick="set_query_text()"
       {% endif %}
-        size="20" name="examplequery" id="examplequery"><option value=0></option>
+        onchange="knowrob.add_selected_to_queryform('examplequery')">
+        <option value=0></option>
       </select>
-      </div>
     </div>
   </div>
   
@@ -217,5 +265,4 @@
     <div id="designator"></div>
     <div id="mjpeg"></div>
   </div>
-  
 {% endblock %}
