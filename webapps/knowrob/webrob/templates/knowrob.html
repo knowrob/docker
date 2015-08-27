@@ -87,9 +87,11 @@
             episode_url: exp_url,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
-            meshPath: '/meshes/'
+            meshPath: '/meshes/',
+            mngDBName: "{{ category }}_{{ exp }}"
       });
       knowrob.init();
+      
       setInterval(container_refresh, 570000);
       container_refresh();
     });
