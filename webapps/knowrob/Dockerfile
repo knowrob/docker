@@ -1,12 +1,16 @@
 FROM openease/easeapp
 MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de
 
+USER root
+RUN easy_install pymongo
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q mongodb
+
 WORKDIR /opt/webapp
 USER ros
 
 ENV DOCKER_LINKS postgres_db:postgres dockerbridge:dockerbridge mongo_db:mongo
 ENV DOCKER_VOLUMES user_data mesh_data summary_data episode_data
- 
+
 ## copy this folder to the container
 ADD . /opt/webapp/
 
