@@ -5,6 +5,7 @@ DEV_SECRET_KEY='\\\xf8\x12\xdc\xf5\xb2W\xd4Lh\xf5\x1a\xbf"\x05@Bg\xdf\xeb>E\xd8<
 SQLALCHEMY_DATABASE_URI = 'postgresql://docker@' + \
     os.environ['POSTGRES_PORT_5432_TCP_ADDR'] + ':' + \
     os.environ['POSTGRES_PORT_5432_TCP_PORT'] + '/docker'
+#SQLALCHEMY_ECHO = True
 
 CSRF_ENABLED = True
 

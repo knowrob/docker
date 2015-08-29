@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap.min.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/user.css') }}"/>
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/iosOverlay.js') }}"></script>
@@ -151,7 +151,7 @@
     };
     
     function add_common_menu_items(left_menu, right_menu) {
-        {% if current_user.is_authenticated() and current_user.has_role('ADMIN') %}
+        {% if current_user.is_authenticated() and current_user.has_role('admin') %}
             handle_webapp_menu(left_menu, {
                 text: 'Admin',
                 submenu: [

@@ -1,3 +1,12 @@
+drop table if exists tutorial;
+create table tutorial (
+    id serial primary key,
+    cat_id text not null,
+    cat_title text not null,
+    title text not null,
+    text text not null,
+    page integer not null
+);
 
 INSERT INTO Tutorial VALUES(0,'getting_started','Getting started','The user interface','The user interface consists of six panes with different purposes.
 

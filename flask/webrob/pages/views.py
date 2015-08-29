@@ -26,12 +26,6 @@ def download_static(filename):
 @login_required
 def download_logged_image(filename):
     return send_from_directory('/episodes/', filename)
-
-@app.route('/knowrob/summary_data/<path:filename>')
-@login_required
-def download_summary_image(filename):
-    # TODO migrate summary_data -> users own data container and use docker_interface to retrieve summary!
-    return send_from_directory('/home/ros/summary_data/', filename)
     
 @app.route('/knowrob/')
 @app.route('/knowrob/exp/<category>/<exp>')
@@ -76,14 +70,16 @@ def menu():
             'href': '/knowrob/editor'
         }
     ]
-    if current_user.has_role('ADMIN'):
-        menu_left.append({
-            'text': 'Admin',
-            'submenu': [{
-                'text': 'Tutorials',
-                'href': '/knowrob/admin/tutorials'
-            }]
-        })
+    try:
+        if current_user.has_role('admin'):
+            menu_left.append({
+                'text': 'Admin',
+                'submenu': [{
+                    'text': 'Tutorials',
+                    'href': '/knowrob/admin/tutorials'
+                }]
+            })
+    except AttributeError: pass
     
     # Maps projects to list of experiments
     episode_choices_map =  {}

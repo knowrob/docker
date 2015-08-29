@@ -1,6 +1,11 @@
 
 from flask import request, render_template, jsonify, Markup
-from flask.ext.misaka import markdown
+# FIXME
+# Seems to be broken ?!? Err msg:
+# File "/usr/local/lib/python2.7/dist-packages/flask_misaka.py", line 8, in <module>
+#    from misaka import (EXT_AUTOLINK, EXT_FENCED_CODE,  # pyflakes.ignore
+# ImportError: cannot import name EXT_LAX_HTML_BLOCKS
+#from flask.ext.misaka import markdown
 from flask_user import current_app
 from urlparse import urlparse
 
@@ -30,7 +35,8 @@ def tutorials(cat_id='getting_started', page=1):
     authentication = False
 
     tut = read_tutorial_page(cat_id, page)
-    content = markdown(tut.text, fenced_code=True)
+    #content = markdown(tut.text, fenced_code=True)
+    content = tut.text
 
     # automatically add event handler for highlighting DOM elements
     tmp = re.findall('<em>(.*?)</em>', str(content))

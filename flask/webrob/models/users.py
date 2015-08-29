@@ -31,8 +31,3 @@ class User(db.Model, UserMixin):
     def first_role(self):
         if len(self.roles)==0: return None
         else: return self.roles[0].name
-    
-    def has_role(self, role_name):
-        for role in self.roles:
-            if role.name == role_name: return True
-        return False

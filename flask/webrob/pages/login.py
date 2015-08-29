@@ -13,6 +13,7 @@ from webrob.docker import docker_interface
 
 @user_logged_in.connect_via(app)
 def track_login(sender, user, **extra):
+    app.logger.info("Logged in " + str(user.username))
     session['user_container_name'] = user.username
     session['username'] = user.username
     session['api_token'] = user.api_token
