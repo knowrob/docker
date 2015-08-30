@@ -14,7 +14,7 @@ import json
 
 from webrob.models.tutorials import Tutorial
 from webrob.app_and_db import app
-from webrob.pages.utility import admin_required
+from webrob.utility import admin_required
 from webrob.models.tutorials import read_tutorial_page
 
 @app.route('/knowrob/tutorials/')
@@ -22,8 +22,6 @@ from webrob.models.tutorials import read_tutorial_page
 @app.route('/knowrob/tutorials/<cat_id>/<page>')
 def tutorials(cat_id='getting_started', page=1):
     session['video'] = 0
-    #if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
-    #    return redirect(url_for('user.logout'))
     
     error=""
     # determine hostname/IP we are currently using

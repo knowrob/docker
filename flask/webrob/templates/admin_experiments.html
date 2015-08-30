@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block menu %}
+{% block _menu %}{% endblock %}
+{% endblock %}
+{% block menu_right %}
+{% block _menu_right %}{% endblock %}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+    <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+{% endblock %}
+
+{% block content %}
+    <script id="create_template" type="text/x-kendo-template">
+        <a class="k-button" href="\#" onclick="return new_experiment()">Create new experiment</a>
+    </script>
+    <script>
+    function new_experiment() {
+        var expName = prompt("Please enter the experiment name", "");
+        if(expName) {
+            $.ajax({
+                url: "/admin/experiment_new",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({name: roleName}),  
+                dataType: "json",
+                success: function (data) {
+                    console.log("Experiment created!");
+                    $('#grid').data('kendoGrid').dataSource.read();
+                    $('#grid').data('kendoGrid').refresh();
+                }
+            }).done( function (request) {});
+        }
+    };
+    function projectsEditor(container, options) {
+        $("<select multiple='multiple' data-bind='value : projects'/>").appendTo(container).kendoMultiSelect({
+            dataTextField: "name",
+            dataValueField: "name",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/project_list",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                schema: {
+                    data: 'projects',
+                    model: {
+                        id: "id",
+                        fields: {
+                            name: { type: "string" }
+                        }
+                    }
+                }
+            }
+        });
+    };
+    function tagsEditor(container, options) {
+        $("<select multiple='multiple' data-bind='value : tags'/>").appendTo(container).kendoMultiSelect({
+            dataTextField: "name",
+            dataValueField: "name",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/tag_list",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                schema: {
+                    data: 'tags',
+                    model: {
+                        id: "id",
+                        fields: {
+                            name: { type: "string" }
+                        }
+                    }
+                }
+            }
+        });
+    };
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/knowrob/exp_meta_data",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                batch: true,
+                schema: {
+                    data: 'experiments',
+                    model: {
+                        id: "id",
+                        fields: {
+                            cat: { editable: false, nullable: false },
+                            exp: { editable: false, nullable: false },
+                            name: { editable: true, nullable: false },
+                            description: { editable: true, nullable: true },
+                            projects: { editable: true, nullable: true },
+                            tags: { editable: true, nullable: true },
+                            platforms: { editable: false, nullable: true }
+                        }
+                    }
+                }
+            },
+            columns: [
+                { field: "cat", title: "Category", width: "60px" },
+                { field: "exp", title: "Experiment", width: "60px" },
+                { field: "name", title: "Name", width: "100px" },
+                { field: "description", title: "Description", width: "150px" },
+                { field: "projects", title: "Projects", width: "70px", template: "#= projects.join(', ') #", editor: projectsEditor },
+                { field: "tags", title: "IEEE Tags", width: "70px", template: "#= tags.join(', ') #", editor: tagsEditor },
+                { field: "platforms", title: "Platforms", width: "70px" },
+                { command: ["edit"], title: "&nbsp;" , width: "50px" }
+            ],
+            save: function(e) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            },
+            selectable: true,
+            editable: "popup",
+            sortable: true
+        });
+    });
+</script>
+<div id="exp_admin_panel">
+    <div id="grid"> </div>
+</div>
+{% endblock %}

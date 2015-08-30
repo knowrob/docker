@@ -7,10 +7,12 @@ from time import time, sleep
 from subprocess import call
 
 from webrob.pages.experiments import get_experiment_list, get_experiment_path
-from webrob.pages.utility import admin_required
+from webrob.utility import admin_required
 from webrob.app_and_db import app
 
 from pymongo import MongoClient
+
+__author__ = 'danielb@cs.uni-bremen.de'
 
 def mongoDBName(category, experiment):
     return category+"_"+experiment

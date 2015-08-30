@@ -17,7 +17,3 @@ app.logger.setLevel(logging.INFO)
 
 # This is the SQLAlchemy ORM object
 db = SQLAlchemy(app)
-
-# Start openEASE webapps
-from webrob.startup.init_webapps import init_webapps
-init_webapps(app)

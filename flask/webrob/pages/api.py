@@ -7,7 +7,7 @@ from webrob.app_and_db import app, db
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import generate_mac
 from webrob.models.users import User
-from webrob.pages.utility import random_string
+from webrob.utility import random_string
 
 __author__ = 'mhorst@cs.uni-bremen.de'
 

@@ -7,6 +7,8 @@ from urllib import urlopen, urlretrieve
 from webrob.app_and_db import app
 from subprocess import call
 
+__author__ = 'danielb@cs.uni-bremen.de'
+
 MESH_REPOSITORIES = [
     "http://svn.ai.uni-bremen.de/svn/cad_models/",
     "https://github.com/code-iai/iai_maps/raw/master/",

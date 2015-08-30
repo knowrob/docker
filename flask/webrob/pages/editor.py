@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: iso-8859-15 -*-
-# @author Daniel Beßler
 
 import os, sys
 import json
@@ -11,12 +8,12 @@ from urlparse import urlparse
 from flask import session, request, render_template, jsonify, send_file
 from flask_user import login_required
 
-
 from webrob.app_and_db import app
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import LFTransfer
-from webrob.pages.utility import copy_template_file
+from webrob.utility import copy_template_file
 
+__author__ = 'danielb@cs.uni-bremen.de'
 
 @app.route('/knowrob/editor')
 @login_required
@@ -133,9 +130,6 @@ def file_del():
     
     return get_pkg_tree()
 
-#################################
-#################################
-#################################
  
 def get_file_path(fileName):
     """

@@ -10,10 +10,10 @@ from urlparse import urlparse
 from webrob.app_and_db import app, db
 from webrob.docker.docker_application import ensure_application_started
 from webrob.docker import docker_interface
-from webrob.pages.utility import admin_required
+from webrob.utility import *
 from webrob.pages.experiments import get_experiment_download_url, get_experiment_url, get_experiment_list, experiment_load_queries
 
-from utility import *
+__author__ = 'danielb@cs.uni-bremen.de'
 
 MAX_HISTORY_LINES = 50
 
@@ -74,10 +74,29 @@ def menu():
         if current_user.has_role('admin'):
             menu_left.append({
                 'text': 'Admin',
-                'submenu': [{
-                    'text': 'Tutorials',
-                    'href': '/knowrob/admin/tutorials'
-                }]
+                'submenu': [
+                    {
+                        'text': 'Tutorials',
+                        'href': '/knowrob/admin/tutorials'
+                    },
+                    {
+                        'text': 'Experiments',
+                        'submenu': [
+                            {
+                                'text': 'Projects',
+                                'href': '/admin/projects'
+                            },
+                            {
+                                'text': 'Tags',
+                                'href': '/admin/tags'
+                            },
+                            {
+                                'text': 'Meta Information',
+                                'href': '/knowrob/admin/experiments'
+                            }
+                        ]
+                    }
+                ]
             })
     except AttributeError: pass
     
@@ -192,6 +211,11 @@ def get_history_item():
   else:
     return jsonify(item="", index=-1)
 
+@app.route('/log')
+@login_required
+def log():
+    logStr = docker_interface.get_container_log(session['user_container_name'])
+    return render_template('log.html', log=logStr)
 
 def get_history_file():
   userDir = get_user_dir()

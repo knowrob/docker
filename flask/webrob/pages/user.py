@@ -6,8 +6,10 @@ from flask_user import login_required
 import json
 
 from webrob.app_and_db import app
-from webrob.pages.utility import admin_required
+from webrob.utility import admin_required
 from webrob.models.users import Role
+
+__author__ = 'danielb@cs.uni-bremen.de'
 
 @app.route('/admin/users')
 @admin_required

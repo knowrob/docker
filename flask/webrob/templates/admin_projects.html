@@ -20,43 +20,59 @@
 <div id="example">
     <div id="grid"></div>
     
+    <script id="create_template" type="text/x-kendo-template">
+        <a class="k-button" href="\#" onclick="return new_project()">Create new record</a>
+    </script>
     <script>
+    function new_project() {
+        var projectName = prompt("Please enter a project name", "");
+        if(projectName) {
+            $.ajax({
+                url: "/admin/project_new",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({name: projectName}),  
+                dataType: "json",
+                success: function (data) {
+                    console.log("project created!");
+                    $('#grid').data('kendoGrid').dataSource.read();
+                    $('#grid').data('kendoGrid').refresh();
+                }
+            }).done( function (request) {});
+        }
+    };
     $(document).ready(function () {
         $("#grid").kendoGrid({
             dataSource: {
                 transport: {
                     read: {
-                        url: "/knowrob/admin/tutorial_list",
+                        url: "/project_list",
                         dataType: "json",
                         type: "POST",
                         contentType: "application/json"
-                    }
+                    },
                 },
                 schema: {
-                    data: 'tutorials',
+                    data: 'projects',
                     model: {
                         id: "id",
                         fields: {
                             id: { type: "number", editable: false, nullable: false },
-                            cat_title: { type: "string", editable: true },
-                            page: { type: "number", editable: true, nullable: false },
-                            title: { type: "string", editable: true },
-                            text: { type: "string", editable: true }
+                            name: { type: "string", editable: true },
+                            url: { type: "string", editable: true }
                         }
                     }
                 }
             },
             save: function(e) {
                 $.ajax({
-                    url: "/knowrob/admin/tutorial_save",
+                    url: "/admin/project_save",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
                         id: e.model.id,
-                        cat_title: e.model.cat_title,
-                        page: e.model.page,
-                        title: e.model.title,
-                        text: e.model.text
+                        name: e.model.name,
+                        url: e.model.url
                     }),  
                     dataType: "json",
                     success: function (data) {
@@ -67,15 +83,13 @@
             },
             remove: function(e) {
                 $.ajax({
-                    url: "/knowrob/admin/tutorial_remove",
+                    url: "/admin/project_remove",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
                         id: e.model.id,
-                        cat_title: e.model.cat_title,
-                        page: e.model.page,
-                        title: e.model.title,
-                        text: e.model.text
+                        name: e.model.name,
+                        url: e.model.url
                     }),  
                     dataType: "json",
                     success: function (data) {
@@ -84,21 +98,18 @@
                     }
                 }).done( function (request) {})
             },
-            columns: [
-                { field: "id", title: "ID", width: 40 },
-                { field: "cat_title", title: "Category", width: 100 },
-                { field: "page", title: "Page", width: 75 },
-                { field: "title", title: "Title", width: 100 },
-                { field: "text", title: "Text", encoded: false, editor: textareaEditor },
-                { command: ["edit", "destroy"], title: "&nbsp;", width: 100 }
+            toolbar: [
+                { template: kendo.template($("#create_template").html()) }
             ],
-            editable: "inline",
-            sortable: true,
-            autoHeight:true
+            columns: [
+                { field: "id", title: "ID" },
+                { field: "name", title: "Name" },
+                { field: "url", title: "URL" },
+                { command: ["edit", "destroy"], title: "&nbsp;" }
+            ],
+            editable: "popup",
+            sortable: true
         });
-        function textareaEditor(container, options) {
-            $('<textarea class="tut_textarea" data-bind="value: ' + options.field + '"></textarea>').appendTo(container);
-        }
     });
     </script>
 </div>

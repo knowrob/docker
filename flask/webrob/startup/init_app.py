@@ -14,7 +14,7 @@ from flask_mail import Mail
 from flask_user import UserManager, SQLAlchemyAdapter
 from flask.ext.babel import Babel
 
-from webrob.pages.utility import random_string
+from webrob.utility import random_string
 from webrob.startup.init_db import *
 from webrob.models.users import Role, User
 
@@ -55,19 +55,18 @@ def init_app(app, db, extra_config_settings={}):
     # Load all models.py files to register db.Models with SQLAlchemy
     from webrob.models import users
     from webrob.models import tutorials
+    from webrob.models import experiments
 
     # Load all views.py files to register @app.routes() with Flask
-    from webrob.pages import admin
     from webrob.pages import api
     from webrob.pages import editor
     from webrob.pages import experiments
-    from webrob.pages import log
+    from webrob.pages import knowrob
     from webrob.pages import login
     from webrob.pages import meshes
     from webrob.pages import mongo
     from webrob.pages import tutorials
-    from webrob.pages import utility
-    from webrob.pages import views
+    from webrob.pages import user
     
     init_db(app, db)
     
