@@ -56,50 +56,6 @@ def __knowrob_page__(template, category=None, exp=None):
 
 @app.route('/knowrob/menu', methods=['POST'])
 def menu():
-    menu_left = [
-        {
-            'text': 'Knowledge Base',
-            'href': '/knowrob/'
-        },
-        {
-            'text': 'Episode Replay',
-            'href': '/knowrob/video'
-        },
-        {
-            'text': 'Prolog Editor',
-            'href': '/knowrob/editor'
-        }
-    ]
-    try:
-        if current_user.has_role('admin'):
-            menu_left.append({
-                'text': 'Admin',
-                'submenu': [
-                    {
-                        'text': 'Tutorials',
-                        'href': '/knowrob/admin/tutorials'
-                    },
-                    {
-                        'text': 'Experiments',
-                        'submenu': [
-                            {
-                                'text': 'Projects',
-                                'href': '/admin/projects'
-                            },
-                            {
-                                'text': 'Tags',
-                                'href': '/admin/tags'
-                            },
-                            {
-                                'text': 'Meta Information',
-                                'href': '/knowrob/admin/experiments'
-                            }
-                        ]
-                    }
-                ]
-            })
-    except AttributeError: pass
-    
     # Maps projects to list of experiments
     episode_choices_map =  {}
     for (category,exp) in get_experiment_list():
@@ -111,7 +67,6 @@ def menu():
             episode_choices_map[menu] = []
         
         episode_choices_map[menu].append((exp, episode_url))
-    
     
     episode_page = '<div class="mega_menu" id="episode-selection">'
     for category in sorted(episode_choices_map.keys()):
@@ -136,7 +91,7 @@ def menu():
                 app.logger.warn("Meta data missing for episodes for " + str((category, exp)))
                 continue
             
-            for t in meta['platforms'].keys():
+            for t in meta['platforms']:
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
                 technology_episodes[t].append((meta['name'], url))
         
@@ -147,7 +102,7 @@ def menu():
         episode_page += '</div></div>'
     episode_page += '</div>'
     
-    
+    menu_left = []
     menu_right = [{
         'text': 'Episode Selection',
         'submenu': [{

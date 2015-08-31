@@ -1,12 +1,5 @@
 {% extends "layout.html" %}
 
-{% block menu %}
-{% block _menu %}{% endblock %}
-{% endblock %}
-{% block menu_right %}
-{% block _menu_right %}{% endblock %}
-{% endblock %}
-
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
@@ -44,14 +37,14 @@
             dataSource: {
                 transport: {
                     read: {
-                        url: "/project_list",
+                        url: "/db/find/project",
                         dataType: "json",
                         type: "POST",
                         contentType: "application/json"
                     },
                 },
                 schema: {
-                    data: 'projects',
+                    data: 'result',
                     model: {
                         id: "id",
                         fields: {
@@ -69,14 +62,39 @@
             dataSource: {
                 transport: {
                     read: {
-                        url: "/tag_list",
+                        url: "/db/find/tag",
                         dataType: "json",
                         type: "POST",
                         contentType: "application/json"
                     },
                 },
                 schema: {
-                    data: 'tags',
+                    data: 'result',
+                    model: {
+                        id: "id",
+                        fields: {
+                            name: { type: "string" }
+                        }
+                    }
+                }
+            }
+        });
+    };
+    function platformsEditor(container, options) {
+        $("<select multiple='multiple' data-bind='value : platforms'/>").appendTo(container).kendoMultiSelect({
+            dataTextField: "name",
+            dataValueField: "name",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/db/find/platform",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                schema: {
+                    data: 'result',
                     model: {
                         id: "id",
                         fields: {
@@ -110,7 +128,7 @@
                             description: { editable: true, nullable: true },
                             projects: { editable: true, nullable: true },
                             tags: { editable: true, nullable: true },
-                            platforms: { editable: false, nullable: true }
+                            platforms: { editable: true, nullable: true }
                         }
                     }
                 }
@@ -122,7 +140,7 @@
                 { field: "description", title: "Description", width: "150px" },
                 { field: "projects", title: "Projects", width: "70px", template: "#= projects.join(', ') #", editor: projectsEditor },
                 { field: "tags", title: "IEEE Tags", width: "70px", template: "#= tags.join(', ') #", editor: tagsEditor },
-                { field: "platforms", title: "Platforms", width: "70px" },
+                { field: "platforms", title: "Platforms", width: "70px", template: "#= platforms.join(', ') #", editor: platformsEditor },
                 { command: ["edit"], title: "&nbsp;" , width: "50px" }
             ],
             save: function(e) {

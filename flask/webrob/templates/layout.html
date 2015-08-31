@@ -6,8 +6,8 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/screen.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
-  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap/css/bootstrap.min.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/user.css') }}"/>
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/iosOverlay.js') }}"></script>
@@ -151,49 +151,48 @@
     };
     
     function add_common_menu_items(left_menu, right_menu) {
-        {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+        
+        if(left_menu) {
+        {% if current_user.is_authenticated() %}
+            add_menu_item(left_menu, { text: 'Knowledge Base', href: "/knowrob/" });
+            add_menu_item(left_menu, { text: 'Episode Replay', href: "/knowrob/video" });
+            add_menu_item(left_menu, { text: 'Prolog Editor', href: "/knowrob/editor" });
+            add_menu_item(left_menu, { text: 'Log', href: "{{ url_for('log') }}" });
+        {% if current_user.has_role('admin') %}
             handle_webapp_menu(left_menu, {
                 text: 'Admin',
                 submenu: [
                     {
                         text: 'User Management',
                         submenu: [
-                            {
-                                text: 'Roles',
-                                href: '/admin/roles'
-                            },
-                            {
-                                text: 'Users',
-                                href: '/admin/users'
-                            }
+                            { text: 'Users', href: '/admin/users' }
+                        ]
+                    },
+                    { text: 'Mongo', href: '/knowrob/admin/mongo' },
+                    { text: 'Tutorials', href: '/knowrob/admin/tutorials' },
+                    {
+                        text: 'Database',
+                        submenu: [
+                            { text: 'User', href: '/db/page/user' },
+                            { text: 'Roles', href: '/db/page/role' },
+                            { text: 'Tags', href: '/db/page/tag' },
+                            { text: 'Projects', href: '/db/page/project' },
+                            { text: 'Platforms', href: '/db/page/platform' }
                         ]
                     },
                     {
-                        text: "Mongo",
-                        href: "/knowrob/admin/mongo"
+                        text: 'Experiments',
+                        submenu: [
+                            { text: 'Meta Information', href: '/knowrob/admin/experiments' }
+                        ]
                     }
                 ]
             });
         {% endif %}
-        
-        if(left_menu) {
-        {% if current_user.is_authenticated() %}
-            add_menu_item(left_menu, {
-                text: 'Log',
-                href: "{{ url_for('log') }}"
-            });
         {% endif %}
         }
         
         if(right_menu) {
-            //var application_selection = application_name;
-            //if(!application_selection) application_selection = "Application";
-            //var application_choices = [];
-            //for(var i in application_list) {
-            //    application_choices.push([application_list[i], "/application/"+application_list[i]]);
-            //}
-            //handle_webapp_menu(right_menu, ["CHOICES", [application_selection, application_choices]]);
-            
             add_menu_item(right_menu, {
                 text: "Logout {{ current_user.username }}",
                 href: "{{ url_for('user.logout') }}"

@@ -1,12 +1,5 @@
 {% extends "layout.html" %}
 
-{% block menu %}
-{% block _menu %}{% endblock %}
-{% endblock %}
-{% block menu_right %}
-{% block _menu_right %}{% endblock %}
-{% endblock %}
-
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
@@ -21,24 +14,18 @@
     <div id="grid"></div>
     
     <script id="create_template" type="text/x-kendo-template">
-        <a class="k-button" href="\#" onclick="return new_tag()">Create new record</a>
+        <a class="k-button" href="\#" onclick="return new_entry()">Create new record</a>
     </script>
     <script>
-    function new_tag() {
-        var tagName = prompt("Please enter a tag name", "");
-        if(tagName) {
-            $.ajax({
-                url: "/admin/tag_new",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({name: tagName}),  
-                dataType: "json",
-                success: function (data) {
-                    console.log("tag created!");
-                    $('#grid').data('kendoGrid').dataSource.read();
-                    $('#grid').data('kendoGrid').refresh();
-                }
-            }).done( function (request) {});
+    function new_entry() {
+        var grid = $("#grid").data("kendoGrid");
+        if (grid) {
+            //this logic creates a new item in the datasource/datagrid
+            var dataSource = grid.dataSource;
+            var total = dataSource.data().length;
+            dataSource.insert(total, {});
+            dataSource.page(dataSource.totalPages());
+            grid.editRow(grid.tbody.children().last());
         }
     };
     $(document).ready(function () {
@@ -46,31 +33,37 @@
             dataSource: {
                 transport: {
                     read: {
-                        url: "/tag_list",
+                        url: "/db/find/{{ table }}",
                         dataType: "json",
                         type: "POST",
                         contentType: "application/json"
                     },
                 },
                 schema: {
-                    data: 'tags',
+                    data: 'result',
                     model: {
                         id: "id",
                         fields: {
-                            id: { type: "number", editable: false, nullable: false },
-                            name: { type: "string", editable: true }
+                        {% for column in columns %}
+                            {{ column.name }}: {
+                                    type: "{{ column.type }}",
+                                    editable: {{ column.editable }},
+                                    nullable: {{ column.nullable }}
+                            },
+                        {% endfor %}
                         }
                     }
                 }
             },
             save: function(e) {
                 $.ajax({
-                    url: "/admin/tag_save",
+                    url: "/db/save/{{ table }}",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        id: e.model.id,
-                        name: e.model.name
+                        {% for column in columns %}
+                        {{ column.name }}: e.model.{{ column.name }},
+                        {% endfor %}
                     }),  
                     dataType: "json",
                     success: function (data) {
@@ -81,12 +74,13 @@
             },
             remove: function(e) {
                 $.ajax({
-                    url: "/admin/tag_remove",
+                    url: "/db/delete/{{ table }}",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
-                        id: e.model.id,
-                        name: e.model.name
+                        {% for column in columns %}
+                        {{ column.name }}: e.model.{{ column.name }},
+                        {% endfor %}
                     }),  
                     dataType: "json",
                     success: function (data) {
@@ -99,8 +93,9 @@
                 { template: kendo.template($("#create_template").html()) }
             ],
             columns: [
-                { field: "id", title: "ID" },
-                { field: "name", title: "Name" },
+                {% for column in columns %}
+                { field: "{{ column.name }}", title: "{{ column.name }}" },
+                {% endfor %}
                 { command: ["edit", "destroy"], title: "&nbsp;" }
             ],
             editable: "popup",

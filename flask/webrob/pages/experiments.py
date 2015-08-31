@@ -10,94 +10,9 @@ import json
 from webrob.app_and_db import app
 from webrob.utility import admin_required
 from webrob.models.experiments import Project, Tag
+from webrob.models.db import *
 
 __author__ = 'danielb@cs.uni-bremen.de'
-
-@app.route('/admin/projects')
-@admin_required
-def admin_projects():
-    return render_template('admin_projects.html', **locals())
-
-@app.route('/project_list', methods=['POST'])
-@login_required
-def admin_project_list():
-    db_adapter = current_app.user_manager.db_adapter
-    projects = db_adapter.find_all_objects(Project)
-    project_list = map(lambda r:  {
-        'id': str(r.id),
-        'name': str(r.name),
-        'url': str(r.url)
-    }, projects)
-    return jsonify(projects=project_list)
-
-@app.route('/admin/project_save', methods=['POST'])
-@admin_required
-def admin_project_save():
-    db_adapter = current_app.user_manager.db_adapter
-    project_update = json.loads(request.data)
-    project_db = db_adapter.get_object(Project, project_update['id'])
-    app.logger.info("Updating project: " + str(project_db.name) + "[" + str(project_db.id) + "]."  + "\n")
-    db_adapter.update_object(project_db, name=project_update['name'], url=project_update['url'])
-    db_adapter.commit()
-    return jsonify(result=None)
-
-@app.route('/admin/project_new', methods=['POST'])
-@admin_required
-def admin_project_new():
-    db_adapter = current_app.user_manager.db_adapter
-    new_project_data = json.loads(request.data)
-    app.logger.info("Creating project with name: " + str(new_project_data['name']) + "\n")
-    db_adapter.add_object(Project, name=new_project_data['name'], url=new_project_data['url'])
-    db_adapter.commit()
-    return jsonify(result=None)
-
-
-
-
-@app.route('/admin/tags')
-@admin_required
-def admin_tags():
-    return render_template('admin_tags.html', **locals())
-
-@app.route('/tag_list', methods=['POST'])
-@login_required
-def admin_tag_list():
-    db_adapter = current_app.user_manager.db_adapter
-    tags = db_adapter.find_all_objects(Tag)
-    for t in tags:
-        members = [attr for attr in dir(t) if not callable(attr) and not attr.startswith("__")]
-        app.logger.info(t.name)
-        app.logger.info(str(t.metadata))
-        app.logger.info(str(dir(t.metadata)))
-        app.logger.info(str(members))
-    tag_list = map(lambda r:  {
-        'id': str(r.id),
-        'name': str(r.name)
-    }, tags)
-    return jsonify(tags=tag_list)
-
-@app.route('/admin/tag_save', methods=['POST'])
-@admin_required
-def admin_tag_save():
-    db_adapter = current_app.user_manager.db_adapter
-    tag_update = json.loads(request.data)
-    tag_db = db_adapter.get_object(Tag, tag_update['id'])
-    app.logger.info("Updating tag: " + str(tag_db.name) + "[" + str(tag_db.id) + "]."  + "\n")
-    db_adapter.update_object(tag_db, name=tag_update['name'])
-    db_adapter.commit()
-    return jsonify(result=None)
-
-@app.route('/admin/tag_new', methods=['POST'])
-@admin_required
-def admin_tag_new():
-    db_adapter = current_app.user_manager.db_adapter
-    new_tag_data = json.loads(request.data)
-    app.logger.info("Creating tag with name: " + str(new_tag_data['name']) + "\n")
-    db_adapter.add_object(Tag, name=new_tag_data['name'])
-    db_adapter.commit()
-    return jsonify(result=None)
-
-
 
 @app.route('/knowrob/admin/experiments')
 @admin_required
@@ -108,17 +23,9 @@ def admin_experiments():
         data = experiment_load_queries(cat, exp)
         if data is None:
             data = { 'meta': { 'name': '', 'description': '' }}
-            
         if not 'projects' in data['meta']: data['meta']['projects'] = []
-        if not 'ieee-tags' in data['meta']: data['meta']['ieee-tags'] = []
-        #data['meta']['projects'] = ','.join(data['meta']['projects'])
-        #data['meta']['ieee-tags'] = ','.join(data['meta']['ieee-tags'])
-        
-        platforms = []
-        if not 'platforms' in data['meta']: data['meta']['platforms'] = {}
-        for x in data['meta']['platforms']: platforms.append(x)
-        data['meta']['platforms'] = ','.join(data['meta']['platforms'])
-        
+        if not 'tags' in data['meta']: data['meta']['tags'] = []
+        if not 'platforms' in data['meta']: data['meta']['platforms'] = []
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)
@@ -148,17 +55,11 @@ def get_exp_meta_data():
         data = experiment_load_queries(cat, exp)
         if data is None:
             data = { 'name': '', 'description': '' }
-        else: data = data['meta']
+        else:
+            data = data['meta']
         if not 'projects' in data: data['projects'] = []
         if not 'tags' in data: data['tags'] = []
-        #data['meta']['projects'] = ','.join(data['meta']['projects'])
-        #data['meta']['tags'] = ','.join(data['meta']['tags'])
-        
-        platforms = []
-        if not 'platforms' in data: data['platforms'] = {}
-        for x in data['platforms']: platforms.append(x)
-        data['platforms'] = ','.join(data['platforms'])
-        
+        if not 'platforms' in data: data['platforms'] = []
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)

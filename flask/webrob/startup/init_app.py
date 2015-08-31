@@ -27,7 +27,7 @@ def add_user(db,user_manager,name,mail,pw,roles):
     db.session.add(user)
     db.session.commit()
 
-def init_app(app, db, extra_config_settings={}):
+def init_app(app, db_instance, extra_config_settings={}):
     # Initialize app config settings
     app.config.from_object('webrob.config.settings')        # Read config from 'app/settings.py' file
     app.config.update(extra_config_settings)                # Overwrite with 'extra_config_settings' parameter
@@ -49,7 +49,7 @@ def init_app(app, db, extra_config_settings={}):
 
     # Setup Flask-User to handle user account related forms
     from webrob.models.users import User
-    db_adapter = SQLAlchemyAdapter(db, User)
+    db_adapter = SQLAlchemyAdapter(db_instance, User)
     user_manager = UserManager(db_adapter, app)     # Init Flask-User and bind to app
 
     # Load all models.py files to register db.Models with SQLAlchemy
@@ -59,6 +59,7 @@ def init_app(app, db, extra_config_settings={}):
 
     # Load all views.py files to register @app.routes() with Flask
     from webrob.pages import api
+    from webrob.pages import db
     from webrob.pages import editor
     from webrob.pages import experiments
     from webrob.pages import knowrob
@@ -68,9 +69,9 @@ def init_app(app, db, extra_config_settings={}):
     from webrob.pages import tutorials
     from webrob.pages import user
     
-    init_db(app, db)
+    init_db(app, db_instance)
     
-    add_user(db,user_manager,'admin', 'openease.iai@gmail.com',
+    add_user(db_instance,user_manager,'admin', 'openease.iai@gmail.com',
              os.environ.get('OPENEASE_MAIL_PASSWORD'), ['admin'])
 
     app.logger.info("Webapp started.")
