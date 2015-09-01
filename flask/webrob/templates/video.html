@@ -7,9 +7,9 @@
     
     function init_video_divs () {
         var episodeSelect = document.getElementById('replay-episode-list');
-        if (episodeSelect !== null && episodeData) {
-            for (var i = 0; i < episodeData.video.length; i++) {
-                  var episode = episodeData.video[i].name;
+        if (episodeSelect !== null && knowrob.episodeData) {
+            for (var i = 0; i < knowrob.episodeData.video.length; i++) {
+                  var episode = knowrob.episodeData.video[i].name;
                   var li = document.createElement("li");
                   li.style.width = "100%";
                   var item = document.createElement("a");
@@ -50,8 +50,8 @@
 
     function selected_video_episode() {
         var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
-        for(var i=0; i<episodeData.video.length; i++) {
-            if(querylist.video[i].name == selectedEpisode) return episodeData.video[i];
+        for(var i=0; i<knowrob.episodeData.video.length; i++) {
+            if(knowrob.episodeData.video[i].name == selectedEpisode) return knowrob.episodeData.video[i];
         }
         return undefined;
     }
@@ -65,10 +65,10 @@
         var selection = selected_video_episode();
         if(selection){
           if(initdiv !== null) {
-            ace.edit('init_query').setValue(selection.init);
+            ace.edit('init_query').setValue(selection.initialization);
           }
           if(initdiv !== null && userdiv !== null) {
-            ace.edit('user_query').setValue(selection.user);
+            ace.edit('user_query').setValue(selection.animation);
           }
           if(firstrange !== null) {
             firstrange.min = selection.start;
@@ -150,14 +150,12 @@
     
     function stop_streaming() {
         isStreaming = false;
-        // Toggle button
         var toggleButton = document.getElementById("replay-toggle-button");
         toggleButton.onclick = start_streaming;
         toggleButton.innerHTML = "Start";
     };
     
     function start_streaming() {
-        // Toggle button
         var toggleButton = document.getElementById("replay-toggle-button");
         toggleButton.onclick = stop_streaming;
         toggleButton.innerHTML = "Stop";
@@ -194,7 +192,7 @@
           var prolog = knowrob.new_pl_client();
           prolog.jsonQuery(query, function(result) {
             update_hud_text(t, function(){
-              knowrob.publish_snapshot(frame_number, fps);
+              //knowrob.publish_snapshot(frame_number, fps);
               frame_number += 1;
               stream_step();
             });
@@ -204,7 +202,7 @@
     };
     
     function update_progress_bar(t0, t1, t) {
-        document.getElementById("replay-progress-bar").value = (t1-t0)/(t-t0);
+        document.getElementById("replay-progress-bar").value = 100*(t-t0)/(t1-t0);
         document.getElementById("replay-progress-value").innerHTML = format_date(t);
     }
     
@@ -279,6 +277,7 @@
 
     $(document).ready(function () {
       knowrob.setup_query_field();
+      knowrob.get_episode_data();
       setup_video_query();
       init_video_divs();
       update_start_time();
@@ -427,7 +426,7 @@
           <form id="replay-panel-form" action="" class="form hidden-form" role="form" onsubmit="return false">
               <div id="replay-progress-field" class="form-group">
                   <label for="replay-progress-bar">Progress</label>
-                  <input id="replay-progress-bar" type="range" min="0" max="1" value="0" readonly />
+                  <input id="replay-progress-bar" type="range" min="0" max="100" value="0" disabled />
                   <div id="replay-progress-value">00:00</div>
               </div>
               <button id="replay-toggle-button" class="btn btn-lg btn-primary btn-block" onclick="start_streaming()">Start</button>
