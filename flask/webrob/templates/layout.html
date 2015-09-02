@@ -151,23 +151,16 @@
     };
     
     function add_common_menu_items(left_menu, right_menu) {
-        
         if(left_menu) {
         {% if current_user.is_authenticated() %}
             add_menu_item(left_menu, { text: 'Knowledge Base', href: "/knowrob/" });
             add_menu_item(left_menu, { text: 'Episode Replay', href: "/knowrob/video" });
-            add_menu_item(left_menu, { text: 'Prolog Editor', href: "/knowrob/editor" });
+            add_menu_item(left_menu, { text: 'Text Editor', href: "/knowrob/editor" });
             add_menu_item(left_menu, { text: 'Log', href: "{{ url_for('log') }}" });
         {% if current_user.has_role('admin') %}
             handle_webapp_menu(left_menu, {
                 text: 'Admin',
                 submenu: [
-                    {
-                        text: 'User Management',
-                        submenu: [
-                            { text: 'Users', href: '/admin/users' }
-                        ]
-                    },
                     { text: 'Mongo', href: '/knowrob/admin/mongo' },
                     { text: 'Tutorials', href: '/knowrob/admin/tutorials' },
                     {
@@ -175,6 +168,7 @@
                         submenu: [
                             { text: 'User', href: '/db/page/user' },
                             { text: 'Roles', href: '/db/page/role' },
+                            { text: 'User Roles', href: '/db/page/user_roles' },
                             { text: 'Tags', href: '/db/page/tag' },
                             { text: 'Projects', href: '/db/page/project' },
                             { text: 'Platforms', href: '/db/page/platform' }
@@ -191,7 +185,6 @@
         {% endif %}
         {% endif %}
         }
-        
         if(right_menu) {
             add_menu_item(right_menu, {
                 text: "Logout {{ current_user.username }}",
@@ -275,6 +268,7 @@
             data: JSON.stringify({}),  
             dataType: "json",
             success: function (data) {
+                add_common_menu_items(left_menu, undefined, application_name);
                 if(left_menu) {
                     for(var i in data.menu_left) {
                         handle_webapp_menu(left_menu, data.menu_left[i]);
@@ -291,7 +285,7 @@
                         handle_webapp_menu(right_menu, RIGHT_MENU_LIST[i]);
                     }
                 }
-                add_common_menu_items(left_menu, right_menu, application_name);
+                add_common_menu_items(undefined, right_menu, application_name);
                 resize_menus();
             }
         }).done( function (request) {});

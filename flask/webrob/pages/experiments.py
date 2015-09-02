@@ -40,10 +40,13 @@ def episode_data(category, exp):
 @admin_required
 def experiment_save(category, exp):
     data = json.loads(request.data)
+    # TODO: get or create
     episodeData = experiment_load_queries(category, exp)
     if episodeData != None:
         for key in data: episodeData[key] = data[key]
         experiment_save_queries(category, exp, episodeData)
+    else:
+        app.logger.info("Can not find " + category + "/" + exp)
     return jsonify(result=None)
 
 @app.route('/knowrob/exp_meta_data', methods=['POST'])
@@ -57,9 +60,13 @@ def get_exp_meta_data():
             data = { 'name': '', 'description': '' }
         else:
             data = data['meta']
-        if not 'projects' in data: data['projects'] = []
-        if not 'tags' in data: data['tags'] = []
-        if not 'platforms' in data: data['platforms'] = []
+            
+        for x in ['projects', 'tags', 'platforms']:
+            if not x in data: data[x] = []
+            wrappedData = []
+            for y in data[x]: wrappedData.append({'name': str(y)})
+            data[x] = wrappedData
+        
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)

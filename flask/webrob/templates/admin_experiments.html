@@ -105,6 +105,21 @@
             }
         });
     };
+    function projectsDisplay(data) {
+        var res = [];
+        $.each(data.projects, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
+    function tagsDisplay(data) {
+        var res = [];
+        $.each(data.tags, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
+    function platformsDisplay(data) {
+        var res = [];
+        $.each(data.platforms, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
     $(document).ready(function () {
         $("#grid").kendoGrid({
             dataSource: {
@@ -138,14 +153,32 @@
                 { field: "exp", title: "Experiment", width: "60px" },
                 { field: "name", title: "Name", width: "100px" },
                 { field: "description", title: "Description", width: "150px" },
-                { field: "projects", title: "Projects", width: "70px", template: "#= projects.join(', ') #", editor: projectsEditor },
-                { field: "tags", title: "IEEE Tags", width: "70px", template: "#= tags.join(', ') #", editor: tagsEditor },
-                { field: "platforms", title: "Platforms", width: "70px", template: "#= platforms.join(', ') #", editor: platformsEditor },
+                { field: "projects", title: "Projects", width: "70px", template: projectsDisplay, editor: projectsEditor },
+                { field: "tags", title: "IEEE Tags", width: "70px", template: tagsDisplay, editor: tagsEditor },
+                { field: "platforms", title: "Platforms", width: "70px", template: platformsDisplay, editor: platformsEditor },
                 { command: ["edit"], title: "&nbsp;" , width: "50px" }
             ],
+            toolbar: [
+                { template: kendo.template($("#create_template").html()) }
+            ],
             save: function(e) {
-                $('#grid').data('kendoGrid').dataSource.read();
-                $('#grid').data('kendoGrid').refresh();
+                $.ajax({
+                    url: "/knowrob/exp_save/"+e.model.cat+"/"+e.model.exp,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ meta: {
+                        name: e.model.name,
+                        description: e.model.description,
+                        projects: e.model.projects.map(function(x) {return x.name;}),
+                        tags: e.model.tags.map(function(x) {return x.name;}),
+                        platforms: e.model.platforms.map(function(x) {return x.name;})
+                    }}),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {});
             },
             selectable: true,
             editable: "popup",

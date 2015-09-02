@@ -51,6 +51,8 @@ def __knowrob_page__(template, category=None, exp=None):
     container_name = session['user_container_name']
     if category is not None: session['exp-category'] = category
     if exp is not None:      session['exp-name'] = exp
+    category = session['exp-category']
+    exp = session['exp-name']
     exp_url = get_experiment_download_url()
     return render_template(template, **locals())
 
@@ -169,8 +171,8 @@ def get_history_item():
 @app.route('/log')
 @login_required
 def log():
-    logStr = docker_interface.get_container_log(session['user_container_name'])
-    return render_template('log.html', log=logStr)
+  logStr = docker_interface.get_container_log(session['user_container_name'])
+  return render_template('log.html', log=logStr)
 
 def get_history_file():
   userDir = get_user_dir()

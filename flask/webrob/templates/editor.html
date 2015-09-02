@@ -528,23 +528,23 @@
 </script>
 {% endblock %}
 
-{% block _menu %}
-  <li class="submenu"><a>Package</a><ul>
-    <li><a href="#" onclick="new_pkg();">New</a></li>
-    <li><a href="#" onclick="upload_pkg();">Upload</a></li>
-    <li><a href="#" onclick="download_pkg();">Download</a></li>
-    <li><a href="#" onclick="delete_pkg();">Delete</a></li>
-    <li><a href="#" onclick="consult_pkg();">Consult</a></li>
-  </ul></li>
-  <li class="submenu"><a>File</a><ul>
-    <li><a href="#" onclick="new_file();">New</a></li>
-    <li><a href="#" onclick="upload_file();">Upload</a></li>
-    <li><a href="#" onclick="save_file();">Save</a></li>
-    <li><a href="#" onclick="delete_file();">Delete</a></li>
-  </ul></li>
-{% endblock %}
-
 {% block content %}
+  <script type="text/javascript">
+    LEFT_MENU_LIST.push({ "text": "Package", "submenu": [
+        { text: "New", onclick: new_pkg },
+        { text: "Upload", onclick: upload_pkg },
+        { text: "Download", onclick: download_pkg },
+        { text: "Delete", onclick: delete_pkg },
+        { text: "Consult", onclick: consult_pkg }
+    ]});
+    LEFT_MENU_LIST.push({ "text": "File", "submenu": [
+        { text: "New", onclick: new_file },
+        { text: "Upload", onclick: upload_file },
+        { text: "Save", onclick: save_file },
+        { text: "Delete", onclick: delete_file }
+    ]});
+  </script>
+  
   <!-- A hidden form used for the download of packages. -->
   <form id="download" action="/knowrob/pkg_down" method="POST">
     <input type="hidden" />

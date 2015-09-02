@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+    <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="example">
+    <div id="grid"></div>
+    
+    <script>
+    $(document).ready(function () {
+        function rolesEditor(container, options) {
+          $("<select multiple='multiple' data-bind='value : roles'/>").appendTo(container).kendoMultiSelect({
+            dataTextField: "name",
+            dataValueField: "name",
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/db/find/role",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                schema: {
+                    data: 'result',
+                    model: {
+                        id: "id",
+                        fields: {
+                            id: { type: "number" },
+                            name: { type: "string" }
+                        }
+                    }
+                }
+            }
+          });
+        };
+        function multiEditDisplay(data) {
+            var res = [];
+            $.each(data.roles, function (idx, elem) { res.push(elem.name); });
+            return res.join(", ");
+        };
+
+        $("#grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/db/find/user_roles",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    }
+                },
+                schema: {
+                    data: 'result',
+                    model: {
+                        id: "id",
+                        fields: {
+                            id: { editable: false },
+                            name: { editable: false },
+                            roles: { editable: true }
+                        }
+                    }
+                }
+            },
+            save: function(e) {
+                $.ajax({
+                    url: "/db/save/user_roles",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        id: e.model.id,
+                        name: e.model.name,
+                        roles: e.model.roles
+                    }),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
+            columns: [
+                { field: "id", title: "ID" },
+                { field: "name", title: "Username" },
+                { field: "roles", title: "Roles", template: multiEditDisplay, editor: rolesEditor },
+                { command: ["edit"], title: "&nbsp;" }
+            ],
+            editable: "popup",
+            sortable: true
+        });
+    });
+    </script>
+</div>
+{% endblock %}

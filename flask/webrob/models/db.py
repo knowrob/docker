@@ -27,6 +27,13 @@ def db_find(cls, i):
     db_adapter = current_app.user_manager.db_adapter
     return db_adapter.get_object(cls, i)
 
+def db_find_name(cls, name):
+    db_adapter = current_app.user_manager.db_adapter
+    entries = db_adapter.find_all_objects(cls)
+    for e in entries:
+        if e.name == name: return e
+    return None
+
 def db_update(cls, i, data):
     entry = db_find(cls,i)
     db_adapter = current_app.user_manager.db_adapter
