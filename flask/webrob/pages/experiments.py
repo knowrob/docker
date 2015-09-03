@@ -49,6 +49,30 @@ def experiment_save(category, exp):
         app.logger.info("Can not find " + category + "/" + exp)
     return jsonify(result=None)
 
+@app.route('/knowrob/exp_move/<cat>/<exp>', methods=['POST'])
+@admin_required
+def experiment_move(cat, exp):
+    data = json.loads(request.data)
+    cat_new = data['cat']
+    exp_new = data['exp']
+    if cat_new==cat and exp_new==exp:
+        return jsonify(result=None)
+    
+    path_old = get_experiment_path(cat,exp)
+    path_new = get_experiment_path(cat_new,exp_new)
+    if os.path.isfile(path_new):
+        app.logger.info("Unable to rename experiment. Experiment with same name already existing.")
+        return jsonify(result=None)
+    
+    os.rename(path_old, path_new)
+    return jsonify(result=None)
+
+@app.route('/knowrob/exp_new/<cat>/<exp>', methods=['POST'])
+@admin_required
+def experiment_move(cat, exp):
+    # TODO: Create exp....
+    return jsonify(result=None)
+
 @app.route('/knowrob/exp_meta_data', methods=['POST'])
 @admin_required
 def get_exp_meta_data():

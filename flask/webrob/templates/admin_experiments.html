@@ -14,21 +14,41 @@
     </script>
     <script>
     function new_experiment() {
-        var expName = prompt("Please enter the experiment name", "");
-        if(expName) {
-            $.ajax({
-                url: "/admin/experiment_new",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({name: roleName}),  
-                dataType: "json",
-                success: function (data) {
-                    console.log("Experiment created!");
-                    $('#grid').data('kendoGrid').dataSource.read();
-                    $('#grid').data('kendoGrid').refresh();
-                }
-            }).done( function (request) {});
-        }
+        var cat = prompt("Please enter a category", 'Pick-and-Place');
+        if(!cat) return;
+        var n = prompt("Please enter a name", 'exp_0');
+        if(!n) return;
+        
+        $.ajax({
+            url: '/knowrob/exp_new/'+cat+'/'+n,
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) {
+                console.log("Experiment created!");
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            }
+        }).done( function (request) {});
+    };
+    function moveExperiment(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var cat = prompt("Please enter a category", dataItem.cat);
+        if(!cat) return;
+        var n = prompt("Please enter a name", dataItem.exp);
+        if(!n) return;
+        $.ajax({
+            url: '/knowrob/exp_move/'+dataItem.cat+'/'+dataItem.exp,
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({ cat: cat, exp: n }),
+            success: function (data) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            }
+        });
     };
     function projectsEditor(container, options) {
         $("<select multiple='multiple' data-bind='value : projects'/>").appendTo(container).kendoMultiSelect({
@@ -156,7 +176,7 @@
                 { field: "projects", title: "Projects", width: "70px", template: projectsDisplay, editor: projectsEditor },
                 { field: "tags", title: "IEEE Tags", width: "70px", template: tagsDisplay, editor: tagsEditor },
                 { field: "platforms", title: "Platforms", width: "70px", template: platformsDisplay, editor: platformsEditor },
-                { command: ["edit"], title: "&nbsp;" , width: "50px" }
+                { command: ["edit", { text: "Move", click: moveExperiment }], title: "&nbsp;" , width: "50px" }
             ],
             toolbar: [
                 { template: kendo.template($("#create_template").html()) }
@@ -179,6 +199,10 @@
                         $('#grid').data('kendoGrid').refresh();
                     }
                 }).done( function (request) {});
+            },
+            cancel:function(e) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
             },
             selectable: true,
             editable: "popup",

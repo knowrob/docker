@@ -72,6 +72,10 @@
                     }
                 }).done( function (request) {})
             },
+            cancel:function(e) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            },
             remove: function(e) {
                 $.ajax({
                     url: "/db/delete/{{ table }}",
@@ -99,7 +103,8 @@
                 { command: ["edit", "destroy"], title: "&nbsp;" }
             ],
             editable: "popup",
-            sortable: true
+            sortable: true,
+            selectable: true
         });
     });
     </script>

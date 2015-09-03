@@ -161,11 +161,17 @@
             handle_webapp_menu(left_menu, {
                 text: 'Admin',
                 submenu: [
-                    { text: 'Mongo', href: '/knowrob/admin/mongo' },
                     { text: 'Tutorials', href: '/knowrob/admin/tutorials' },
                     {
-                        text: 'Database',
+                        text: 'Mongo',
                         submenu: [
+                            { text: 'Synchronization', href: '/knowrob/admin/mongo' }
+                        ]
+                    },
+                    {
+                        text: 'SQL',
+                        submenu: [
+                            { text: 'Documentation', href: '/db/page/docu' },
                             { text: 'User', href: '/db/page/user' },
                             { text: 'Roles', href: '/db/page/role' },
                             { text: 'User Roles', href: '/db/page/user_roles' },

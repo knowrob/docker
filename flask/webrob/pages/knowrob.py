@@ -51,8 +51,9 @@ def __knowrob_page__(template, category=None, exp=None):
     container_name = session['user_container_name']
     if category is not None: session['exp-category'] = category
     if exp is not None:      session['exp-name'] = exp
-    category = session['exp-category']
-    exp = session['exp-name']
+    if 'exp-category' in session: category = session['exp-category']
+    if 'exp-name' in session: exp = session['exp-name']
+    
     exp_url = get_experiment_download_url()
     return render_template(template, **locals())
 

@@ -5,19 +5,7 @@
 
 <div class="page-centered">
     <div class="headline">
-    <div class="content-box" id="welcome-headline-box">
-    <h1 class="content-box-header">{%trans%}Welcome to openEASE{%endtrans%}</h1>
-        openEASE is a web-based knowledge service providing robot and human activity data.
-        It contains semantically annotated data of manipulation actions,
-        including the environment the agent is acting in, the objects it manipulates,
-        the task it performs, and the behavior it generates.
-        The episode representations can include images captured by the robot,
-        other sensor datastreams as well as full-body poses.
-        A powerful query language and inference tools, allow reasoning about
-        the data and retrieving requested information based on semantic queries.
-        Based on the data and using the inference tools robots can answer queries regarding to what they did,
-        why, how, what happened, and what they saw.
-    </div></div>
+    <div class="content-box" id="welcome-headline-box"></div></div>
 
     <div id="page-body">
         <div class="content-box" id="user-data-box">
@@ -62,5 +50,16 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/db/docu/WELCOME',
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) { $("#welcome-headline-box").html(data.result); }
+        });
+    });
+</script>
 
 {% endblock %}

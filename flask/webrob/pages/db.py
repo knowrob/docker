@@ -14,6 +14,15 @@ from webrob.models.users import *
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+@app.route('/db/docu/<key>', methods=['POST'])
+def db_docu_text(key):
+    db_adapter = current_app.user_manager.db_adapter
+    docs = db_adapter.find_all_objects(db_table_class('docu'))
+    for d in docs:
+        if d.key == key: return jsonify(result=d.text)
+    app.logger.warn("Unable to find docu for: " + str(key) + ".")
+    abort(404)
+
 @app.route('/db/page/user_roles')
 @admin_required
 def db_page_user_roles():

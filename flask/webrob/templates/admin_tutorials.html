@@ -65,6 +65,10 @@
                     }
                 }).done( function (request) {})
             },
+            cancel:function(e) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            },
             remove: function(e) {
                 $.ajax({
                     url: "/knowrob/admin/tutorial_remove",
