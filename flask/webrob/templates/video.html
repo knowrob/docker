@@ -9,22 +9,25 @@
         var episodeSelect = document.getElementById('replay-episode-list');
         if (episodeSelect !== null && knowrob.episodeData) {
             for (var i = 0; i < knowrob.episodeData.video.length; i++) {
-                  var episode = knowrob.episodeData.video[i].name;
-                  var li = document.createElement("li");
-                  li.style.width = "100%";
-                  var item = document.createElement("a");
-                  item.href = "#";
-                  item.onclick = function() {
-                      document.getElementById("replay-episode-value").innerHTML = episode;
-                      replay_episode_selected();
-                  };
-                  item.style.width = "100%";
-                  item.style.textAlign = "center";
-                  item.appendChild(document.createTextNode(episode));
-                  li.appendChild(item);
-                  episodeSelect.appendChild(li);
+                  add_video_item(knowrob.episodeData.video[i].name);
             }
         }
+    };
+    function add_video_item (episode) {
+      var li = document.createElement("li");
+      li.style.width = "100%";
+      var item = document.createElement("a");
+      item.href = "#";
+      item.onclick = function() {
+          document.getElementById("replay-episode-value").innerHTML = episode;
+          replay_episode_selected();
+      };
+      item.style.width = "100%";
+      item.style.textAlign = "center";
+      item.appendChild(document.createTextNode(episode));
+      li.appendChild(item);
+      var episodeSelect = document.getElementById('replay-episode-list');
+      episodeSelect.appendChild(li);
     };
     
     function setup_video_query() {
@@ -274,6 +277,82 @@
         update_video_divs();
         update_summary_divs();
     };
+    
+    {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+    function save_video_settings() {
+        var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
+        var videoSequence = [{
+            name: selectedEpisode,
+            start: document.getElementById('replay-start-time').value,
+            end: document.getElementById('replay-end-time').value,
+            initialization: ace.edit('init_query').getValue(),
+            animation: ace.edit('user_query').getValue(),
+            fps: parseInt(document.getElementById("replay-fps").value, 10)
+        }];
+        var oldVid = undefined;
+        for(var i=0; i<knowrob.episodeData.video.length; i++) {
+            if(knowrob.episodeData.video[i].name != selectedEpisode) {
+                videoSequence.push(knowrob.episodeData.video[i]);
+            }
+            else { oldVidIndex = i; }
+        }
+        
+        $.ajax({
+            url: "/knowrob/exp_save/{{ category }}/{{ exp }}",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ video: videoSequence }),
+            dataType: "json"
+        }).done( function (request) {});
+    };
+    function delete_video() {
+        if(!selected_video_episode()) return;
+        
+        var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
+        if(!confirm("Are you sure you want to delete '"+selectedEpisode+"'?")) return;
+        
+        var videoSequence = [];
+        for(var i=0; i<knowrob.episodeData.video.length; i++) {
+            if(knowrob.episodeData.video[i].name != selectedEpisode) {
+                videoSequence.push(knowrob.episodeData.video[i]);
+            }
+        }
+        
+        $.ajax({
+            url: "/knowrob/exp_save/{{ category }}/{{ exp }}",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ video: videoSequence }),
+            dataType: "json",
+            success: function (data) {
+                // TODO: update without reload
+                location.reload();
+            }
+        }).done( function (request) {});
+    }
+    {% endif %}
+    
+    function new_video() {
+        var name = prompt("Please enter a name for the video", "");
+        if(!name) return;
+        // TODO: let user select experiment instead of timestamps
+        var start = prompt("Please enter a start timestamp", "");
+        if(!start) return; start = parseInt(start);
+        var end = prompt("Please enter a end timestamp", "");
+        if(!end) return; end = parseInt(end);
+        
+        knowrob.episodeData.video.push({
+            name: name,
+            start: start,
+            end: end,
+            initialization: '',
+            animation: '',
+            fps: 6
+        });
+        document.getElementById('replay-episode-value').innerHTML = name;
+        add_video_item(name);
+        replay_episode_selected();
+    };
 
     $(document).ready(function () {
       knowrob.setup_query_field();
@@ -366,9 +445,14 @@
             <image src="/static/images/shade.png"
                    class="content-box-toggle"
                    id="replay-selection-toggle"/> 
-            <a href="#">Plan Selection</a>
+            <a href="#">Video Selection</a>
           </h1>
           <form id="replay-episode-form" action="" class="form" role="form">
+              <button id="new-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="new_video()">New</button><br>
+      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+              <button id="del-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="delete_video()">Delete</button><br>
+      {% endif %}
+              
               <div id="replay-episode-field" class="form-group">
                   <ul class="menu pkg-menu" id="replay-episode-selection"><li>
                       <a href="#" id='replay-episode-value'>Choose an episode</a>
@@ -412,6 +496,10 @@
                   <label for="user_query">Animation Query</label>
                   <div id="user_query"></div>
               </div>
+              
+      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+              <button id="save-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="save_video_settings()">Save</button><br>
+      {% endif %}
           </form>
       </div>
           

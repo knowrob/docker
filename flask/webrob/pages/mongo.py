@@ -3,7 +3,6 @@ from flask import session, render_template, stream_with_context, Response
 from flask_user import login_required
 
 import os
-from time import time, sleep
 from subprocess import call
 
 from webrob.pages.experiments import get_experiment_list, get_experiment_path
@@ -129,5 +128,3 @@ def mng_import_bson(db_name, collection, bson_file):
           "--collection", collection,
           str(bson_file)
     ])
-    
-    

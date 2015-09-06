@@ -2,22 +2,27 @@
 import os, sys
 import json
 import zipfile
+import traceback
 
 from urlparse import urlparse
 
-from flask import session, request, render_template, jsonify, send_file
+from flask import session, request, render_template, jsonify, send_file, redirect, url_for
 from flask_user import login_required
 
 from webrob.app_and_db import app
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import LFTransfer
 from webrob.utility import copy_template_file
+from webrob.docker.docker_application import ensure_application_started
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
-@app.route('/knowrob/editor')
+@app.route('/editor')
 @login_required
 def editor(filename=""):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+        return redirect(url_for('user.logout'))
+    
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
@@ -57,7 +62,9 @@ def pkg_new():
                     })
             lft.to_container(packageName, packageName)
     except:  # catch *all* exceptions
+        app.logger.error("Unable to create package.")
         app.logger.error(str(sys.exc_info()[0]))
+        app.logger.error(str(traceback.format_exc()))
         pkg_del(packageName)
     
     return jsonify(result=None)

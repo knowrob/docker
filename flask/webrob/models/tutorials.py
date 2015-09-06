@@ -9,5 +9,5 @@ class Tutorial(db.Model):
     text = db.Column(db.String(), nullable=False)
     page = db.Column(db.Integer(), nullable=False)
 
-def read_tutorial_page(ecat, page):
+def read_tutorial_page(cat, page):
     return Tutorial.query.filter_by(cat_id=cat,page=page).first()

@@ -28,6 +28,9 @@
             grid.editRow(grid.tbody.children().last());
         }
     };
+    function textEditor(container, options) {
+        $('<textarea class="tut_textarea" data-bind="value: ' + options.field + '"></textarea>').appendTo(container);
+    };
     $(document).ready(function () {
         $("#grid").kendoGrid({
             dataSource: {
@@ -73,6 +76,7 @@
                 }).done( function (request) {})
             },
             cancel:function(e) {
+                // HACK: For some reasons rows disappear when editing is canceled
                 $('#grid').data('kendoGrid').dataSource.read();
                 $('#grid').data('kendoGrid').refresh();
             },
@@ -98,13 +102,27 @@
             ],
             columns: [
                 {% for column in columns %}
-                { field: "{{ column.name }}", title: "{{ column.name }}" },
+                {
+                    field: "{{ column.name }}",
+                    {% if column.name|string() == "text" %}
+                    encoded: false, editor: textEditor,
+                    {% endif %}
+                    {% if column.type|string() == "number" %}
+                    width: 60,
+                    {% endif %}
+                    {% if column.name|string() == "key" or column.name|string() == "title" or column.name|string() == "cat_title" %}
+                    width: 100,
+                    {% endif %}
+                    {% if column.name|string() == "cat_id" %}
+                    width: 80,
+                    {% endif %}
+                    title: "{{ column.name }}"
+                },
                 {% endfor %}
-                { command: ["edit", "destroy"], title: "&nbsp;" }
+                { command: ["edit", "destroy"], title: "&nbsp;", width: 100 }
             ],
-            editable: "popup",
-            sortable: true,
-            selectable: true
+            editable: "inline",
+            sortable: true
         });
     });
     </script>

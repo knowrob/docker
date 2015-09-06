@@ -1,22 +1,17 @@
 
 import os
+import sys
+import traceback
 
 from flask import send_from_directory
 from flask_user import login_required
 from urllib import urlopen, urlretrieve
-from webrob.app_and_db import app
 from subprocess import call
 
-__author__ = 'danielb@cs.uni-bremen.de'
+from webrob.app_and_db import app
+from webrob.config.settings import MESH_REPOSITORIES
 
-MESH_REPOSITORIES = [
-    "http://svn.ai.uni-bremen.de/svn/cad_models/",
-    "https://github.com/code-iai/iai_maps/raw/master/",
-    "https://github.com/bbrieber/iai_robots/raw/master/",
-    "https://github.com/PR2/pr2_common/raw/master/"
-    #"https://github.com/code-iai/iai_robots/raw/master/",
-    #"https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
-]
+__author__ = 'danielb@cs.uni-bremen.de'
 
 def is_mesh_url_valid(url):
     return urlopen(url).getcode() == 200
@@ -51,7 +46,6 @@ def download_mesh_to_local_cache(src, dst):
 @login_required
 def download_mesh(mesh):
     meshFile = os.path.join('/home/ros/mesh_data', mesh)
-    
     if not os.path.isfile(meshFile):
         for repository in MESH_REPOSITORIES:
             sourceFile = repository + mesh
@@ -59,6 +53,8 @@ def download_mesh(mesh):
                 if download_mesh_to_local_cache(sourceFile, meshFile):
                     break
             except:
+                app.logger.error(str(sys.exc_info()[0]))
+                app.logger.error(str(traceback.format_exc()))
                 pass
     
     return send_from_directory(

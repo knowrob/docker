@@ -69,7 +69,7 @@ def experiment_move(cat, exp):
 
 @app.route('/knowrob/exp_new/<cat>/<exp>', methods=['POST'])
 @admin_required
-def experiment_move(cat, exp):
+def experiment_new(cat, exp):
     # TODO: Create exp....
     return jsonify(result=None)
 
@@ -101,9 +101,11 @@ def get_exp_meta_data():
 # TODO redundant below
 def get_experiment_url(category, exp):
     if category is not None and exp is not None:
-        episode_url = '/knowrob/'
+        episode_url = ''
         if 'video' in session and session['video']==True:
-            episode_url += 'video/'
+            episode_url += '/video/'
+        else:
+            episode_url += '/knowrob/'
         episode_url += 'exp/'
         if len(category)>0: episode_url += category + '/'
         episode_url += exp

@@ -12,10 +12,9 @@ from webrob.docker.docker_application import ensure_application_started
 from webrob.docker import docker_interface
 from webrob.utility import *
 from webrob.pages.experiments import get_experiment_download_url, get_experiment_url, get_experiment_list, experiment_load_queries
+from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
-
-MAX_HISTORY_LINES = 50
 
 @app.route('/knowrob/static/<path:filename>')
 @login_required
@@ -34,8 +33,8 @@ def knowrob(category=None, exp=None):
     session['video'] = False
     return __knowrob_page__('knowrob_simple.html', category, exp)
 
-@app.route('/knowrob/video')
-@app.route('/knowrob/video/exp/<category>/<exp>')
+@app.route('/video')
+@app.route('/video/exp/<category>/<exp>')
 @login_required
 def video(category=None, exp=None):
     session['video'] = True

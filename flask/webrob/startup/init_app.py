@@ -67,7 +67,6 @@ def init_app(app, db_instance, extra_config_settings={}):
     from webrob.pages import meshes
     from webrob.pages import mongo
     from webrob.pages import tutorials
-    from webrob.pages import user
     
     init_db(app, db_instance)
     
@@ -76,4 +75,3 @@ def init_app(app, db_instance, extra_config_settings={}):
 
     app.logger.info("Webapp started.")
     return app
-

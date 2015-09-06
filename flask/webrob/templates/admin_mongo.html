@@ -1,12 +1,5 @@
 {% extends "layout.html" %}
 
-{% block menu %}
-{% block _menu %}{% endblock %}
-{% endblock %}
-{% block menu_right %}
-{% block _menu_right %}{% endblock %}
-{% endblock %}
-
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />

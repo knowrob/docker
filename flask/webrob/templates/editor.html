@@ -15,12 +15,8 @@
     $(document).ready(function () {
       init();
       $('#page').layout({
-        south: {
-          minSize: 75
-        },
-        west: {
-          size: 250
-        }
+        south: { minSize: 75 },
+        west: { size: 250 }
       });
     });
   </script>
@@ -182,9 +178,17 @@
         }
         save_editor_file_if_changed();
         
+        var consultCmd = "((ros_package_initialized("+pkg+"), make) ; register_ros_package("+pkg+")).";
+        console.log("QUERY " + consultCmd);
+        // TODO: feedback for user!
+        // FIXME: broken for some reason
         var pl = new JsonProlog(ros, {});
         // Assert package in prolog
-        pl.jsonQuery("(ros_package_initialized("+pkg+"), make) ; register_ros_package("+pkg+")", function(x) {});
+        pl.jsonQuery(consultCmd, function(x) {
+            //console.log("User package consulted.");
+            //console.log(x);
+            pl.finishClient();
+        });
     }
     
     /**

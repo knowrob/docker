@@ -15,8 +15,9 @@
                 <dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
             </dl>
         </div>
-        <div id="video-box">
-            <iframe width="420" height="270" src="//www.youtube-nocookie.com/embed/iu_Y7mxDjgA"></iframe>
+        <div class="content-box" id="video-box">
+            <h1 class="content-box-header">Howto use openEASE</h1>
+            <video id="howto-video" width="420" height="236" src="{{ url_for('static', filename='HowtouseopenEASE.mp4') }}" controls></video>
         </div>
     </div>
 </div>

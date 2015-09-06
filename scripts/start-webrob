@@ -75,6 +75,8 @@ runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+runContainer "lft_data" "-v /tmp/openEASE/dockerbridge busybox true"
+
 runContainer "episode_data" "-v $OPENEASE_EPISODE_DATA:/episodes -v /episodes busybox true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -138,6 +140,7 @@ docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     --volumes-from ease_secret:ro \
     --volumes-from user_data \
     --volumes-from episode_data \
+    --volumes-from lft_data \
     --link postgres_db:postgres \
     --link dockerbridge:dockerbridge \
     --link mongo_db:mongo \

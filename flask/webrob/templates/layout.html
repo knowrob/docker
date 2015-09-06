@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <link rel="stylesheet" media="all" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:400,400italic,700|Oswald|Source+Code+Pro" />
+  <link rel="stylesheet" media="all" type="text/css" href="{{ url_for('static', filename='lib/font/font.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/screen.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
@@ -29,8 +29,8 @@
   
   <div class="header">
     <nav id="navbar-tool">
-      <a class="navbar-tool-brand" href="http://www.open-ease.org"><img src="//www.open-ease.org/wp-content/themes/openease_wp/img/oe-logo-small.svg"> openEASE</a>
-      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://ai.uni-bremen.de/"><img src="//www.open-ease.org/wp-content/themes/openease_wp/img/ai_logo_white.png"></a>
+      <a class="navbar-tool-brand" href="http://www.open-ease.org"><img src="{{ url_for('static', filename='logos/oe-logo-small.svg') }}"> openEASE</a>
+      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://ai.uni-bremen.de/"><img src="{{ url_for('static', filename='logos/ai_logo_white.png') }}"></a>
       <a class="navbar-tool-brand navbar-tool-brand-2" href="http://www.informatik.uni-bremen.de/cms/detail.php?id=12"><img src="{{ url_for('static', filename='logos/uni-bremen.png') }}"></a>
     </nav>
   </div>
@@ -112,7 +112,6 @@
         // TODO handle item.icon and item.shortcut
         //if(item.shortcut) x += '<div class="menu_item_shortcut">' + item.shortcut + '</div>';
         a.innerHTML = x;
-        //a.appendChild(document.createTextNode(item.text));
         if(item.onclick) a.onclick = item.onclick;
         return a;
     };
@@ -154,14 +153,14 @@
         if(left_menu) {
         {% if current_user.is_authenticated() %}
             add_menu_item(left_menu, { text: 'Knowledge Base', href: "/knowrob/" });
-            add_menu_item(left_menu, { text: 'Episode Replay', href: "/knowrob/video" });
-            add_menu_item(left_menu, { text: 'Text Editor', href: "/knowrob/editor" });
+            add_menu_item(left_menu, { text: 'Episode Replay', href: "/video" });
+            add_menu_item(left_menu, { text: 'Text Editor', href: "/editor" });
+            add_menu_item(left_menu, { text: 'Tutorials', href: "/tutorials/" });
             add_menu_item(left_menu, { text: 'Log', href: "{{ url_for('log') }}" });
         {% if current_user.has_role('admin') %}
             handle_webapp_menu(left_menu, {
                 text: 'Admin',
                 submenu: [
-                    { text: 'Tutorials', href: '/knowrob/admin/tutorials' },
                     {
                         text: 'Mongo',
                         submenu: [
@@ -177,7 +176,8 @@
                             { text: 'User Roles', href: '/db/page/user_roles' },
                             { text: 'Tags', href: '/db/page/tag' },
                             { text: 'Projects', href: '/db/page/project' },
-                            { text: 'Platforms', href: '/db/page/platform' }
+                            { text: 'Platforms', href: '/db/page/platform' },
+                            { text: 'Tutorials', href: '/db/page/tutorial' }
                         ]
                     },
                     {

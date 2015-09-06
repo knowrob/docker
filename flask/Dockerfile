@@ -1,9 +1,9 @@
-FROM knowrob/hydro-swi
+FROM ubuntu:14.04
 MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de
 
 # install python and flask
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc imagemagick mongodb libffi-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc imagemagick mongodb libffi-dev libpq-dev
 
 RUN easy_install pymongo
 RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado

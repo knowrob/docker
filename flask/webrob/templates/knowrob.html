@@ -64,21 +64,17 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/html2canvas.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/FileSaver.js') }}"></script>
-  <script type="text/javascript" src="//gabelerner.github.io/canvg/rgbcolor.js"></script>
-  <script type="text/javascript" src="//gabelerner.github.io/canvg/StackBlur.js"></script>
-  <script type="text/javascript" src="//gabelerner.github.io/canvg/canvg.js"></script>
+  <!-- TODO: What are these scripts used for ? -->
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/canvg/rgbcolor.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/canvg/StackBlur.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/canvg/canvg.js') }}"></script>
   <script type="text/javascript">
     // global knowrob handle
     var knowrob;
     
     $(document).ready(function () {
       // The file that contains example queries
-      var exp_url = "{% if exp_url
-          %}{{ exp_url }}{%
-      else
-          %}{{ undefined }}{%
-      endif %}";
-      
+      var exp_url = "{% if exp_url %}{{ exp_url }}{% else %}{{ undefined }}{% endif %}";
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
       var auth = '{{ authentication }}';
