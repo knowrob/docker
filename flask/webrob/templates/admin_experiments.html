@@ -18,14 +18,19 @@
         if(!cat) return;
         var n = prompt("Please enter a name", 'exp_0');
         if(!n) return;
-        
         $.ajax({
-            url: '/knowrob/exp_new/'+cat+'/'+n,
+            url: '/knowrob/exp_save/'+cat+'/'+n,
             type: "POST",
             contentType: "application/json",
             dataType: "json",
+            data: JSON.stringify({ meta: {
+                name: "Experiment name",
+                description: "Experiment description",
+                projects: [],
+                tags: [],
+                platforms: ["Robotic Agents"]
+            }}),  
             success: function (data) {
-                console.log("Experiment created!");
                 $('#grid').data('kendoGrid').dataSource.read();
                 $('#grid').data('kendoGrid').refresh();
             }
@@ -128,7 +133,7 @@
                 { field: "projects", title: "Projects", width: "70px", template: projectsDisplay, editor: multiselectEditor('projects', 'project') },
                 { field: "tags", title: "IEEE Tags", width: "70px", template: tagsDisplay, editor: multiselectEditor('tags', 'tag') },
                 { field: "platforms", title: "Platforms", width: "70px", template: platformsDisplay, editor: multiselectEditor('platforms', 'platform') },
-                { command: ["edit", { text: "Move", click: moveExperiment }], title: "&nbsp;" , width: "50px" }
+                { command: ["edit", { text: "Move", click: moveExperiment }, "destroy"], title: "&nbsp;" , width: "50px" }
             ],
             toolbar: [
                 { template: kendo.template($("#create_template").html()) }
@@ -151,6 +156,18 @@
                         $('#grid').data('kendoGrid').refresh();
                     }
                 }).done( function (request) {});
+            },
+            remove: function(e) {
+                $.ajax({
+                    url: "/knowrob/exp_del/"+e.model.cat+"/"+e.model.exp,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
             },
             selectable: true,
             editable: "popup",

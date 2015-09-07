@@ -6,6 +6,9 @@ from flask_user import current_app
 
 import os
 import json
+import random
+import string
+import shutil
 
 from webrob.app_and_db import app
 from webrob.utility import admin_required
@@ -34,19 +37,31 @@ def admin_experiments():
 @app.route('/knowrob/exp_data/<category>/<exp>')
 @login_required
 def episode_data(category, exp):
+    create_queries_file(category, exp)
     return send_from_directory('/episodes/'+category+'/'+exp, 'queries.json')
 
 @app.route('/knowrob/exp_save/<category>/<exp>', methods=['POST'])
 @admin_required
 def experiment_save(category, exp):
     data = json.loads(request.data)
-    # TODO: get or create
+    experiment_create_directory(category, exp)
     episodeData = experiment_load_queries(category, exp)
     if episodeData != None:
         for key in data: episodeData[key] = data[key]
         experiment_save_queries(category, exp, episodeData)
     else:
         app.logger.info("Can not find " + category + "/" + exp)
+    return jsonify(result=None)
+
+@app.route('/knowrob/exp_del/<cat>/<exp>', methods=['POST'])
+@admin_required
+def experiment_del(cat, exp):
+    root = "/episodes"
+    cat_path = os.path.join(root, cat)
+    if not os.path.isdir(cat_path): return jsonify(result=None)
+    exp_path = os.path.join(cat_path, exp)
+    if not os.path.isdir(exp_path): return jsonify(result=None)
+    shutil.rmtree(exp_path)
     return jsonify(result=None)
 
 @app.route('/knowrob/exp_move/<cat>/<exp>', methods=['POST'])
@@ -65,12 +80,6 @@ def experiment_move(cat, exp):
         return jsonify(result=None)
     
     os.rename(path_old, path_new)
-    return jsonify(result=None)
-
-@app.route('/knowrob/exp_new/<cat>/<exp>', methods=['POST'])
-@admin_required
-def experiment_new(cat, exp):
-    # TODO: Create exp....
     return jsonify(result=None)
 
 @app.route('/knowrob/exp_meta_data', methods=['POST'])
@@ -98,7 +107,6 @@ def get_exp_meta_data():
     return jsonify(experiments=exp_data)
 
 
-# TODO redundant below
 def get_experiment_url(category, exp):
     if category is not None and exp is not None:
         episode_url = ''
@@ -138,7 +146,34 @@ def get_experiment_list():
 def get_experiment_path(category, exp):
     return "/episodes/"+category+"/"+exp
 
+def create_queries_file(cat,exp):
+    path = get_experiment_path(cat,exp)
+    if not os.path.isdir(path): return
+    f = os.path.join(path, 'queries.json')
+    if os.path.isfile(f): return
+    
+    data = { "meta": 
+      {
+        "date": "2015-07-18T12:00:00",
+        "name": ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)),
+        "description": ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)),
+        "tags": [],
+        "platforms": []
+      },
+      "query": [],
+      "video": []
+    }
+    with open(f, 'w') as data_file: json.dump(data, data_file)
+
+def experiment_create_directory(cat,exp):
+    root = "/episodes"
+    cat_path = os.path.join(root, cat)
+    if not os.path.isdir(cat_path): os.mkdir(cat_path)
+    exp_path = os.path.join(cat_path, exp)
+    if not os.path.isdir(exp_path): os.mkdir(exp_path)
+    
 def experiment_load_queries(category, exp):
+    create_queries_file(category,exp)
     episode_file = "/episodes/"+category+"/"+exp+"/queries.json"
     if not os.path.isfile(episode_file): return None
     data = None
