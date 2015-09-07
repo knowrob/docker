@@ -13,7 +13,5 @@ docker pull knowrob/dockerbridge
 
 
 # WebApp container
-docker pull openease/easeapp
-docker pull openease/login
-docker pull openease/knowrob
+docker pull openease/flask
 

@@ -35,19 +35,54 @@
     var prolog;
 
     function init() {
+      function connected_callback() {
+          // 'change' event is triggered whenever the editor content changes
+          ace.edit("editor").getSession().on('change', on_editor_changed);
+          // Initialization of widgets on reload
+          update_editor();
+          update_pkg_list(true);
+      };
+    
       // Connect to ROS.
       wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       ros = new ROSLIB.Ros({
         url : wsproto + '://{{ host_url }}/ws/{{ container_name }}/'
       });
-      
-      // 'change' event is triggered whenever the editor content changes
-      ace.edit("editor").getSession().on('change', on_editor_changed);
-      
-      // Initialization of widgets on reload
-      update_editor();
-      update_pkg_list(true);
+      ros.on('connection', function() {
+          console.log('Connected to websocket server.');
+          var authentication  = '{{ authentication }}' === '' ? true : '{{ authentication }}' === 'true';
+          if(authentication) {
+              authenticate('/api/v1.0/auth_by_session', connected_callback);
+          }
+          else {
+              connected_callback();
+          }
+      });
     }
+
+    ///////////////////////////////
+    //////////// Authentication
+    ///////////////////////////////
+    // TODO: redundant with knowrob.js!
+
+    this.authenticate = function (authurl, then) {
+        console.log("Acquiring auth token");
+        // Call wsauth api to acquire auth token by existing user login session
+        $.ajax({
+            url: authurl,
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json"
+        }).done( function (request) {
+            console.log("Sending auth token");
+            ros.authenticate(request.mac, request.client, request.dest, request.rand, request.t, request.level,
+                request.end);
+            // If a callback function was specified, call it in the context of Knowrob class (that)
+            if(then) {
+                then.call();
+            }
+        })
+    };
     
     ////////////////////////////////
     /////////// Editor view
@@ -181,12 +216,10 @@
         var consultCmd = "((ros_package_initialized("+pkg+"), make) ; register_ros_package("+pkg+")).";
         console.log("QUERY " + consultCmd);
         // TODO: feedback for user!
-        // FIXME: broken for some reason
         var pl = new JsonProlog(ros, {});
         // Assert package in prolog
         pl.jsonQuery(consultCmd, function(x) {
-            //console.log("User package consulted.");
-            //console.log(x);
+            console.log("User package consulted.");
             pl.finishClient();
         });
     }
