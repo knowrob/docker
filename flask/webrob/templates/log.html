@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
+
+{% block head %}
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      update_editor();
+      $('#page').layout();
+    });
+  </script>
+  
+  <script id="entity_body" type="text/pain">{{log}}</script>
+  <script type="text/javascript">
+    function update_editor() {
+        var edit = ace.edit("editor");
+        edit.resize(true);
+        edit.setTheme("ace/theme/solarized_light");
+        edit.getSession().setUseWrapMode(true);
+        edit.setOptions({
+            showGutter: true,
+            printMarginColumn: true,
+            highlightActiveLine: true,
+            highlightGutterLine: true,
+            readOnly: true
+        });
+        edit.setValue(document.getElementById('entity_body').innerHTML, -1);
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="ui-layout-center">
+    <div id="editor" class="black_border"></div>
+  </div>
+{% endblock %}

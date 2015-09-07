@@ -6,6 +6,7 @@ RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.7.
 	update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac" 1 && \
 	update-alternatives --set java "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" && \
 	update-alternatives --set javac "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac"
+
 USER ros
 # set up workspace and setup knowrob
 WORKDIR /home/ros/src
@@ -28,5 +29,3 @@ ENV OPEN_EASE_APPLICATION true
 
 # build the catkin workspace
 RUN /opt/ros/hydro/bin/catkin_make
-
-VOLUME /home/ros/summary_data

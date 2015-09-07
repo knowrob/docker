@@ -1,0 +1,66 @@
+{% extends 'flask_user/public_base.html' %}
+
+{% block content_inner %}
+{% from "flask_user/_macros.html" import render_field, render_checkbox_field, render_submit_field %}
+
+<div class="page-centered">
+    <div class="headline">
+    <div class="content-box" id="welcome-headline-box"></div></div>
+
+    <div id="page-body">
+        <div class="content-box" id="user-data-box">
+            <h1 class="content-box-header">{%trans%}Please sign in{%endtrans%}</h1>
+            
+            <form action="" method="POST" class="form" role="form">
+                {{ form.hidden_tag() }}
+
+                <div class="row">
+                    <div class="field-hint" id="forgot-password-link">
+                        {% if user_manager.enable_forgot_password %}
+                            <a href="{{ url_for('user.forgot_password') }}" tabindex='195'>
+                                {%trans%}Forgot your Password?{%endtrans%}</a>
+                        {% endif %}
+                    </div>
+                </div>
+                    
+                {# Username or Email field #}
+                {% set field = form.username if user_manager.enable_username else form.email %}
+                <div id="user-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                    <input placeholder="Username" class="form-control" id="username" name="username" type="text" value="" required autofocus />
+                </div>
+
+                {# Password field #}
+                {% set field = form.password %}
+                <div id="pw-field" class="form-group {% if field.errors %}has-error{% endif %}">
+                    <input placeholder="Password" class="form-control" id="password" name="password" type="password" value="" required />
+                </div>
+                
+                <div id="remember-me" class="checkbox">
+                    <label><input type="checkbox" value="remember_me">Remember me</input></label>
+                </div>
+                
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                
+                <a id="sign-up-button" class="btn btn-lg btn-primary btn-block" href="{{ url_for('user.register') }}" type="submit">Register</a>
+                
+            </form>
+        </div>
+        <div class="content-box" id="video-box">
+            <h1 class="content-box-header">Howto use openEASE</h1>
+            <video id="howto-video" width="420" height="236" src="{{ url_for('static', filename='HowtouseopenEASE.mp4') }}" controls></video>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/db/docu/WELCOME',
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) { $("#welcome-headline-box").html(data.result); }
+        });
+    });
+</script>
+
+{% endblock %}

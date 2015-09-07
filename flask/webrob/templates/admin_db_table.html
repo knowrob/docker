@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+    <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="example">
+    <div id="grid"></div>
+    
+    <script id="create_template" type="text/x-kendo-template">
+        <a class="k-button" href="\#" onclick="return new_entry()">Create new record</a>
+    </script>
+    <script>
+    function new_entry() {
+        var grid = $("#grid").data("kendoGrid");
+        if (grid) {
+            //this logic creates a new item in the datasource/datagrid
+            var dataSource = grid.dataSource;
+            var total = dataSource.data().length;
+            dataSource.insert(total, {});
+            dataSource.page(dataSource.totalPages());
+            grid.editRow(grid.tbody.children().last());
+        }
+    };
+    function textEditor(container, options) {
+        $('<textarea class="tut_textarea" data-bind="value: ' + options.field + '"></textarea>').appendTo(container);
+    };
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/db/find/{{ table }}",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                schema: {
+                    data: 'result',
+                    model: {
+                        id: "id",
+                        fields: {
+                        {% for column in columns %}
+                            {{ column.name }}: {
+                                    type: "{{ column.type }}",
+                                    editable: {{ column.editable }},
+                                    nullable: {{ column.nullable }}
+                            },
+                        {% endfor %}
+                        }
+                    }
+                }
+            },
+            save: function(e) {
+                $.ajax({
+                    url: "/db/save/{{ table }}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        {% for column in columns %}
+                        {{ column.name }}: e.model.{{ column.name }},
+                        {% endfor %}
+                    }),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
+            cancel:function(e) {
+                // HACK: For some reasons rows disappear when editing is canceled
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            },
+            remove: function(e) {
+                $.ajax({
+                    url: "/db/delete/{{ table }}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        {% for column in columns %}
+                        {{ column.name }}: e.model.{{ column.name }},
+                        {% endfor %}
+                    }),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
+            toolbar: [
+                { template: kendo.template($("#create_template").html()) }
+            ],
+            columns: [
+                {% for column in columns %}
+                {
+                    field: "{{ column.name }}",
+                    {% if column.name|string() == "text" %}
+                    encoded: false, editor: textEditor,
+                    {% endif %}
+                    {% if column.type|string() == "number" %}
+                    width: 60,
+                    {% endif %}
+                    {% if column.name|string() == "key" or column.name|string() == "title" or column.name|string() == "cat_title" %}
+                    width: 100,
+                    {% endif %}
+                    {% if column.name|string() == "cat_id" %}
+                    width: 80,
+                    {% endif %}
+                    title: "{{ column.name }}"
+                },
+                {% endfor %}
+                { command: ["edit", "destroy"], title: "&nbsp;", width: 100 }
+            ],
+            editable: "inline",
+            sortable: true
+        });
+    });
+    </script>
+</div>
+{% endblock %}

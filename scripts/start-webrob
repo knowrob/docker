@@ -41,7 +41,7 @@ else
 fi
 
 # Stop all webapp containers
-IMAGES=`docker images | grep latest | grep -Eo '^[^ ]+' | grep -v "openease/easeapp" | grep -v "openease/login"`
+IMAGES=`docker images | grep latest | grep -Eo '^[^ ]+' | grep -v "openease/easeapp" | grep -v "openease/flask"`
 for IMG in $IMAGES; do
     X=`docker inspect --format="{{ .ContainerConfig.Env }}" $IMG | grep "OPEN_EASE_WEBAPP=true"`
     if [ -n "$X" ]; then
@@ -49,10 +49,6 @@ for IMG in $IMAGES; do
         stopContainer "$NAME"
     fi
 done
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check if knowrob_data container exists and create otherwise
-runContainer "knowrob_data" "knowrob/knowrob_data:latest true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if user_data container exists and create otherwise
@@ -63,16 +59,25 @@ runContainer "user_data" "knowrob/user_data true"
 runContainer "mesh_data" "-v /home/ros/mesh_data ubuntu chmod -R ugo+rw /home/ros/mesh_data"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check if summary_data container exists and create otherwise
-runContainer "summary_data" "knowrob/summary_data true"
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_data container exists and create otherwise
 runContainer "mongo_data" "-v /data/db busybox true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
 runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#runContainer "ftp_data" "-v /home busybox true"
+#runContainer "ftpd_server" "-d --volumes-from ftp_data -p 21:21 openease/pure-ftpd" true
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+runContainer "lft_data" "-v /tmp/openEASE/dockerbridge busybox true"
+
+runContainer "episode_data" "-v $OPENEASE_EPISODE_DATA:/episodes -v /episodes busybox true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if nginx is running or stopped and start otherwise
@@ -91,8 +96,7 @@ runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if postgres_db is running or stopped and start otherwise
-runContainer "tutorials_data" "--name tutorials_data knowrob/tutorials_data true"
-runContainer "postgres_db" "-d -p 5432:5432 -e POSTGRES_USER=docker --volumes-from user_db --volumes-from tutorials_data knowrob/postgres" true
+runContainer "postgres_db" "-d -p 5432:5432 -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
@@ -103,7 +107,7 @@ runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e 
 # start a knowrob container for the tutorials
 runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
-runContainer "tutorials" "-d -p 127.0.0.1:9090:9090 -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from knowrob_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
+runContainer "tutorials" "-d -p 127.0.0.1:9090:9090 -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -119,26 +123,30 @@ done
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start webrob container
-RUNNING=$(docker inspect --format="{{ .State.Running }}" login 2>/dev/null)
+RUNNING=$(docker inspect --format="{{ .State.Running }}" flask 2>/dev/null)
 
 if [ "$RUNNING" == 'true' ]; then # container exists, and is running
   echo "Web app container is running, stopping and removing it..."
-  docker stop login && docker rm login
+  docker stop flask && docker rm flask
 elif [ "$RUNNING" == 'false' ]; then # container exist
   echo "Web app container exists, removing it..."
-  docker rm login
+  docker rm flask
 fi
 
 echo "Creating login web app container..."
 docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     --volumes-from mesh_data \
     --volumes-from ease_secret:ro \
+    --volumes-from user_data \
+    --volumes-from episode_data \
+    --volumes-from lft_data \
     --link postgres_db:postgres \
     --link dockerbridge:dockerbridge \
-    -e VIRTUAL_HOST=login \
+    --link mongo_db:mongo \
+    -e VIRTUAL_HOST=flask \
     -e VIRTUAL_PORT=5000 \
     -e EASE_DEBUG=$EASE_DEBUG \
     -e OPENEASE_MAIL_USERNAME=$OPENEASE_MAIL_USERNAME \
     -e OPENEASE_MAIL_PASSWORD=$OPENEASE_MAIL_PASSWORD \
-    --name login \
-    openease/login python runserver.py
+    --name flask \
+    openease/flask python runserver.py

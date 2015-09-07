@@ -1,0 +1,181 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+    <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+{% endblock %}
+
+{% block content %}
+    <script id="create_template" type="text/x-kendo-template">
+        <a class="k-button" href="\#" onclick="return new_experiment()">Create new experiment</a>
+    </script>
+    <script>
+    function new_experiment() {
+        var cat = prompt("Please enter a category", 'Pick-and-Place');
+        if(!cat) return;
+        var n = prompt("Please enter a name", 'exp_0');
+        if(!n) return;
+        $.ajax({
+            url: '/knowrob/exp_save/'+cat+'/'+n,
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({ meta: {
+                name: "Experiment name",
+                description: "Experiment description",
+                projects: [],
+                tags: [],
+                platforms: ["Robotic Agents"]
+            }}),  
+            success: function (data) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            }
+        }).done( function (request) {});
+    };
+    function moveExperiment(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var cat = prompt("Please enter a category", dataItem.cat);
+        if(!cat) return;
+        var n = prompt("Please enter a name", dataItem.exp);
+        if(!n) return;
+        $.ajax({
+            url: '/knowrob/exp_move/'+dataItem.cat+'/'+dataItem.exp,
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({ cat: cat, exp: n }),
+            success: function (data) {
+                $('#grid').data('kendoGrid').dataSource.read();
+                $('#grid').data('kendoGrid').refresh();
+            }
+        });
+    };
+    function multiselectEditor(field, db) {
+        return function(container, options) {
+            $("<select multiple='multiple' data-bind='value : "+field+"'/>").appendTo(container).kendoMultiSelect({
+                dataTextField: "name",
+                dataValueField: "name",
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "/db/find/"+db,
+                            dataType: "json",
+                            type: "POST",
+                            contentType: "application/json"
+                        },
+                    },
+                    schema: {
+                        data: 'result',
+                        model: {
+                            id: "id",
+                            fields: {
+                                name: { type: "string" }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+    };
+    function projectsDisplay(data) {
+        var res = [];
+        $.each(data.projects, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
+    function tagsDisplay(data) {
+        var res = [];
+        $.each(data.tags, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
+    function platformsDisplay(data) {
+        var res = [];
+        $.each(data.platforms, function (idx, elem) { res.push(elem.name); });
+        return res.join(", ");
+    };
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/knowrob/exp_meta_data",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                },
+                batch: true,
+                schema: {
+                    data: 'experiments',
+                    model: {
+                        id: "exp",
+                        fields: {
+                            cat: { editable: false, nullable: false },
+                            exp: { editable: false, nullable: false },
+                            name: { editable: true, nullable: false },
+                            description: { editable: true, nullable: true },
+                            projects: { editable: true, nullable: true },
+                            tags: { editable: true, nullable: true },
+                            platforms: { editable: true, nullable: true }
+                        }
+                    }
+                }
+            },
+            columns: [
+                { field: "cat", title: "Category", width: "60px" },
+                { field: "exp", title: "Experiment", width: "60px" },
+                { field: "name", title: "Name", width: "100px" },
+                { field: "description", title: "Description", width: "150px" },
+                { field: "projects", title: "Projects", width: "70px", template: projectsDisplay, editor: multiselectEditor('projects', 'project') },
+                { field: "tags", title: "IEEE Tags", width: "70px", template: tagsDisplay, editor: multiselectEditor('tags', 'tag') },
+                { field: "platforms", title: "Platforms", width: "70px", template: platformsDisplay, editor: multiselectEditor('platforms', 'platform') },
+                { command: ["edit", { text: "Move", click: moveExperiment }, "destroy"], title: "&nbsp;" , width: "50px" }
+            ],
+            toolbar: [
+                { template: kendo.template($("#create_template").html()) }
+            ],
+            save: function(e) {
+                $.ajax({
+                    url: "/knowrob/exp_save/"+e.model.cat+"/"+e.model.exp,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ meta: {
+                        name: e.model.name,
+                        description: e.model.description,
+                        projects: e.model.projects.map(function(x) {return x.name;}),
+                        tags: e.model.tags.map(function(x) {return x.name;}),
+                        platforms: e.model.platforms.map(function(x) {return x.name;})
+                    }}),  
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {});
+            },
+            remove: function(e) {
+                $.ajax({
+                    url: "/knowrob/exp_del/"+e.model.cat+"/"+e.model.exp,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#grid').data('kendoGrid').dataSource.read();
+                        $('#grid').data('kendoGrid').refresh();
+                    }
+                }).done( function (request) {})
+            },
+            selectable: true,
+            editable: "popup",
+            sortable: true
+        });
+    });
+</script>
+<div id="exp_admin_panel">
+    <div id="grid"> </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://knowrob.org/kb/knowrob.owl#"
+     xml:base="http://knowrob.org/kb/knowrob.owl"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:knowrob="http://knowrob.org/kb/knowrob.owl#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsens="http://knowrob.org/kb/xsens.owl#"
+     xmlns:datalabel="http://knowrob.org/kb/datalabel.owl#">
+    <owl:Ontology rdf:about="http://knowrob.org/kb/knowrob.owl#">
+        <owl:imports rdf:resource="knowrob"/>
+    </owl:Ontology>
+</rdf:RDF>

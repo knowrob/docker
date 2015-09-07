@@ -47,7 +47,7 @@ server {
         {{ range $i, $address := $container.Addresses }}
           {{ if eq $address.Port $container.Env.VIRTUAL_PORT }}
   # Container {{ $host }}
-            {{ if eq $host "login" }}
+            {{ if eq $host "flask" }}
   location / {
             {{ else if $container.Env.OPEN_EASE_WEBAPP }}
   location /{{ $host }}/ {
