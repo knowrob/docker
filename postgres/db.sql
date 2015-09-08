@@ -22,6 +22,17 @@ INSERT INTO Platform VALUES(2, 'Motion Capturing');
 INSERT INTO Platform VALUES(3, 'Perception');
 
 
+drop table if exists role;
+create table role (
+    id serial primary key,
+    name text not null
+);
+INSERT INTO Role VALUES(0, 'admin');
+INSERT INTO Role VALUES(1, 'reviewer');
+INSERT INTO Role VALUES(2, 'user');
+INSERT INTO Role VALUES(3, 'editor');
+
+
 drop table if exists tag;
 create table tag (
     id serial primary key,

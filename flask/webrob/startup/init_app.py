@@ -23,7 +23,7 @@ from werkzeug.security import generate_password_hash
 def add_user(db,user_manager,name,mail,pw,roles):
     if User.query.filter(User.username==name).first(): return
     user = User(username=name, email=mail, active=True, password=user_manager.hash_password(pw), confirmed_at=datetime.datetime.utcnow())
-    for r in roles: user.roles.append(Role(name=r))
+    for r in roles: user.roles.append(Role.query.filter(Role.name==r).first())
     db.session.add(user)
     db.session.commit()
 
