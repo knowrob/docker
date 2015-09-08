@@ -1,0 +1,10 @@
+#!/bin/bash
+# Author: Daniel Beßler
+
+TARGET="$1"
+if [ -z "$TARGET" ]; then
+	TARGET="backup.sql"
+fi
+
+echo "Writing SQL backup to: $TARGET"
+docker exec postgres_db pg_dump --username=postgres docker > $TARGET
