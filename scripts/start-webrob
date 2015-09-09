@@ -92,11 +92,11 @@ runContainer "docker-gen" "-d --volumes-from nginx \
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if user_db container exists and create otherwise
-runContainer "user_db" "-v /var/lib/postgresql/data knowrob/user_db true"
+runContainer "postgres_data" "-v /var/lib/postgresql/data knowrob/user_db true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if postgres_db is running or stopped and start otherwise
-runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from user_db knowrob/postgres" true
+runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from postgres_data knowrob/postgres" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
@@ -137,7 +137,7 @@ fi
 docker inspect prac_tools prac_data > /dev/null 2>&1
 if [ $? -eq 0 ]; then
   echo "Creating PRAC web app container..."
-  docker run --rm -i -p 127.0.0.1::5000 \
+  docker run --rm -d -p 127.0.0.1::5000 \
     --volumes-from ease_secret:ro \
     --volumes-from lft_data \
     --volumes-from prac_tools \
