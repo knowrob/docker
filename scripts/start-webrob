@@ -133,7 +133,9 @@ elif [ "$RUNNING" == 'false' ]; then # container exist
   docker rm flask
 fi
 
-echo "Creating login web app container..."
+#docker run --rm -i -p 127.0.0.1::5000 --volumes-from ease_secret:ro --volumes-from lft_data --volumes-from prac_tools --volumes-from prac_data --link dockerbridge:dockerbridge --link postgres_db:postgres -e VIRTUAL_HOST=prac -e VIRTUAL_PORT=5000 -e EASE_DEBUG=$EASE_DEBUG  -e OPEN_EASE_WEBAPP=true --name prac openease/prac python runserver.py
+
+echo "Creating flask web app container..."
 docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     --volumes-from mesh_data \
     --volumes-from ease_secret:ro \
