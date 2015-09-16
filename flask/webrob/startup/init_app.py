@@ -25,7 +25,12 @@ def add_user(db,user_manager,name,mail,pw,roles):
     if pw==None or len(pw)<4: return
     if User.query.filter(User.username==name).first(): return
     user = User(username=name, email=mail, active=True, password=user_manager.hash_password(pw), confirmed_at=datetime.datetime.utcnow())
-    for r in roles: user.roles.append(Role.query.filter(Role.name==r).first())
+    for r in roles:
+        x = Role.query.filter(Role.name==r).first()
+        if x==None:
+            app.logger.info("Unable to find role: " + str(r))
+        else:
+            user.roles.append(x)
     db.session.add(user)
     db.session.commit()
 
@@ -73,7 +78,7 @@ def init_app(app, db_instance, extra_config_settings={}):
     init_db(app, db_instance)
     init_webapp(app, db_instance)
     
-    add_user(db_instance,user_manager,'admin', 'openease.iai@gmail.com',
+    add_user(app,db_instance,user_manager,'admin', 'openease.iai@gmail.com',
              os.environ.get('OPENEASE_ADMIN_PASSWORD'), ['admin'])
 
     app.logger.info("Webapp started.")
