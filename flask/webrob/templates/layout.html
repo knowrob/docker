@@ -36,7 +36,7 @@
   </div>
   <div class="metanav">
     <div class="metanav_left">
-    {% if current_user.is_authenticated() %}
+    {% if current_user.is_authenticated %}
       <ul class="menu aligned-left" id="dynamic-menu-left">
       </ul>
       <ul class="menu aligned-left" id="static-menu-left">
@@ -45,7 +45,7 @@
     {% endif %}
     </div>
     <div class="metanav_right">
-      {% if not current_user.is_authenticated() %}
+      {% if not current_user.is_authenticated %}
         <a href="{{ url_for('user.login') }}">Sign in</a>
       {% else %}
         <ul class="menu aligned-right" id="dynamic-menu-right">
@@ -151,7 +151,7 @@
     
     function add_common_menu_items(left_menu, right_menu) {
         if(left_menu) {
-        {% if current_user.is_authenticated() %}
+        {% if current_user.is_authenticated %}
             add_menu_item(left_menu, { text: 'Knowledge Base', href: "/knowrob/" });
             add_menu_item(left_menu, { text: 'Episode Replay', href: "/video" });
             add_menu_item(left_menu, { text: 'Text Editor', href: "/editor" });

@@ -19,7 +19,10 @@ create table platform (
 INSERT INTO Platform VALUES(0, 'Robotic Agents');
 INSERT INTO Platform VALUES(1, 'Simulation');
 INSERT INTO Platform VALUES(2, 'Motion Capturing');
-INSERT INTO Platform VALUES(3, 'Perception');
+INSERT INTO Platform VALUES(3, 'RoboSherlock');
+INSERT INTO Platform VALUES(4, 'CRAM');
+INSERT INTO Platform VALUES(5, 'KnowRob');
+INSERT INTO Platform VALUES(6, 'PRAC');
 
 
 drop table if exists role;
