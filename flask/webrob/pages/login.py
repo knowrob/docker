@@ -25,7 +25,7 @@ def track_logout(sender, user, **extra):
 
 @app.route('/')
 def show_user_data():
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return redirect(url_for('user.login'))
     if not 'user_container_name' in session:
         return redirect(url_for('user.logout'))

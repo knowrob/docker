@@ -278,7 +278,7 @@
         update_summary_divs();
     };
     
-    {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+    {% if current_user.is_authenticated and current_user.has_role('admin') %}
     function save_video_settings() {
         var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
         var videoSequence = [{
@@ -449,7 +449,7 @@
           </h1>
           <form id="replay-episode-form" action="" class="form" role="form">
               <button id="new-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="new_video()">New</button><br>
-      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+      {% if current_user.is_authenticated and current_user.has_role('admin') %}
               <button id="del-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="delete_video()">Delete</button><br>
       {% endif %}
               
@@ -497,7 +497,7 @@
                   <div id="user_query"></div>
               </div>
               
-      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+      {% if current_user.is_authenticated and current_user.has_role('admin') %}
               <button id="save-video-button" type="button" class="btn btn-lg btn-primary btn-block" onclick="save_video_settings()">Save</button><br>
       {% endif %}
           </form>

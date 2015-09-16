@@ -3,7 +3,7 @@
 
 {% block content %}
   <script type="text/javascript">
-    {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+    {% if current_user.is_authenticated and current_user.has_role('admin') %}
     LEFT_MENU_LIST.push({ "text": "Admin", "submenu": [
         {
             text: "Query Library",
@@ -135,7 +135,7 @@
             knowrob.query();
             return false;
         }
-    {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+    {% if current_user.is_authenticated and current_user.has_role('admin') %}
         else if(event.keyCode == 46) { // DEL
             delete_query();
             return false;
@@ -242,7 +242,7 @@
           <ul class="query_button_group">
             <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
             <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
-      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+      {% if current_user.is_authenticated and current_user.has_role('admin') %}
             <li><a href="#" class="query_button admin_button" id="btn_query_save" onclick="save_query()">Save</a></li>
       {% endif %}
           </ul>
@@ -252,7 +252,7 @@
     </div>
     <div id="library">
       <select name="examplequery" id="examplequery"
-      {% if current_user.is_authenticated() and current_user.has_role('admin') %}
+      {% if current_user.is_authenticated and current_user.has_role('admin') %}
         ondblclick="set_query_text()"
       {% endif %}
         onchange="knowrob.add_selected_to_queryform('examplequery')">
