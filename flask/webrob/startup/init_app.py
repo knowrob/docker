@@ -21,7 +21,7 @@ from webrob.models.users import Role, User
 
 from werkzeug.security import generate_password_hash
 
-def add_user(db,user_manager,name,mail,pw,roles):
+def add_user(app,db,user_manager,name,mail,pw,roles):
     if pw==None or len(pw)<4: return
     if User.query.filter(User.username==name).first(): return
     user = User(username=name, email=mail, active=True, password=user_manager.hash_password(pw), confirmed_at=datetime.datetime.utcnow())
