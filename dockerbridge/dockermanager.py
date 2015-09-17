@@ -27,11 +27,6 @@ class DockerManager(object):
             traceback.print_exc()
 
     def __start_common_container__(self, all_containers):
-        if self.__get_container("knowrob_data", all_containers) is None:
-            sysout("Creating knowrob_data container.")
-            self.__client.create_container('knowrob/knowrob_data', detach=True, name="knowrob_data", entrypoint='true')
-            self.__client.start("knowrob_data")
-
         if self.__get_container("mongo_data", all_containers) is None:
             sysout("Creating mongo data container.")
             self.__client.create_container('busybox', detach=True, name='mongo_data', volumes=['/data/db'],
