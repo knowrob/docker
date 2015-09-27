@@ -40,9 +40,17 @@ def episode_data(category, exp):
     create_queries_file(category, exp)
     return send_from_directory('/episodes/'+category+'/'+exp, 'queries.json')
 
+@app.route('/knowrob/exp_save', methods=['POST'])
 @app.route('/knowrob/exp_save/<category>/<exp>', methods=['POST'])
 @admin_required
-def experiment_save(category, exp):
+def experiment_save(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+     
     data = json.loads(request.data)
     experiment_create_directory(category, exp)
     episodeData = experiment_load_queries(category, exp)
@@ -184,4 +192,4 @@ def experiment_save_queries(category, exp, data):
     episode_file = "/episodes/"+category+"/"+exp+"/queries.json"
     if not os.path.isfile(episode_file): return None
     app.logger.info("Saving " + episode_file)
-    with open(episode_file, 'w') as data_file: json.dump(data, data_file)
+    with open(episode_file, 'w') as data_file: json.dump(data, data_file, indent=4)

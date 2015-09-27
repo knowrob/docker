@@ -78,7 +78,8 @@ def init_app(app, db_instance, extra_config_settings={}):
     init_db(app, db_instance)
     init_webapp(app, db_instance)
     
-    add_user(app,db_instance,user_manager,'admin', 'openease.iai@gmail.com',
+    add_user(app,db_instance,user_manager,'admin',
+             os.environ.get('OPENEASE_MAIL_USERNAME', 'admin@openease.org'),
              os.environ.get('OPENEASE_ADMIN_PASSWORD'), ['admin'])
 
     app.logger.info("Webapp started.")
