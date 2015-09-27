@@ -31,8 +31,8 @@ The openEASE platform uses the following host directories and files:
 		- /home/ros/mesh_data
 		Used for storing mesh_data that is automatically downloaded by the easeapp/knowrob container
 		Used by: easeapp/knowrob container.
-	knowrob_data
-		- /home/ros/knowrob_data
+	episode_data
+		- /episodes
 		Used for common data files needed in every user container and the easeapp containers, like common experiment data.
 		Used by: easeapp/knowrob container and (read-only) all easeapp/knowrob user containers.
 	ease_secret
@@ -53,7 +53,7 @@ The openEASE platform uses the following host directories and files:
 		- /data/db
 		Contains the mongo dbs for shared experiment data
 		Used by: mongo_db
-	user_db
+	postgres_data
 		- /var/lib/postgresql/data
 		Contains the postgres databases for user account data and user roles
 		Used by: postgres_db
@@ -68,7 +68,7 @@ The openEASE platform uses the following host directories and files:
 			- /home/ros/user_data
 		mongo_data
 			- /data/db
-		user_db
+		postgres_data
 			- /var/lib/postgresql/data
 
 4. Backup
