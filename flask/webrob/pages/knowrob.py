@@ -168,6 +168,11 @@ def get_history_item():
   else:
     return jsonify(item="", index=-1)
 
+@app.route('/knowrob/admin/cookie')
+@login_required
+def admin_cookie():
+    return render_template('admin_cookie.html', **locals())
+
 @app.route('/log')
 @login_required
 def log():

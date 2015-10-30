@@ -189,6 +189,15 @@
                 ]
             });
         {% endif %}
+            handle_webapp_menu(left_menu, {
+                text: 'Admin',
+                submenu: [
+                    {
+                        text: 'Cookies',
+                        href: '/knowrob/admin/cookie'
+                    }
+                ]
+            });
         {% endif %}
         }
         if(right_menu) {

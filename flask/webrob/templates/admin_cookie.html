@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+    <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+{% endblock %}
+
+{% block content %}
+<script>
+    $(document).ready(function () {
+        var cookie_values = [
+            ["hud-font", "Bold 24px Monospace"],
+            ["hud-text-shadow", false],
+            ["hud-text-shadow-color", "gray"],
+            ["hud-text-shadow-offset-y", "4"],
+            ["hud-text-shadow-offset-x", "4"],
+            ["hud-text-shadow-blur", "6"],
+            ["hud-text-bubble", false],
+            ["hud-text-bubble-border-color", "black"],
+            ["hud-text-bubble-border-width", 1],
+            ["hud-text-bubble-color", "rgba(255, 255, 255, 0.8)"],
+            ["sprite-font", "Bold 24px Monospace"],
+            ["sprite-text-shadow", false],
+            ["sprite-text-shadow-color", "gray"],
+            ["sprite-text-shadow-offset-y", "4"],
+            ["sprite-text-shadow-offset-x", "4"],
+            ["sprite-text-shadow-blur", "6"],
+            ["sprite-text-bubble", true],
+            ["sprite-text-bubble-border-color", "black"],
+            ["sprite-text-bubble-border-width", 1],
+            ["sprite-text-bubble-color", "rgba(255, 255, 255, 0.8)"]
+        ];
+        var grid_data = [];
+        for(var i=0; i<cookie_values.length; ++i) {
+            var name = cookie_values[i][0];
+            console.log(name);
+            var value = $.cookie(name);
+            if(value == undefined) {
+                value = cookie_values[i][1];
+                $.cookie(name,value,{path:'/'});
+            }
+            grid_data.push({name: name, value: value});
+        }
+        var dataSource = new kendo.data.DataSource({
+            data: grid_data,
+            sort: { field: "name", dir: "asc" },
+            schema: {
+              model: {
+                id: "name",
+                fields: {
+                    name: { editable: false },
+                    value: { editable: true }
+                }
+              }
+            }
+        });
+        dataSource.read();
+
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            columns: [
+                { field: "name", title: "Name", editable: false },
+                { field: "value", title: "Value" },
+                { command: ["edit"], title: "&nbsp;", width: 100 }
+            ],
+            save: function(e) {
+                $.cookie(e.model.name,e.model.value,{path:'/'});
+            },
+            editable: "popup",
+            selectable: true,
+            sortable: true
+        });
+    });
+</script>
+<div id="mng_admin_panel">
+    <div id="grid"> </div>
+</div>
+{% endblock %}
