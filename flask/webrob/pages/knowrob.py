@@ -31,16 +31,21 @@ def download_logged_image(filename):
 @login_required
 def knowrob(category=None, exp=None):
     session['video'] = False
-    return __knowrob_page__('knowrob_simple.html', category, exp)
+    return __knowrob_page__('knowrob_simple.html', True, category, exp)
+
+@app.route('/knowrob/host')
+def knowrob_external(category=None, exp=None):
+    session['video'] = False
+    return __knowrob_page__('knowrob_simple.html', False, category, exp)
 
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')
 @login_required
 def video(category=None, exp=None):
     session['video'] = True
-    return __knowrob_page__('video.html', category, exp)
+    return __knowrob_page__('video.html', True, category, exp)
 
-def __knowrob_page__(template, category=None, exp=None):
+def __knowrob_page__(template, docker_ros=True, category=None, exp=None):
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     error=""
