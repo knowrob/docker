@@ -82,11 +82,11 @@ def admin_mongo_update(cat,exp):
         mng = mongoConnect()
         db = mng[db_name]
         for collection_name in list(collections):
+            # TODO: make this more flexible
             db[collection_name].ensure_index('__recorded')
             yield 'Search index created for %s.__recorded.\n' % (collection_name)
-            if collection_name == 'tf':
-                db[collection_name].ensure_index('transforms.header.stamp')
-                yield 'Search index created for %s.transforms.header.stamp.\n' % (collection_name)
+            db[collection_name].ensure_index('transforms.header.stamp')
+            yield 'Search index created for %s.transforms.header.stamp.\n' % (collection_name)
         mng.close()
         
     return Response(stream_with_context(mng_import()))
