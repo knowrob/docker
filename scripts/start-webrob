@@ -107,7 +107,7 @@ runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e 
 # start a knowrob container for the tutorials
 runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
-runContainer "tutorials" "-d -p 127.0.0.1:9090:9090 -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
+runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

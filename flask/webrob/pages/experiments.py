@@ -143,10 +143,12 @@ def get_experiment_list():
     root_path = "/episodes"
     
     for category in os.listdir(root_path):
+        if category.startswith('.'): continue
         p = os.path.join(root_path, category)
         if not os.path.isdir(p): continue
         
         for experiment in os.listdir(p):
+            if experiment.startswith('.'): continue
             out.append((category,experiment))
     
     return out

@@ -62,6 +62,11 @@ server {
     {{ end }}
   }
   {{ end }}
+  
+  location /ws/host/ {
+    rewrite /ws/host/(.*) /$1 break;
+    proxy_pass http://172.17.42.1:9090;
+  }
 }
 
 {{ if (and (ne $cert "") (exists (printf "/etc/nginx/certs/%s.crt" $cert)) (exists (printf "/etc/nginx/certs/%s.key" $cert))) }}
