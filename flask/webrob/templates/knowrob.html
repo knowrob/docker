@@ -75,12 +75,13 @@
     $(document).ready(function () {
       // The file that contains example queries
       var exp_url = "{% if exp_url %}{{ exp_url }}{% else %}{{ undefined }}{% endif %}";
-      var rosUrl = 'ws://localhost/ws/host';
-      var auth = 'false';
+      var auth = '{{ authentication }}';
+      var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
       if('{{ docker_ros }}' === 'True') {
-        var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
         rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-        auth = '{{ authentication }}';
+      }
+      else {
+        rosUrl = wsproto + '://localhost/ws_host/';
       }
       console.log(rosUrl);
       knowrob = new Knowrob({
