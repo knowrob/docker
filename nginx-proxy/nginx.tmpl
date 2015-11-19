@@ -39,6 +39,11 @@ proxy_read_timeout 600s;
 
 server {
   server_name localhost data.open-ease.org;
+  # entrypoint that connects to ros service on the host
+  location /ws_host/ {
+    rewrite /ws_host/(.*) /$1 break;
+    proxy_pass http://172.17.42.1:9090;
+  }
   # iterates over all containers and creates 'location' entries
   # websocket endpoints: /ws/<container-name>
   {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
@@ -62,11 +67,6 @@ server {
     {{ end }}
   }
   {{ end }}
-  
-  location /ws/host/ {
-    rewrite /ws/host/(.*) /$1 break;
-    proxy_pass http://172.17.42.1:9090;
-  }
 }
 
 {{ if (and (ne $cert "") (exists (printf "/etc/nginx/certs/%s.crt" $cert)) (exists (printf "/etc/nginx/certs/%s.key" $cert))) }}
