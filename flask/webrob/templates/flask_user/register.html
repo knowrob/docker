@@ -45,6 +45,15 @@
 
                 <button id="register-button" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
             </form>
+{% for error in form.username.errors %}
+            <p class="error"><strong>Error:</strong> {{ error }}</p>
+{% endfor %}
+{% for error in form.email.errors %}
+            <p class="error"><strong>Error:</strong> {{ error }}</p>
+{% endfor %}
+{% for error in form.password.errors %}
+            <p class="error"><strong>Error:</strong> {{ error }}</p>
+{% endfor %}
         </div>
         <div class="content-box" id="video-box">
             <h1 class="content-box-header">Howto use openEASE</h1>
