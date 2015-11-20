@@ -6,7 +6,9 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-pip python-dev wget gcc imagemagick mongodb libffi-dev libpq-dev
 
 RUN easy_install pymongo
-RUN pip install Flask Flask-Misaka flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado
+# NOTE: At the moment Flask-Misaka==0.3 is incompatible with latest misaka==2.0.0
+# @see https://github.com/singingwolfboy/flask-misaka/issues/11
+RUN pip install Flask misaka==1.0.2 Flask-Misaka==0.3 flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado
 WORKDIR /opt/webapp
 
 # flag used in nginx configuration
