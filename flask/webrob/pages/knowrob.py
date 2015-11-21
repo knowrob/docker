@@ -30,29 +30,34 @@ def download_logged_image(filename):
 @app.route('/knowrob/exp/<category>/<exp>')
 @login_required
 def knowrob(category=None, exp=None):
+    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+        return redirect(url_for('user.logout'))
     session['video'] = False
-    return __knowrob_page__('knowrob_simple.html', True, category, exp)
+    return __knowrob_page__('knowrob_simple.html', session['user_container_name'], category, exp)
 
-@app.route('/knowrob/host')
-def knowrob_external(category=None, exp=None):
+@app.route('/knowrob/remote')
+@app.route('/knowrob/remote/exp/<category>/<exp>')
+@app.route('/knowrob/remote/<host>')
+@app.route('/knowrob/remote/<host>/exp/<category>/<exp>')
+@login_required
+def knowrob_remote(host='172.17.42.1:9090', category=None, exp=None):
     session['video'] = False
-    return __knowrob_page__('knowrob_simple.html', False, category, exp)
+    return __knowrob_page__('knowrob_simple.html', host, category, exp)
 
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')
 @login_required
 def video(category=None, exp=None):
-    session['video'] = True
-    return __knowrob_page__('video.html', True, category, exp)
-
-def __knowrob_page__(template, docker_ros=True, category=None, exp=None):
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
+    session['video'] = True
+    return __knowrob_page__('video.html', session['user_container_name'], category, exp)
+
+def __knowrob_page__(template, container_name, category=None, exp=None):
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
-    container_name = session['user_container_name']
     if category is not None: session['exp-category'] = category
     if exp is not None:      session['exp-name'] = exp
     if 'exp-category' in session: category = session['exp-category']

@@ -77,13 +77,7 @@
       var exp_url = "{% if exp_url %}{{ exp_url }}{% else %}{{ undefined }}{% endif %}";
       var auth = '{{ authentication }}';
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-      if('{{ docker_ros }}' === 'True') {
-        rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-      }
-      else {
-        rosUrl = wsproto + '://localhost/ws_host/';
-      }
-      console.log(rosUrl);
+      var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
       knowrob = new Knowrob({
             ros_url: rosUrl,
             episode_url: exp_url,
