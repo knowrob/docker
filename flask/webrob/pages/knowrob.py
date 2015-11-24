@@ -40,9 +40,9 @@ def knowrob(category=None, exp=None):
 @app.route('/knowrob/remote/<host>')
 @app.route('/knowrob/remote/<host>/exp/<category>/<exp>')
 @login_required
-def knowrob_remote(host='172.17.42.1:9090', category=None, exp=None):
+def knowrob_remote(host='172.17.42.1', category=None, exp=None):
     session['video'] = False
-    return __knowrob_page__('knowrob_simple.html', host, category, exp)
+    return __knowrob_page__('knowrob_simple.html', 'remote/'+host, category, exp)
 
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')
