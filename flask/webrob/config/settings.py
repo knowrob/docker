@@ -28,6 +28,7 @@ MESH_REPOSITORIES = [
     "http://svn.ai.uni-bremen.de/svn/cad_models/",
     "https://github.com/code-iai/iai_maps/raw/master/",
     "https://github.com/bbrieber/iai_robots/raw/master/",
+    "https://github.com/bbrieber/saphari_final_review/raw/master/",
     "https://github.com/PR2/pr2_common/raw/master/"
     #"https://github.com/code-iai/iai_robots/raw/master/",
     #"https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
