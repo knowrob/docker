@@ -103,6 +103,9 @@ def menu():
                 app.logger.warn("Meta data missing for episodes for " + str((category, exp)))
                 continue
             
+            if not 'published' in meta: meta['published'] = 'true'
+            if meta['published'] == 'false': continue
+            
             for t in meta['platforms']:
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
                 technology_episodes[t].append((meta['name'], url))
