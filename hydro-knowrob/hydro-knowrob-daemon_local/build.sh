@@ -5,7 +5,7 @@ NAMES="knowrob knowrob_addons knowrob_dev iai_maps iai_common_msgs iai_cad_tools
 
 SCRIPT=`readlink -f "$0"`
 DIR=`dirname $SCRIPT`
-LOCAL_DIR="$DIR/knowrob"
+LOCAL_DIR="$DIR/src"
 KNOWROB_FOUND=0
 
 is_knowrob_dir() {
@@ -28,7 +28,7 @@ is_knowrob_dir() {
 create_archive() {
   cd $1
   rm -rf ./src.tar
-  tar --exclude=.svn --exclude=.git --exclude=build --exclude=.gradle -cf ./src.tar ./*
+  tar --exclude=.svn --exclude=.git --exclude=build --exclude=bin --exclude=.gradle -cf ./src.tar ./*
   mv ./src.tar $DIR/
   cd $DIR
 }

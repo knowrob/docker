@@ -29,6 +29,11 @@ def admin_experiments():
         if not 'projects' in data['meta']: data['meta']['projects'] = []
         if not 'tags' in data['meta']: data['meta']['tags'] = []
         if not 'platforms' in data['meta']: data['meta']['platforms'] = []
+        if not 'published' in data['meta']: data['meta']['published'] = 'true'
+        
+        # ignore unpublished experiments
+        if data['meta']['published'] == 'false': continue
+        
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)
