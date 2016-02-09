@@ -3,56 +3,30 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $DIR
 
-# TODO(daniel): Run fake DNS in docker container to avoid `sudo` here.
-# TODO(daniel): resolv.conf of dockerbridge!!!!
+# runContainer - Creates docker containers if not existing
+#   arg1: <container_name> - String, Name of the container
+#   arg2: <docker_run_parameters> - String, Docker run parameters, excluding --name parameter
+#   arg3: (start_if_not_running) - Boolean, true if container should be started
+function runContainer {
+  RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
+  if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then # container does not exist
+    echo "No $1 container exists, creating a new one..."
+    bash -c "docker run --dns 127.0.0.1 --name $1 $2"
+  fi
+  if [ "$3" == true ] && [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+    echo "$1 container exists, starting it..."
+    docker start $1
+  fi
+}
 
-echo "Starting openEASE in offline mode currently requires a local DNS server, "\
-    "and the DNS server requires root rights, using 'sudo' to start the DNS server now..."
-# make sure sudo remembers password
-sudo echo ""
-
-# Check if dnsmasq is running kill it if this is the case
-echo "Checking for dnsmasq blocking the DNS port...."
-DNSMNASQ=`sudo netstat -anlp | grep -w LISTEN | grep dnsmasq`
-if [ "X$DNSMNASQ" == "X" ]; then
-    echo "    dnsmasq is not running."
-else
-    echo "    dnsmasq is running and blocking the DNS port, have to kill it using 'sudo killall dnsmasq'"
-    sudo killall dnsmasq
-fi
-echo ""
-
-# Make sure fake DNS is started
-echo "Checking if fake DNS is already running...."
-FAKE_DNS=`ps -A | grep start-dns-dummy`
-if [ "X$FAKE_DNS" == "X" ]; then
-    sudo ./start-dns-dummy &
-    echo "    Fake DNS server started."
-else
-    echo "    Fake DNS server already running."
-fi
-echo "NOTE: Stop the DNS server using 'sudo killall start-dns-dummy'"
-echo ""
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if user_data container exists and create otherwise
+echo "Starting DNS Server..."
+runContainer "dns" "openease/dns true"
+sleep 2 # FIXME: do not blindly wait here
+DNS_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' dns`
+echo "DNS server running on IP $DNS_IP"
 
 echo "Starting the webapp...."
-./start-webrob &
+./start-webrob --dns $DNS_IP
 
-echo "Rewriting resolv.conf...."
-write_resolv_conf () {
-    while [ Y"$X" = Y"" ]; do
-        RESOLV_PATH=`docker inspect --format="{{ .ResolvConfPath }}" dockerbridge 2>/dev/null`
-        if [ $? -eq 0 ]; then
-            sudo bash -c "echo 'nameserver 127.0.0.1' > $RESOLV_PATH"
-            echo "    resolv.conf written!"
-            break
-        fi
-        sleep 1
-    done
-}
-write_resolv_conf &
-echo ""
-
-for job in `jobs -p`
-do
-    wait $job
-done
