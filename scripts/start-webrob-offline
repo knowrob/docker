@@ -22,11 +22,15 @@ function runContainer {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if user_data container exists and create otherwise
 echo "Starting DNS Server..."
-runContainer "dns" "openease/dns true"
+runContainer "dns" "-d openease/dns" true
 sleep 2 # FIXME: do not blindly wait here
 DNS_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' dns`
 echo "DNS server running on IP $DNS_IP"
 
+# Make sure some containers are (re)started with proper dns
+# TODO: only restart when DNS is wrong
+docker rm -f dockerbridge
+
 echo "Starting the webapp...."
-./start-webrob --dns $DNS_IP
+./start-webrob --dns=$DNS_IP
 
