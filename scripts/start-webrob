@@ -3,6 +3,23 @@
 bool=true
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+# Default options
+DNS="8.8.8.8" # google DNS
+
+for i in "$@"
+do
+case $i in
+    -d=*|--dns=*)
+    DNS="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+done
+echo "Using DNS server: $DNS"
+
 # runContainer - Creates docker containers if not existing
 #   arg1: <container_name> - String, Name of the container
 #   arg2: <docker_run_parameters> - String, Docker run parameters, excluding --name parameter
@@ -11,7 +28,7 @@ function runContainer {
   RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
   if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then # container does not exist
     echo "No $1 container exists, creating a new one..."
-    bash -c "docker run --name $1 $2"
+    bash -c "docker run --dns $DNS --name $1 $2"
   fi
   if [ "$3" == true ] && [ "$RUNNING" == 'false' ]; then # container exists, but stopped
     echo "$1 container exists, starting it..."

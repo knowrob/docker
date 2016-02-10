@@ -45,6 +45,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
 
+  <!-- FIXME: includes files from google.com! -->
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
@@ -77,13 +78,8 @@
       var exp_url = "{% if exp_url %}{{ exp_url }}{% else %}{{ undefined }}{% endif %}";
       var auth = '{{ authentication }}';
       var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-      if('{{ docker_ros }}' === 'True') {
-        rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-      }
-      else {
-        rosUrl = wsproto + '://localhost/ws_host/';
-      }
-      console.log(rosUrl);
+      var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
+      console.info(rosUrl);
       knowrob = new Knowrob({
             ros_url: rosUrl,
             episode_url: exp_url,
