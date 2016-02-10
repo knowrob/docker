@@ -38,6 +38,7 @@ proxy_read_timeout 600s;
 {{ $cert := "default" }}
 
 server {
+  listen 80;
   server_name localhost data.open-ease.org;
   # entrypoint that connects to ros service on the host
   # TODO: figure out howto make the IP a variable so that openEASE can connect
@@ -51,6 +52,17 @@ server {
     rewrite /ws/remote/172.17.42.1/(.*) /$1 break;
     proxy_pass http://172.17.42.1:9090;
   }
+  
+  location  /mln/ {
+    rewrite /mln/(.*) /mln/$1 break;
+    proxy_pass http://172.17.42.1:5002;
+  }
+
+  location  /prac/ {
+    rewrite /prac/(.*) /prac/$1 break;
+    proxy_pass http://172.17.42.1:5001;
+  }
+
   # iterates over all containers and creates 'location' entries
   # websocket endpoints: /ws/<container-name>
   {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
