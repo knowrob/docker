@@ -3,6 +3,24 @@
 bool=true
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+# Default options
+DNS="8.8.8.8" # google DNS
+
+for i in "$@"
+do
+case $i in
+    -d=*|--dns=*)
+    DNS="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+done
+
+echo "Using DNS server: $DNS"
+
 # runContainer - Creates docker containers if not existing
 #   arg1: <container_name> - String, Name of the container
 #   arg2: <docker_run_parameters> - String, Docker run parameters, excluding --name parameter
@@ -11,7 +29,7 @@ function runContainer {
   RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
   if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then # container does not exist
     echo "No $1 container exists, creating a new one..."
-    bash -c "docker run --name $1 $2"
+    bash -c "docker run --dns $DNS --name $1 $2"
   fi
   if [ "$3" == true ] && [ "$RUNNING" == 'false' ]; then # container exists, but stopped
     echo "$1 container exists, starting it..."
@@ -131,26 +149,6 @@ if [ "$RUNNING" == 'true' ]; then # container exists, and is running
 elif [ "$RUNNING" == 'false' ]; then # container exist
   echo "Web app container exists, removing it..."
   docker rm flask
-fi
-
-# Start PRAC and ensure PRAC data volumes are installed
-docker inspect prac_tools prac_data > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-  echo "Creating PRAC web app container..."
-  docker run -d -p 127.0.0.1::5000 \
-    --volumes-from ease_secret:ro \
-    --volumes-from lft_data \
-    --volumes-from prac_tools \
-    --volumes-from prac_data \
-    --link dockerbridge:dockerbridge \
-    --link postgres_db:postgres \
-    -e VIRTUAL_HOST=prac \
-    -e VIRTUAL_PORT=5000 \
-    -e EASE_DEBUG=$EASE_DEBUG \
-    -e OPEN_EASE_WEBAPP=true \
-    --name prac openease/prac python runserver.py
-else
-  echo "Unable to start PRAC: prac_tools, prac_data missing."
 fi
 
 echo "Creating flask web app container..."

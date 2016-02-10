@@ -1,0 +1,39 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $DIR
+
+# TODO(daniel): auto-detect if we are offline instead?
+# Then this code could be integrated into common start script
+
+# runContainer - Creates docker containers if not existing
+#   arg1: <container_name> - String, Name of the container
+#   arg2: <docker_run_parameters> - String, Docker run parameters, excluding --name parameter
+#   arg3: (start_if_not_running) - Boolean, true if container should be started
+function runContainer {
+  RUNNING=$(docker inspect --format="{{ .State.Running }}" $1 2>/dev/null)
+  if [ $? -eq 1 ] || [ "$RUNNING" == '<no value>' ]; then # container does not exist
+    echo "No $1 container exists, creating a new one..."
+    bash -c "docker run --dns 127.0.0.1 --name $1 $2"
+  fi
+  if [ "$3" == true ] && [ "$RUNNING" == 'false' ]; then # container exists, but stopped
+    echo "$1 container exists, starting it..."
+    docker start $1
+  fi
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check if user_data container exists and create otherwise
+echo "Starting DNS Server..."
+runContainer "dns" "-d openease/dns" true
+sleep 2 # FIXME(daniel): do not blindly wait here
+DNS_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' dns`
+echo "DNS server running on IP $DNS_IP"
+
+# Make sure some containers are (re)started with proper dns
+# TODO(daniel): only restart when DNS is wrong
+docker rm -f dockerbridge
+
+echo "Starting the webapp...."
+./start-webrob --dns=$DNS_IP
+

@@ -3,6 +3,7 @@ docker pull busybox
 docker pull mongo
 docker pull nginx
 docker pull jwilder/docker-gen
+docker pull openease/dns
 docker pull knowrob/user_db
 docker pull knowrob/user_data
 docker pull knowrob/postgres
