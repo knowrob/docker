@@ -11,7 +11,7 @@ from webrob.app_and_db import app, db
 from webrob.docker.docker_application import ensure_application_started
 from webrob.docker import docker_interface
 from webrob.utility import *
-from webrob.pages.experiments import get_experiment_download_url, get_experiment_url, get_experiment_list, experiment_load_queries
+from webrob.pages.experiments import get_experiment_download_url, get_experiment_list, experiment_load_queries
 from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
@@ -71,14 +71,11 @@ def menu():
     # Maps projects to list of experiments
     episode_choices_map =  {}
     for (category,exp) in get_experiment_list():
-        episode_url = get_experiment_url(category,exp)
-        
         menu = ''
         if len(category)>0: menu = category
         if not menu in episode_choices_map:
             episode_choices_map[menu] = []
-        
-        episode_choices_map[menu].append((exp, episode_url))
+        episode_choices_map[menu].append((exp,category))
     
     episode_page = '<div class="mega_menu" id="episode-selection">'
     for category in sorted(episode_choices_map.keys()):
@@ -90,7 +87,7 @@ def menu():
         episode_page += '<div class="category-episodes">'
         
         technology_episodes = {}
-        for (exp,url) in cat_episodes:
+        for (exp,category) in cat_episodes:
             data = experiment_load_queries(category, exp)
             if data is None:
                 app.logger.warn("Failed to load episodes for " + str((category, exp)))
@@ -108,12 +105,12 @@ def menu():
             
             for t in meta['platforms']:
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
-                technology_episodes[t].append((meta['name'], url))
+                technology_episodes[t].append((meta['name'], (exp,category)))
         
         for t in sorted(technology_episodes.keys()):
             episode_page += '<h4 class="technology-title">'+t+'</h4>'
-            for (name,url) in technology_episodes[t]:
-                episode_page += '<a href="'+ url +'">'+name+'</a>'
+            for (name,(exp,category)) in technology_episodes[t]:
+                episode_page += '<a style="cursor: pointer" onclick=set_episode("'+ category +'","'+ exp +'")>'+name+'</a>'
         episode_page += '</div></div>'
     episode_page += '</div>'
     

@@ -12,12 +12,17 @@
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
   <script type="text/javascript">
-    $(document).ready(function () {
-      init();
-      $('#page').layout({
+    function resize() {
+      $('#page-content').layout({
+        center__maskContents:  true,
+        west__maskContents:  true,
         south: { minSize: 75 },
         west: { size: 250 }
       });
+    };
+    $(document).ready(function () {
+      init();
+      resize();
     });
   </script>
 
@@ -49,7 +54,7 @@
         url : wsproto + '://{{ host_url }}/ws/{{ container_name }}/'
       });
       ros.on('connection', function() {
-          console.log('Connected to websocket server.');
+          console.log('Editor connected to websocket server.');
           var authentication  = '{{ authentication }}' === '' ? true : '{{ authentication }}' === 'true';
           if(authentication) {
               authenticate('/api/v1.0/auth_by_session', connected_callback);

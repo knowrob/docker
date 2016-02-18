@@ -17,6 +17,22 @@ from webrob.models.db import *
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+@app.route('/episode_queries')
+def episode_queries():
+    if 'exp-category' in session and 'exp-name' in session: 
+        category = session['exp-category']
+        episode = session['exp-name']
+        data = experiment_load_queries(category, episode)
+        return jsonify(data)
+    else:
+        return jsonify(result=None)
+
+@app.route('/episode_set/<category>/<episode>')
+def episode_set(category, episode):
+    session['exp-category'] = category
+    session['exp-name'] = episode
+    return jsonify(result=None)
+
 @app.route('/knowrob/admin/experiments')
 @admin_required
 def admin_experiments():
@@ -118,21 +134,6 @@ def get_exp_meta_data():
         exp_data.append(data)
     
     return jsonify(experiments=exp_data)
-
-
-def get_experiment_url(category, exp):
-    if category is not None and exp is not None:
-        episode_url = ''
-        if 'video' in session and session['video']==True:
-            episode_url += '/video/'
-        else:
-            episode_url += '/knowrob/'
-        episode_url += 'exp/'
-        if len(category)>0: episode_url += category + '/'
-        episode_url += exp
-        return episode_url
-    else:
-        return None
 
 def get_experiment_download_url():
     if 'exp-category' in session and 'exp-name' in session:

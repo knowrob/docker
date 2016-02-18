@@ -483,18 +483,9 @@
         add_video_item(name);
         replay_episode_selected();*/
     };
-
-    $(document).ready(function () {
-      knowrob.setup_query_field();
-      knowrob.get_episode_data();
-      setup_video_query();
-      init_video_divs();
-      update_start_time();
-      update_end_time();
-      
-      //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
-
-      $('#page').layout({
+    
+    function resize() {
+      $('#page-content').layout({
         stateManagement__enabled: true,
         south: {
           minSize: 60
@@ -526,6 +517,20 @@
           }
         }
       });
+      knowrob.resize_canvas();
+    };
+
+    $(document).ready(function () {
+      knowrob.setup_query_field();
+      knowrob.get_episode_data();
+      setup_video_query();
+      init_video_divs();
+      update_start_time();
+      update_end_time();
+      
+      //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
+      
+      resize();
       
       $("#replay-start-time").on("change", function(){
         if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value){
@@ -539,7 +544,6 @@
         }
         update_end_time();
       });
-      knowrob.resize_canvas();
     });
   </script>
   

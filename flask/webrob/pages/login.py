@@ -35,7 +35,12 @@ def show_user_data():
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
-    application_names = docker_interface.get_application_image_names()
     role_names = map(lambda x: str(x.name), current_user.roles)
-
-    return render_template('show_user_data.html', **locals())
+    
+    category = None
+    exp = None
+    if 'exp-category' in session: category = session['exp-category']
+    if 'exp-name' in session: exp = session['exp-name']
+    
+    return render_template('ui/main.html', **locals())
+    #return render_template('show_user_data.html', **locals())

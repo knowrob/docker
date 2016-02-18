@@ -4,9 +4,7 @@
 {% block content %}
   <script type="text/javascript">
     {% if current_user.is_authenticated and current_user.has_role('admin') %}
-    LEFT_MENU_LIST.push({ "text": "Admin", "submenu": [
-        {
-            text: "Query Library",
+    LEFT_MENU_LIST.push({ text: "Query Library",
             submenu: [
                 {
                     text: "Save Library",
@@ -32,8 +30,7 @@
                     shortcut: "a"
                 }
             ]
-        }
-    ]});
+        });
     
     function ensure_selected() {
         if(document.getElementById("examplequery").selectedIndex<1) {
@@ -156,8 +153,8 @@
         return true;
     };
 
-    $(document).ready(function () {
-      var knowrobLayout = $('#page').layout({
+    function resize() {
+      var knowrobLayout = $('#page-content').layout({
         stateManagement__enabled: true,
         south: {
           minSize: 60
@@ -218,10 +215,13 @@
       });
       knowrob.resize_canvas();
       
+      // XXX: save to call multiple times??
       $('#designator').change(function() { knowrobLayout.open('east'); });
       $('#mjpeg').change(function() { knowrobLayout.open('east'); });
       $('#chart').change(function() { centerLayout.open('south'); });
-      
+    };
+    $(document).ready(function () {
+      resize();
       $('#examplequery').keyup(query_select_key_event);
     });
   </script>
