@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block menu %}
+  <div class="header">
+    <nav id="navbar-tool">
+      <a class="navbar-tool-brand" href="http://www.open-ease.org"><img src="{{ url_for('static', filename='logos/oe-logo-small.svg') }}"> openEASE</a>
+      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://ai.uni-bremen.de/"><img src="{{ url_for('static', filename='logos/ai_logo_white.png') }}"></a>
+      <a class="navbar-tool-brand navbar-tool-brand-2" href="http://www.informatik.uni-bremen.de/cms/detail.php?id=12"><img src="{{ url_for('static', filename='logos/uni-bremen.png') }}"></a>
+    </nav>
+  </div>
+  <div class="metanav">
+    <div class="metanav_left">
+    {% if current_user.is_authenticated %}
+      <ul class="menu aligned-left" id="menu-left">
+      </ul>
+      <ul class="menu aligned-left" id="frame-menu-left">
+      </ul>
+    {% endif %}
+    </div>
+    <div class="metanav_right">
+      {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('user.login') }}">Sign in</a>
+      {% else %}
+        <ul class="menu aligned-right" id="frame-menu-right">
+        </ul>
+        <ul class="menu aligned-right" id="menu-right">
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
