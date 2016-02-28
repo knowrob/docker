@@ -1,10 +1,23 @@
-{% extends "knowrob_layout.html" %}
-
-
-<!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
-
+{% extends "layout_header.html" %}
 
 {% block head %}
+  <meta charset="utf-8" />
+  <link rel="stylesheet" media="all" type="text/css" href="{{ url_for('static', filename='lib/font/font.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/screen.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap/css/bootstrap.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/user.css') }}"/>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/iosOverlay.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/spin.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/prettify.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-1.11.1.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
   
@@ -40,13 +53,16 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/MouseHandler.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/OrbitControls.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/KeepAlivePublisher.js') }}"></script>
-
+  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/designator/desig.js') }}"></script>
   
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_bold.typeface.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_regular.typeface.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/BarChart.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
@@ -56,46 +72,40 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/designator/desig.js') }}"></script>
-  
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_bold.typeface.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_regular.typeface.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
+{% endblock %}
 
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob.js') }}"></script>
-  
+{% block content %}
   <script type="text/javascript">
-    // global knowrob handle
-    var knowrob;
-    
-    $(document).ready(function () {
-      var auth = '{{ authentication }}';
-      var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-      var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-      
-      knowrob = new Knowrob({
+    var auth = '{{ authentication }}';
+    var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
+    var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
+    var client = new KnowrobClient({
+            username: '{{ current_user.username }}',
             ros_url: rosUrl,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
             meshPath: '/meshes/',
-            category: "{{ category }}",
-            episode: "{{ exp }}"
-      });
-      knowrob.init();
-      
-      setInterval(container_refresh, 570000);
-      container_refresh();
-    });
-    function container_refresh() {
-        $.ajax({
-            url: '/api/v1.0/refresh_by_session',
-            type: "GET",
-            contentType: "application/json",
-            dataType: "json"
+            category: '{{ category }}',
+            episode: '{{ exp }}'
         });
-    };
+    
+    $(document).ready(function () {
+        client.init();
+        $(window).load(client.updateLocation);
+        $(window).bind('hashchange', client.updateLocation);
+    });
   </script>
-{% endblock %}
-
-{% block _menu_right %}
-  <li><a id="exp-value">Experiment</a><ul id="exp-menu" style="min-width: 180px;"></ul></li>
+  
+  <div class="page" id="page" style="overflow: hidden;">
+    <iframe id="kb-frame" class="content-frame" src="/knowrob"></iframe>
+    <iframe id="replay-frame" class="content-frame" src="/video"></iframe>
+    <iframe id="editor-frame" class="content-frame" src="/editor"></iframe>
+    <!-- <iframe id="tutorials-frame" class="content-frame" src="/tutorials"></iframe> -->
+    <iframe id="logs-frame" class="content-frame" src="/log"></iframe>
+  </div>
 {% endblock %}

@@ -110,7 +110,7 @@ def menu():
         for t in sorted(technology_episodes.keys()):
             episode_page += '<h4 class="technology-title">'+t+'</h4>'
             for (name,(exp,category)) in technology_episodes[t]:
-                episode_page += '<a style="cursor: pointer" onclick=set_episode("'+ category +'","'+ exp +'")>'+name+'</a>'
+                episode_page += '<a style="cursor: pointer" onclick=client.setEpisode("'+ category +'","'+ exp +'")>'+name+'</a>'
         episode_page += '</div></div>'
     episode_page += '</div>'
     
@@ -181,7 +181,7 @@ def get_history_item():
 @app.route('/knowrob/admin/cookie')
 @login_required
 def admin_cookie():
-    return render_template('admin_cookie.html', **locals())
+    return render_template('admin/cookie.html', **locals())
 
 @app.route('/log')
 @login_required

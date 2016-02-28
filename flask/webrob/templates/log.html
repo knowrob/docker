@@ -7,6 +7,16 @@
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
   <script type="text/javascript">
+    function on_marker_dblclick(marker) {};
+    function on_marker_delete(ns) {};
+    function on_designator_received(designatorHtml) {};
+    function on_image_received(imageHtml, imageWidth, imageHeight) {};
+    function on_camera_pose_received(pose) {};
+    function on_episode_selected(lib) {};
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    function on_register_nodes() {};
+    
     $(document).ready(function () {
       update_editor();
       $('#page-content').layout();
@@ -33,7 +43,9 @@
 {% endblock %}
 
 {% block content %}
-  <div class="ui-layout-center">
-    <div id="editor" class="black_border"></div>
+  <div id="page-content" style="width:100%; height:100%;">
+    <div class="ui-layout-center">
+        <div id="editor" class="black_border"></div>
+    </div>
   </div>
 {% endblock %}

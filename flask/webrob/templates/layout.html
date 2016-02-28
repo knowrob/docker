@@ -26,11 +26,8 @@
     var LEFT_MENU_LIST=[];
     var RIGHT_MENU_LIST=[];
   </script>
+  {% block menu %}{% endblock %}
   
-  <div id="page-content" style="width:100%; height:100%;">
-    {% block content %}{% endblock %}
-  </div>
-  
-
+  {% block content %}{% endblock %}
 </body>
 </html>

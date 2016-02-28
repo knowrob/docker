@@ -23,6 +23,9 @@ def episode_queries():
         category = session['exp-category']
         episode = session['exp-name']
         data = experiment_load_queries(category, episode)
+        if data == None:
+            app.logger.info("No episode data available for %s/%s" % (category, episode))
+            return jsonify(result=None)
         return jsonify(data)
     else:
         return jsonify(result=None)
@@ -53,7 +56,7 @@ def admin_experiments():
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)
-    return render_template('admin_experiments.html', **locals())
+    return render_template('admin/experiments.html', **locals())
 
 @app.route('/knowrob/exp_data/<category>/<exp>')
 @login_required

@@ -1,4 +1,4 @@
-{% extends "knowrob_layout.html" %}
+{% extends "layout.html" %}
 
 {% block bodyargs %}{% if overlay %} {% endif %}{% endblock %}
 
@@ -28,16 +28,10 @@
 
   <script type="text/javascript">
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-
-    // global ROS handle
-    var ros;
     
     var activeFile;
     var ignoreChanges = false;
     var hasChanges = false;
-
-    //global jsonprolog handle
-    var prolog;
 
     function init() {
       function connected_callback() {
@@ -47,47 +41,7 @@
           update_editor();
           update_pkg_list(true);
       };
-    
-      // Connect to ROS.
-      wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-      ros = new ROSLIB.Ros({
-        url : wsproto + '://{{ host_url }}/ws/{{ container_name }}/'
-      });
-      ros.on('connection', function() {
-          console.log('Editor connected to websocket server.');
-          var authentication  = '{{ authentication }}' === '' ? true : '{{ authentication }}' === 'true';
-          if(authentication) {
-              authenticate('/api/v1.0/auth_by_session', connected_callback);
-          }
-          else {
-              connected_callback();
-          }
-      });
     }
-
-    ///////////////////////////////
-    //////////// Authentication
-    ///////////////////////////////
-    // TODO: redundant with knowrob.js!
-
-    this.authenticate = function (authurl, then) {
-        console.log("Acquiring auth token");
-        // Call wsauth api to acquire auth token by existing user login session
-        $.ajax({
-            url: authurl,
-            type: "GET",
-            contentType: "application/json",
-            dataType: "json"
-        }).done( function (request) {
-            console.log("Sending auth token");
-            ros.authenticate(request.mac, request.client, request.dest, request.rand, request.t, request.level,
-                request.end);
-            // If a callback function was specified, call it in the context of Knowrob class (that)
-            if(then) {
-                then.call();
-            }
-        })
-    };
     
     ////////////////////////////////
     /////////// Editor view
@@ -567,6 +521,16 @@
         fileSelector.click();
     }
     
+    function on_marker_dblclick(marker) {};
+    function on_marker_delete(ns) {};
+    function on_designator_received(designatorHtml) {};
+    function on_image_received(imageHtml, imageWidth, imageHeight) {};
+    function on_camera_pose_received(pose) {};
+    function on_episode_selected(lib) {};
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    function on_register_nodes() {};
+    
 </script>
 {% endblock %}
 
@@ -587,24 +551,26 @@
     ]});
   </script>
   
-  <!-- A hidden form used for the download of packages. -->
-  <form id="download" action="/knowrob/pkg_down" method="POST">
-    <input type="hidden" />
-  </form>
-  
-  <div class="ui-layout-center">
-    <div id="editor" class="black_border"></div>
-  </div>
-
-  <div class="ui-layout-west">
-    <div>
-      <ul class="menu pkg-menu"><li>
-        <a href="#" id='pkg-value'></a>
-        <ul id='pkg-selection'></ul>
-      </li></ul>
+  <div id="page-content" style="width:100%; height:100%;">
+    <!-- A hidden form used for the download of packages. -->
+    <form id="download" action="/knowrob/pkg_down" method="POST">
+        <input type="hidden" />
+    </form>
+    
+    <div class="ui-layout-center">
+        <div id="editor" class="black_border"></div>
     </div>
-    <div>
-      <ul id="file-list"></ul>
+
+    <div class="ui-layout-west">
+        <div>
+        <ul class="menu pkg-menu"><li>
+            <a href="#" id='pkg-value'></a>
+            <ul id='pkg-selection'></ul>
+        </li></ul>
+        </div>
+        <div>
+        <ul id="file-list"></ul>
+        </div>
     </div>
   </div>
 {% endblock %}

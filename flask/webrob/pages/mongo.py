@@ -56,7 +56,7 @@ def admin_mongo():
         }
     
     mng.close()
-    return render_template('admin_mongo.html', **locals())
+    return render_template('admin/mongo.html', **locals())
 
 @app.route('/knowrob/admin/mongo_update/<cat>/<exp>', methods=['GET', 'POST'])
 @admin_required
