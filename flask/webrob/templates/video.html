@@ -9,7 +9,7 @@
     function init_video_divs () {
         var episodeSelect = document.getElementById('replay-episode-list');
         if (episodeSelect !== null && knowrob.episodeData) {
-            if(knowrob.episodeData.video.length > 0)
+            if(knowrob.episodeData.video != null && knowrob.episodeData.video.length > 0)
             {
                for (var i = 0; i < knowrob.episodeData.video.length; i++) {
                   add_video_item(knowrob.episodeData.video[i].name);
@@ -25,8 +25,11 @@
             opt.value = 0;
             opt.innerHTML = 'Choose an experiment time interval';
             select.appendChild(opt);
-            for (var i = 0; i < knowrob.episodeData.time_intervals.length; i++) {
-                add_time_interval(i + 1, knowrob.episodeData.time_intervals[i].start, knowrob.episodeData.time_intervals[i].end);
+            if(knowrob.episodeData.time_intervals != null)
+            {
+                for (var i = 0; i < knowrob.episodeData.time_intervals.length; i++) {
+                    add_time_interval(i + 1, knowrob.episodeData.time_intervals[i].start, knowrob.episodeData.time_intervals[i].end);
+                }
             }      
         }
     };
@@ -47,9 +50,13 @@
             //var select = document.getElementById('time-sequence-dropdown');
             //var string_value = select.options[select.selectedIndex].text;
             //var string_array = string_value.split("--");
-            var start = knowrob.episodeData.time_intervals[i-1].start;
-            var end = knowrob.episodeData.time_intervals[i-1].end;
-
+            var start = 0;
+            var end = 20000000;
+            if(knowrob.episodeData.time_intervals != null)
+            {
+                start = knowrob.episodeData.time_intervals[i-1].start;
+                end = knowrob.episodeData.time_intervals[i-1].end;
+            }
             firstrange.min = start;
             firstrange.max = end;
             firstrange.value = start;
@@ -101,8 +108,11 @@
 
     function selected_video_episode() {
         var selectedEpisode = document.getElementById('replay-episode-value').innerHTML;
-        for(var i=0; i<knowrob.episodeData.video.length; i++) {
-            if(knowrob.episodeData.video[i].name == selectedEpisode) return knowrob.episodeData.video[i];
+        if(knowrob.episodeData.video != null)
+        {
+            for(var i=0; i<knowrob.episodeData.video.length; i++) {
+                if(knowrob.episodeData.video[i].name == selectedEpisode) return knowrob.episodeData.video[i];
+            }
         }
         return undefined;
     }
@@ -213,7 +223,7 @@
     
     function format_initial_query(t) {
         var fps = parseInt(document.getElementById("replay-fps").value, 10);
-        var init_query = "openease_video_fps(" + fps + "), openease_video_start, !, clear_canvas, T = 'timepoint_" + t + "', task_tree_canvas, " +
+        var init_query = "openease_video_fps(" + fps + "), openease_video_start, clear_canvas, T = 'timepoint_" + t + "', task_tree_canvas, !," +
             ace.edit('init_query').getValue().trim();
         init_query = init_query.substr(0, init_query.length - 1);
         return init_query;
@@ -228,6 +238,8 @@
               console.log(prolog.format(result));
               setTimeout(function(){ stream_range(t0,t1); }, 500);
            }, mode=1);
+           var win = window.open('http://localhost:8080/stream_viewer?topic={snapshots}, '_blank');
+           win.focus();
         }
 
         isStreaming = false;
@@ -370,6 +382,7 @@
     function save_video_settings() {
         if(isNewVideo == true)
         {
+            if(knowrob.episodeData.video == null) knowrob.episodeData.video = [];
             knowrob.episodeData.video.push({
                 name: document.getElementById('name-text').value,
                 start: document.getElementById('replay-start-time').value,
@@ -470,7 +483,8 @@
         if(!start) return; start = parseInt(start);
         var end = prompt("Please enter a end timestamp", "");
         if(!end) return; end = parseInt(end);
-        
+
+        if(knowrob.episodeData.video == null) knowrob.episodeData.video = [];
         knowrob.episodeData.video.push({
             name: name,
             start: start,
