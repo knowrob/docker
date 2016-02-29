@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<!-- TODO: use prolog only on parent frame -->
   <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
@@ -23,10 +22,23 @@
     function on_designator_received(designatorHtml) {};
     function on_image_received(imageHtml, imageWidth, imageHeight) {};
     function on_camera_pose_received(pose) {};
-    function on_episode_selected(lib) {};
     function on_marker_contextmenu(marker) {};
     function on_render(camera,scene) {};
     function on_register_nodes() {};
+    
+    function on_episode_selected(lib) {
+        // stop replay if active
+        ui.stopStreaming();
+        // reset to initial state
+        document.getElementById("replay-episode-value").innerHTML = 'Choose an existing video query';
+        document.getElementById("replay-episode-list").innerHTML  = '';
+        ui.hideReplayBox('replay-configuration-box');
+        ui.hideReplayBox('replay-panel-box');
+        // load selected video query
+        ui.initVideoDivs();
+        ui.updateStartTime();
+        ui.updateEndTime();
+    };
     
     function resize() {
       $('#page-content').layout({
@@ -67,7 +79,6 @@
     $(document).ready(function () {
         ui = new KnowrobReplayUI(parent.client, {});
         ui.init();
-        
         resize();
       
         //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
@@ -76,13 +87,13 @@
           if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value){
               document.getElementById("replay-start-time").value = document.getElementById("replay-end-time").value - 1;
           }
-          updateStartTime();
+          ui.updateStartTime();
         });
         $("#replay-end-time").on("change", function(){
           if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value) {
               document.getElementById("replay-end-time").value = document.getElementById("replay-start-time").value + 1;
           }
-          updateEndTime();
+          ui.updateEndTime();
         });
       
         //var visClient = new TaskTreeVisClient({

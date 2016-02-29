@@ -10,9 +10,9 @@
   </div>
   <div class="metanav">
     <div class="metanav_left">
-    {% if current_user.is_authenticated %}
       <ul class="menu aligned-left" id="menu-left">
       </ul>
+    {% if current_user.is_authenticated %}
       <ul class="menu aligned-left" id="frame-menu-left">
       </ul>
     {% endif %}
@@ -28,4 +28,31 @@
       {% endif %}
     </div>
   </div>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
+  <script type="text/javascript">
+    var OPENEASE_USER_IFACES = [
+        { id: 'kb', src:'/knowrob', name: 'Knowledge Base' },
+        { id: 'replay', src:'/video', name: 'Episode Replay' },
+        { id: 'editor', src:'/editor', name: 'Text Editor' },
+        { id: 'logs', src:'/log', name: 'Log' }
+    ];
+  
+    function FlaskUser(){
+        this.username = '{{ current_user.username }}';
+        this.mail     = '{{ current_user.email }}';
+        this.isLoggedIn = function() {
+            return '{{ current_user.is_authenticated }}' == 'True';
+        };
+        this.isAdmin = function() {
+            return '{{ current_user.is_authenticated and current_user.has_role("admin") }}' == 'True';
+        };
+    };
+    var flask_user = new FlaskUser();
+    var menu = new KnowrobMenu(flask_user, OPENEASE_USER_IFACES);
+    
+    $(document).ready(menu.updateMenu);
+  </script>
+  
 {% endblock %}

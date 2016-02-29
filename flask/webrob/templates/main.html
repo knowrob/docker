@@ -91,7 +91,9 @@
             auth_url: '/api/v1.0/auth_by_session',
             meshPath: '/meshes/',
             category: '{{ category }}',
-            episode: '{{ exp }}'
+            episode: '{{ exp }}',
+            user_interfaces: OPENEASE_USER_IFACES,
+            menu: menu
         });
     
     $(document).ready(function () {
@@ -101,11 +103,16 @@
     });
   </script>
   
-  <div class="page" id="page" style="overflow: hidden;">
-    <iframe id="kb-frame" class="content-frame" src="/knowrob"></iframe>
-    <iframe id="replay-frame" class="content-frame" src="/video"></iframe>
-    <iframe id="editor-frame" class="content-frame" src="/editor"></iframe>
-    <!-- <iframe id="tutorials-frame" class="content-frame" src="/tutorials"></iframe> -->
-    <iframe id="logs-frame" class="content-frame" src="/log"></iframe>
-  </div>
+  <div class="page" id="page" style="overflow: hidden;" />
+  <script type="text/javascript">
+    // Declare page frames: Each user interface of openEASE is
+    // put into an iframe that is child of #page
+    for(var i in OPENEASE_USER_IFACES) {
+        var frame = document.createElement("iframe");
+        frame.id = OPENEASE_USER_IFACES[i].id+'-frame';
+        frame.className = 'content-frame';
+        frame.src = OPENEASE_USER_IFACES[i].src;
+        document.getElementById('page').appendChild(frame);
+    };
+  </script>
 {% endblock %}
