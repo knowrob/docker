@@ -23,10 +23,14 @@
     function on_designator_received(designatorHtml) {};
     function on_image_received(imageHtml, imageWidth, imageHeight) {};
     function on_camera_pose_received(pose) {};
-    function on_episode_selected(lib) {};
     function on_marker_contextmenu(marker) {};
     function on_render(camera,scene) {};
     function on_register_nodes() {};
+    
+    function on_episode_selected(lib) {
+        // TODO: update video query
+        // TODO: stop replay if active
+    };
     
     function resize() {
       $('#page-content').layout({

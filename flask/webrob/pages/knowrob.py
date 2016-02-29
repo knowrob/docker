@@ -26,6 +26,7 @@ def download_static(filename):
 def download_logged_image(filename):
     return send_from_directory('/episodes/', filename)
     
+@app.route('/kb/')
 @app.route('/knowrob/')
 @app.route('/knowrob/exp/<category>/<exp>')
 @login_required
@@ -44,6 +45,7 @@ def knowrob_remote(host='172.17.42.1', category=None, exp=None):
     session['video'] = False
     return __knowrob_page__('knowrob_simple.html', 'remote/'+host, category, exp)
 
+@app.route('/replay')
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')
 @login_required
@@ -183,6 +185,7 @@ def get_history_item():
 def admin_cookie():
     return render_template('admin/cookie.html', **locals())
 
+@app.route('/logs')
 @app.route('/log')
 @login_required
 def log():
