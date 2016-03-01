@@ -85,8 +85,9 @@
     var auth = '{{ authentication }}';
     var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
     var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
+    var ui;
     var client = new KnowrobClient({
-            username: '{{ current_user.username }}',
+            flask_user: flask_user,
             ros_url: rosUrl,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
@@ -95,14 +96,21 @@
             episode: '{{ exp }}',
             user_interfaces: OPENEASE_USER_IFACES,
             menu: menu,
-            require_episode: false
+            require_episode: false,
+            global_viewer: function() { return ui.rosViewer.rosViewer; }
         });
-    var ui;
     
     $(document).ready(function () {
         client.init();
         ui = new TutorialUI(client, {});
         ui.init();
+      
+        // hook for links of class "show_code" that pastes the content of the
+        // previous code block into the query field
+        $( "a.show_code" ).click(function( event ) {
+            ui.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+            event.preventDefault();
+        });
         
         var pageLayout = $('#page-content').layout({
             stateManagement__enabled: true,
@@ -136,7 +144,8 @@
             }
         });
         centerLayout = $('#editor-container').layout({
-            center: { paneSelector: "#markers", minSize: 50 },
+            center: { paneSelector: "#markers", minSize: 50,
+                      onresize: function() { if( ui ) ui.resizeCanvas(); } },
             south: { paneSelector: "#chart", initClosed: true, minSize: 50 }
         });
         ui.resizeCanvas();

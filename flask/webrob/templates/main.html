@@ -85,7 +85,7 @@
     var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
     var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
     var client = new KnowrobClient({
-            username: '{{ current_user.username }}',
+            flask_user: flask_user,
             ros_url: rosUrl,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
