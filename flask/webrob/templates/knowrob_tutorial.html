@@ -94,7 +94,8 @@
             category: '{{ category }}',
             episode: '{{ exp }}',
             user_interfaces: OPENEASE_USER_IFACES,
-            menu: menu
+            menu: menu,
+            require_episode: false
         });
     var ui;
     
@@ -146,6 +147,7 @@
     });
   </script>
 
+  <div class="page" id="page" style="overflow: hidden;">
   <div id="page-content" style="width:100%; height:100%;">
     <div class="ui-layout-center" id="editor-container">
         <div id="markers"></div>
@@ -192,6 +194,7 @@
         <div id="designator"></div>
         <div id="mjpeg"></div>
     </div>
+  </div>
   </div>
   
 {% endblock %}
