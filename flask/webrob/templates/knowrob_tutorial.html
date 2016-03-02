@@ -78,7 +78,6 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/tutorial-page.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -86,7 +85,8 @@
     var auth = '{{ authentication }}';
     var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
     var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-    var ui;
+    var rosViewer;
+    var plConsole;
     var client = new KnowrobClient({
             flask_user: flask_user,
             ros_url: rosUrl,
@@ -98,13 +98,19 @@
             user_interfaces: OPENEASE_USER_IFACES,
             menu: menu,
             require_episode: false,
-            global_viewer: function() { return ui.rosViewer.rosViewer; }
+            global_viewer: function() { return rosViewer.rosViewer; }
         });
     
     $(document).ready(function () {
         client.init();
-        ui = new TutorialUI(client, {use_console_overlay: false});
-        ui.init();
+        
+        plConsole = new PrologConsole(client, {use_console_overlay: false});
+        plConsole.init();
+        
+        rosViewer = client.newCanvas({
+            divID: document.getElementById('markers')
+        });
+        resizeCanvas();
         
         var pageLayout = $('#page-content').layout({
             stateManagement__enabled: true,
@@ -139,10 +145,10 @@
         });
         centerLayout = $('#editor-container').layout({
             center: { paneSelector: "#markers", minSize: 50,
-                      onresize: function() { if( ui ) ui.resizeCanvas(); } },
+                      onresize: function() { resizeCanvas(); } },
             south: { paneSelector: "#chart", initClosed: true, minSize: 50 }
         });
-        ui.resizeCanvas();
+        resizeCanvas();
         
         $('#designator').change(function() { pageLayout.open('east'); });
         $('#mjpeg').change(function() { pageLayout.open('east'); });
@@ -150,6 +156,10 @@
         
         loadTutorial('getting_started', 1);
     });
+
+    function resizeCanvas() {
+        rosViewer.resize($('#markers').width(), $('#markers').height());
+    };
     
     function loadTutorial(category, page) {
         $.ajax({
@@ -205,7 +215,7 @@
             // hook for links of class "show_code" that pastes the content of the
             // previous code block into the query field
             $( "a.show_code" ).click(function( event ) {
-                ui.console.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+                plConsole.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
                 event.preventDefault();
             });
         });
@@ -243,8 +253,8 @@
                 <div id="console_bottom">
                     <div id="query_buttons">
                         <ul class="query_button_group">
-                            <li><a href="#" class="query_button" id="btn_query"  onclick="ui.console.query()">Query</a></li>
-                            <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.console.nextSolution()">Next Solution</a></li>
+                            <li><a href="#" class="query_button" id="btn_query"  onclick="plConsole.query()">Query</a></li>
+                            <li><a href="#" class="query_button" id="btn_query_next" onclick="plConsole.nextSolution()">Next Solution</a></li>
                         </ul>
                     </div>
                 </div>
