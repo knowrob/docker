@@ -74,6 +74,7 @@
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
@@ -102,15 +103,8 @@
     
     $(document).ready(function () {
         client.init();
-        ui = new TutorialUI(client, {});
+        ui = new TutorialUI(client, {use_console_overlay: false});
         ui.init();
-      
-        // hook for links of class "show_code" that pastes the content of the
-        // previous code block into the query field
-        $( "a.show_code" ).click(function( event ) {
-            ui.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
-            event.preventDefault();
-        });
         
         var pageLayout = $('#page-content').layout({
             stateManagement__enabled: true,
@@ -153,57 +147,117 @@
         $('#designator').change(function() { pageLayout.open('east'); });
         $('#mjpeg').change(function() { pageLayout.open('east'); });
         $('#chart').change(function() { centerLayout.open('south'); });
+        
+        loadTutorial('getting_started', 1);
     });
+    
+    function loadTutorial(category, page) {
+        $.ajax({
+            url: "/tutorials/get",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({category: category, page: page}),  
+            dataType: "json"
+        }).done( function (data) {
+            var lib = document.getElementById('library');
+            lib.innerHTML = ''; // clear
+            // <h2>tut.cat_title</h2>
+            var h2 = document.createElement("h2");
+            h2.innerHTML = data.this.cat_id;
+            lib.appendChild(h2);
+            // <h4>tut.page.  tut.title</h4>
+            var h4 = document.createElement("h4");
+            h4.innerHTML = data.this.page + '. ' + data.this.title;
+            lib.appendChild(h4);
+            // {{ content }}
+            var text = document.createElement("div");
+            text.innerHTML = data.this.text;
+            lib.appendChild(text);
+            // <div id="tut_nav">
+            var nav = document.createElement("div");
+            nav.id = 'tut_nav';
+            if(data.prev) {
+                // <div style="float:left;">
+                //    <a onclick="loadTutorial(prev.cat_id, prev.page)">Previous: prev.title</a>
+                // </div>
+                var link = document.createElement("div");
+                var link_a = document.createElement("a");
+                link.style.float = 'left';
+                link_a.innerHTML = 'Previous: ' + data.prev.title
+                link_a.onclick = function() { loadTutorial(data.prev.cat_id, data.prev.page); };
+                link.appendChild(link_a);
+                nav.appendChild(link);
+            }
+            if(data.next) {
+                // <div style="float:right;">
+                //    <a onclick="loadTutorial(nxt.cat_id, nxt.page)">Next: nxt.title</a>
+                // </div>
+                var link = document.createElement("div");
+                var link_a = document.createElement("a");
+                link.style.float = 'right';
+                link_a.innerHTML = 'Next: ' + data.next.title
+                link_a.onclick = function() { loadTutorial(data.next.cat_id, data.next.page); };
+                link.appendChild(link_a);
+                nav.appendChild(link);
+            }
+            lib.appendChild(nav);
+            
+            // hook for links of class "show_code" that pastes the content of the
+            // previous code block into the query field
+            $( "a.show_code" ).click(function( event ) {
+                ui.console.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+                event.preventDefault();
+            });
+        });
+    };
+    
+    function highlightElement(name, type, highlight) {
+      if(typeof type == "string") {
+        if(type === "class") {
+          var elems = document.getElementsByClassName(name);
+          for (i = 0; i < elems.length; i++) {
+            elems[i].style.backgroundColor = highlight ? "#144F78" : "#BBB";
+            elems[i].style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
+          }
+        }
+        else if(type === "id") {
+          document.getElementById(name).style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
+        }
+      }
+    }; 
   </script>
 
   <div class="page" id="page" style="overflow: hidden;">
-  <div id="page-content" style="width:100%; height:100%;">
-    <div class="ui-layout-center" id="editor-container">
-        <div id="markers"></div>
-        <div id="chart"></div>	
-    </div>
+    <div id="page-content" style="width:100%; height:100%;">
+        <div class="ui-layout-center" id="editor-container">
+            <div id="markers"></div>
+            <div id="chart"></div>	
+        </div>
 
-    <div class="ui-layout-west">
-        <div id="console">
-            <div id="console_top">
-                <div id="history" style="font-size:20px;"></div>
-                <div id="user_query" style="font-size:20px;">member(A, [a,b,c]).</div>
-            </div>
-            <div id="console_bottom">
-                <div id="query_buttons">
-                <ul class="query_button_group">
-                    <li><a href="#" class="query_button" id="btn_query"  onclick="ui.query()">Query</a></li>
-                    <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.next_solution()">Next Solution</a></li>
-                </ul>
+        <div class="ui-layout-west">
+            <div id="console">
+                <div id="console_top">
+                    <div id="history" style="font-size:20px;"></div>
+                    <div id="user_query" style="font-size:20px;"></div>
                 </div>
+                <div id="console_bottom">
+                    <div id="query_buttons">
+                        <ul class="query_button_group">
+                            <li><a href="#" class="query_button" id="btn_query"  onclick="ui.console.query()">Query</a></li>
+                            <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.console.nextSolution()">Next Solution</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="library" class="black_border" style="position:relative; left:0px; top:470px; width:auto; font-size:10pt; padding:5px 15px; overflow:auto; margin-top:10px;">
             </div>
         </div>
-        <div id="library" class="black_border" style="position:relative; left:0px; top:470px; width:auto; font-size:10pt; padding:5px 15px; overflow:auto; margin-top:10px;">
-            <h2>{{ tut.cat_title }}</h2>
-            <h4>{{tut.page}}. {{ tut.title }}</h4>
-            {{ content }}
-
-            <!-- Bottom navigation: prev and next tutorials -->
-            <div style="position:relative; bottom:0; width:auto; height:25px; padding-bottom:10px;">
-{% if prev %}
-                <div style="float:left;">
-                    <a href="{{ url_for('tutorials', cat_id=prev.cat_id, page=prev.page) }}">Previous: {{prev.title}}</a>
-                </div>
-{% endif %}
-{% if nxt %}
-                <div style="float:right;">
-                    <a href="{{ url_for('tutorials', cat_id=nxt.cat_id, page=nxt.page) }}">Next: {{nxt.title}}</a>
-                </div>
-{% endif %}
-            </div>
+        
+        <div class="ui-layout-east">
+            <div id="designator"></div>
+            <div id="mjpeg"></div>
         </div>
     </div>
-    
-    <div class="ui-layout-east">
-        <div id="designator"></div>
-        <div id="mjpeg"></div>
-    </div>
-  </div>
   </div>
   
 {% endblock %}

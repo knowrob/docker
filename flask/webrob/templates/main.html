@@ -74,6 +74,7 @@
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
@@ -94,7 +95,8 @@
             episode: '{{ exp }}',
             user_interfaces: OPENEASE_USER_IFACES,
             menu: menu,
-            require_episode: true
+            require_episode: true,
+            use_console_overlay: true
         });
     
     $(document).ready(function () {
