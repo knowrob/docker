@@ -1,6 +1,7 @@
 
 from flask import request, session, render_template, Markup, jsonify
 from flask.ext.misaka import markdown
+from flask_user import current_user
 from urlparse import urlparse
 import re
 
@@ -20,6 +21,11 @@ def tutorials():
     readonly = True
     authentication = False
     session['video'] = 0
+    
+    # Use the user container if user is authenticated
+    if current_user.is_authenticated:
+        container_name = session['user_container_name']
+        authentication = True
 
     return render_template('knowrob_tutorial.html', **locals())
 
