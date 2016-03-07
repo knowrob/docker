@@ -36,6 +36,9 @@ def get_tutorial():
 
 def read_tutorial(cat_id, page):
     tut = read_tutorial_page(cat_id, page)
+    if tut==None:
+        app.logger.info("No tutorial available for %s/%s" % (cat_id, str(page)))
+        return {}
     content = markdown(tut.text, fenced_code=True)
 
     # automatically add event handler for highlighting DOM elements
