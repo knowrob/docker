@@ -12,6 +12,12 @@
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
   <script type="text/javascript">
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    
+    var activeFile;
+    var ignoreChanges = false;
+    var hasChanges = false;
+    
     function resize() {
       $('#page-content').layout({
         center__maskContents:  true,
@@ -21,27 +27,16 @@
       });
     };
     $(document).ready(function () {
-      init();
+      // 'change' event is triggered whenever the editor content changes
+      ace.edit("editor").getSession().on('change', on_editor_changed);
+      // Initialization of widgets on reload
+      update_editor();
+      update_pkg_list(true);
       resize();
     });
   </script>
 
   <script type="text/javascript">
-    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    
-    var activeFile;
-    var ignoreChanges = false;
-    var hasChanges = false;
-
-    function init() {
-      function connected_callback() {
-          // 'change' event is triggered whenever the editor content changes
-          ace.edit("editor").getSession().on('change', on_editor_changed);
-          // Initialization of widgets on reload
-          update_editor();
-          update_pkg_list(true);
-      };
-    }
     
     ////////////////////////////////
     /////////// Editor view
@@ -172,13 +167,22 @@
         }
         save_editor_file_if_changed();
         
+        // FIXME: seems reconsult not working!!!!
         var consultCmd = "((ros_package_initialized("+pkg+"), make) ; register_ros_package("+pkg+")).";
-        console.log("QUERY " + consultCmd);
-        // TODO: feedback for user!
-        var pl = new JsonProlog(ros, {});
+        var pl = parent.client.newProlog();
         // Assert package in prolog
         pl.jsonQuery(consultCmd, function(x) {
-            console.log("User package consulted.");
+            if(x.status && x.status=='OK') {
+                console.log("User package consulted.");
+                alert("User package consulted.");
+            }
+            else {
+                console.log("Failed to consult this package (please check logs).");
+                if(x.error)
+                    alert(x.error);
+                else
+                    alert("Failed to consult this package (please check logs).");
+            }
             pl.finishClient();
         });
     }

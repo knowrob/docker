@@ -74,6 +74,7 @@
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
@@ -85,7 +86,7 @@
     var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
     var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
     var client = new KnowrobClient({
-            username: '{{ current_user.username }}',
+            flask_user: flask_user,
             ros_url: rosUrl,
             authentication: auth,
             auth_url: '/api/v1.0/auth_by_session',
@@ -93,7 +94,9 @@
             category: '{{ category }}',
             episode: '{{ exp }}',
             user_interfaces: OPENEASE_USER_IFACES,
-            menu: menu
+            menu: menu,
+            require_episode: true,
+            use_console_overlay: true
         });
     
     $(document).ready(function () {

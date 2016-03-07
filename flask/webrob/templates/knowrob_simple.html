@@ -24,6 +24,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
 {% endblock %}
 
@@ -114,7 +115,7 @@
     
     function querySelectKeyEvent(event) {
         if (event.key == ' ') { // ENTER
-            ui.query();
+            ui.console.query();
             return false;
         }
     {% if current_user.is_authenticated and current_user.has_role('admin') %}
@@ -206,7 +207,9 @@
     };
     
     $(document).ready(function () {
-        ui = new KnowrobUI(parent.client, {});
+        ui = new KnowrobUI(parent.client, {
+            use_console_overlay: true
+        });
         ui.init();
         resize();
         
@@ -266,8 +269,8 @@
         <div id="console_bottom">
             <div id="query_buttons">
             <ul class="query_button_group">
-                <li><a href="#" class="query_button" id="btn_query"  onclick="ui.query()">Query</a></li>
-                <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.nextSolution()">Next Solution</a></li>
+                <li><a href="#" class="query_button" id="btn_query"  onclick="ui.console.query()">Query</a></li>
+                <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.console.nextSolution()">Next Solution</a></li>
         {% if current_user.is_authenticated and current_user.has_role('admin') %}
                 <li><a href="#" class="query_button admin_button" id="btn_query_save" onclick="ui.saveQuery()">Save</a></li>
         {% endif %}
@@ -281,7 +284,7 @@
         {% if current_user.is_authenticated and current_user.has_role('admin') %}
             ondblclick="ui.setQueryText()"
         {% endif %}
-            onchange="ui.addSelectedToQueryform('examplequery')">
+            onchange="ui.console.addSelectedToQueryform('examplequery')">
             <option value=0></option>
         </select>
         </div>
