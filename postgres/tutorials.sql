@@ -8,7 +8,13 @@ create table tutorial (
     page integer not null
 );
 
-INSERT INTO Tutorial VALUES(0,'getting_started','Getting started','The user interface',
+INSERT INTO Tutorial VALUES(110,'overview','openEASE Tutorials','Tutorial List',
+'
+  * <a onclick="loadTutorial(''getting_started'',1)">Getting started</a>
+  * <a onclick="loadTutorial(''episodes'',1)">Episodic memory</a>
+',1);
+
+INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user interface',
 'The user interface consists of six panes with different purposes.
 
   * The *Prolog interaction area hl_console* in the upper left consists of the *history pane hl_history* in the top and the *query field hl_user&#95;query* at the bottom. Prolog queries are to be typed in the *query field hl_user&#95;query*, whereas the history of the queries with their respective results will be shown in the *history pane hl_history*.
@@ -25,7 +31,7 @@ If the *3D display pane hl_markers* does not yet show a grid in the background, 
 base has not yet been loaded completely. In this case, please wait a moment and
 reload the page.',1);
 
-INSERT INTO Tutorial VALUES(1,'getting_started','Getting started','Logic Programming (1)',
+INSERT INTO Tutorial VALUES(221,'getting_started','Getting started','Logic Programming (1)',
 'The query language used in openEASE is [Prolog](http://www.swi-prolog.org), a logical programming language.
 Queries consist of predicates that are linked by logical operators, usually the
 AND operator (in Prolog represented by a comma '',''), or the OR operator
@@ -65,7 +71,7 @@ The result `true`, on the other hand, only denotes that additional solutions
 may exist, i.e. that the space of solutions has not yet been exhaustively searched.
 ',2);
 
-INSERT INTO Tutorial VALUES(2,'getting_started','Getting started','Logic Programming (2)',
+INSERT INTO Tutorial VALUES(222,'getting_started','Getting started','Logic Programming (2)',
 'A Prolog program consists of a number of clauses.
 Each clause is either a fact or a rule.
 After a Prolog program is consulted in a Prolog interpreter,
@@ -155,7 +161,7 @@ This tutorial is only a brief introduction to logic programming with Prolog.
 Please visit the [SWI Prolog](http://www.swi-prolog.org) website or one of the
 many [Prolog tutorials](http://www.learnprolognow.org) available online.',3);
 
-INSERT INTO Tutorial VALUES(3,'getting_started','Getting started','Web Ontology Language',
+INSERT INTO Tutorial VALUES(223,'getting_started','Getting started','Web Ontology Language',
 'Experiment data may consist of different components - semantic annotations
 that are stored in the [Web Ontology Language](http://en.wikipedia.org/wiki/Web_Ontology_Language) (OWL),
 images that have been recorded during the task
@@ -227,12 +233,14 @@ OWL''s strict formal semantics, its typing and the existing reasoning methods ar
 In order to profit from these properties, it is thus necessary that information which is read from external sources
 by Prolog predicates is transformed into a representation that is compatible to the OWL knowledge. 
 
+**TODO** namespaces
+
 **Note:** As usual, the predicate `rdf_has` supports an arbitrary number of arguments to be bound or unbound.
 
 **Note:** For modeling with OWL, use the [Protege OWL editor](http://protege.stanford.edu/download/protege/4.1/installanywhere/) (version 4.x) which makes exploring and editing OWL files much easier and have a look at the documentation.
 ',4);
 
-INSERT INTO Tutorial VALUES(4,'getting_started','Getting started','KnowRob Packages',
+INSERT INTO Tutorial VALUES(97643634,'getting_started','Getting started','KnowRob Packages',
 'If your application requires functionality beyond that one already provided by the standard KnowRob packages,
 you will need to create your own KnowRob package.
 The following description assumes that you would like to add knowledge in terms of OWL ontologies,
@@ -278,7 +286,7 @@ your packages.
 
 **Note:** At the moment, it is not possible to compile code in user packages on openEASE. Thus, you can not include languages such as Java or C++ in your package.',5);
 
-INSERT INTO Tutorial VALUES(5,'getting_started','Getting started','Marker Visualization',
+INSERT INTO Tutorial VALUES(224,'getting_started','Getting started','Marker Visualization',
 'openEASE includes a browser-based visualization canvas that can display 3D data such as the environment map or the robot itself.
 The canvas is based on [rosbridge](http://wiki.ros.org/rosbridge)
 and the [robotwebtools](http://robotwebtools.org/) libraries that provide tools for displaying information from ROS in a browser.
@@ -353,7 +361,7 @@ If you would like to reset the canvas to be empty, please use following call:
 
 **Note:** Remove individual markers with `marker_remove` by binding a marker name to the predicate argument.',6);
 
-INSERT INTO Tutorial VALUES(6,'getting_started','Getting started','Next steps','
+INSERT INTO Tutorial VALUES(225,'getting_started','Getting started','Next steps','
 After a successful [registration](https://data.open-ease.org/user/register) and
 login you are now able to run the different experiments provided by the AI research group by choosing one of the application from the dropdown menu.
 You can switch the experiments in the upper right of the openEASE menu bar.
@@ -370,6 +378,63 @@ The remaining tutorials cover different aspects of the knowledge processing serv
 including the representation of semantic maps, tasks and actions, objects and locations
 as well as representation of kinematic chains and robot capabilities.
 ',7);
+
+INSERT INTO Tutorial VALUES(440,'episodes','Episodic memory','Task representation','
+Loading Action Logs
+
+    load_experiments(''/episodes/Pick-and-Place/pr2-general-pick-and-place_0/'', [''episode1''], ''log.owl'').
+
+Action Ontology
+
+    owl_subclass_of(A, knowrob:''Action'').
+
+Action Effects
+fromLocation / toLocation
+',1);
+
+INSERT INTO Tutorial VALUES(441,'episodes','Episodic memory','Robot action logs','
+Toplevel
+
+    subtask(''TOPLEVEL'', SubTasks).
+
+Perceive/Grasp situation
+
+    task(T), task_goal(T,''GRASP''), task_start(T, Start).
+
+Combining Semantic Map entities with action logs
+',2);
+
+INSERT INTO Tutorial VALUES(442,'episodes','Episodic memory','Episode statistics','
+Timeline
+
+    % bind an episode
+    experiment(E),
+    % find all instances of knowrob:''PurposefulAction''
+    findall(_Y-(_T0-_T1), (
+        rdfs_instance_of(_X, knowrob:''PurposefulAction''),
+        event_class_name(_X,_Y),
+        once((
+            subtask_all(E,_X),
+            event_interval(_X,_T0,_T1)
+        ))
+    ), _Actions),
+    pairs_keys_values(_Actions, ClassNames, _Times),
+    pairs_keys_values(_Times, StartTimes, EndTimes),
+    % show the timeline
+    add_timeline(''actions'', ''Logged Actions'', ClassNames, StartTimes, EndTimes).
+
+Failures
+
+    findall(Type-Num, (
+        owl_subclass_of(T, knowrob:''CRAMFailure''),
+        rdf_split_url(_, Type, T),
+        findall(F, failure_type(F, T), Failures),
+        length(Failures, Num)
+    ), Distrib),
+    pairs_keys_values(Distrib, Types, Nums),
+    add_diagram(errordist, ''Error distribution'', piechart, xlabel, ylabel, 350, 350, ''11px'', [[Types, Nums]]).
+
+',3);
 
 /*INSERT INTO Tutorial VALUES(2,'getting_started','Getting started','Loading data','Experiment data may consist of different components -- semantic annotations
 that are stored in OWL files, images that have been recorded during the task

@@ -154,7 +154,7 @@
         $('#mjpeg').change(function() { pageLayout.open('east'); });
         $('#chart').change(function() { centerLayout.open('south'); });
         
-        loadTutorial('getting_started', 1);
+        loadTutorial('overview', 1);
     });
 
     function resizeCanvas() {
@@ -198,18 +198,22 @@
                 link.appendChild(link_a);
                 nav.appendChild(link);
             }
+            // <div style="float:right;">
+            //    <a onclick="loadTutorial(nxt.cat_id, nxt.page)">Next: nxt.title</a>
+            // </div>
+            var link = document.createElement("div");
+            var link_a = document.createElement("a");
+            link.style.float = 'right';
             if(data.next) {
-                // <div style="float:right;">
-                //    <a onclick="loadTutorial(nxt.cat_id, nxt.page)">Next: nxt.title</a>
-                // </div>
-                var link = document.createElement("div");
-                var link_a = document.createElement("a");
-                link.style.float = 'right';
                 link_a.innerHTML = 'Next: ' + data.next.title
                 link_a.onclick = function() { loadTutorial(data.next.cat_id, data.next.page); };
-                link.appendChild(link_a);
-                nav.appendChild(link);
+            } else {
+                link_a.innerHTML = 'Tutorial Overview'
+                link_a.onclick = function() { loadTutorial('overview', 1); };
             }
+            link.appendChild(link_a);
+            nav.appendChild(link);
+            
             lib.appendChild(nav);
             
             // hook for links of class "show_code" that pastes the content of the
