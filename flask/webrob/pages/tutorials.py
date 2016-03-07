@@ -32,10 +32,17 @@ def tutorials():
 @app.route('/tutorials/get', methods=['POST'])
 def get_tutorial():
     data = json.loads(request.data)
-    return jsonify(read_tutorial(data['category'], data['page']))
+    response = read_tutorial(data['category'], data['page'])
+    if response==None:
+        return jsonify({})
+    else:
+        return jsonify(response)
 
 def read_tutorial(cat_id, page):
     tut = read_tutorial_page(cat_id, page)
+    if tut==None:
+        app.logger.info("No tutorial available for %s/%s" % (cat_id, str(page)))
+        return None
     content = markdown(tut.text, fenced_code=True)
 
     # automatically add event handler for highlighting DOM elements
