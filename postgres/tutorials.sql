@@ -10,8 +10,8 @@ create table tutorial (
 
 INSERT INTO Tutorial VALUES(110,'overview','openEASE Tutorials','Tutorial List',
 '
-  * <a onclick="loadTutorial(''getting_started'',1)">Getting started</a>
-  * <a onclick="loadTutorial(''episodes'',1)">Episodic memory</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''getting_started'',1)">Getting started</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''actions'',1)">Action ontology</a>
 ',1);
 
 INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user interface',
@@ -379,37 +379,111 @@ including the representation of semantic maps, tasks and actions, objects and lo
 as well as representation of kinematic chains and robot capabilities.
 ',7);
 
-INSERT INTO Tutorial VALUES(440,'episodes','Episodic memory','Task representation','
-Loading Action Logs
+INSERT INTO Tutorial VALUES(440,'actions','Episodic memory','Action representation (1)','
+In openEASE, instances of actions are represented in the ABOX of the OWL reasoner.
+These action instances may be
 
-    load_experiments(''/episodes/Pick-and-Place/pr2-general-pick-and-place_0/'', [''episode1''], ''log.owl'').
+  * actually observed or performed actions (something that happened at a certain time)
+  * planned actions (something one intends to do)
+  * inferred actions (something one imagines that happens)
+  * asserted actions (some action someone told me has happened)
 
-Action Ontology
+In any case, one talks about an action that could be asserted a (past or future) time and actor.
+
+In contrast, the TBOX describes general information about classes of actions.
+These can be quite general classes like `PuttingSomethingSomewhere`,
+or very specific ones like `PuttingDinnerPlateInCenterOfPlacemat`.
+However, all these class specifications describe types of actions that,
+when they are actually executed, get instantiated to the corresponding actions in the ABOX.
+Following query yields in all action classes defined in the core ontology:
 
     owl_subclass_of(A, knowrob:''Action'').
 
-Action Effects
-fromLocation / toLocation
 ',1);
 
-INSERT INTO Tutorial VALUES(441,'episodes','Episodic memory','Robot action logs','
-Toplevel
+INSERT INTO Tutorial VALUES(441,'actions','Episodic memory','Action representation (2)','
+Episodic memory can be loaded using the `load_experiments` predicate that parses
+the OWL file with the high-level description, and does some housekeeping to
+set up search paths for the other information sources.
 
-    subtask(''TOPLEVEL'', SubTasks).
+    load_experiment(''/episodes/Pick-and-Place/xsens-kitchen-pnp_0/episode1/log.owl'').
 
-Perceive/Grasp situation
+As an example, let''s have a look at an instance of the class
+`PuttingSomethingSomewhere` that corresponds to transporting an object from one position to another.
+Obviously, this kind of action involves to pick up the object, move to the goal position,
+and put the object down again. These sub-events are modeled in the following piece of OWL code: 
 
-    task(T), task_goal(T,''GRASP''), task_start(T, Start).
+<pre>
+&lt;owl:NamedIndividual rdf:about="&knowrob;PuttingSomethingSomewhere_KKxZYXiM"&gt;
+    &lt;rdf:type rdf:resource="&knowrob;PuttingSomethingSomewhere"/&gt;
+    &lt;knowrob:startTime rdf:resource="&knowrob;timepoint_1398864734.5133333"/&gt;
+    &lt;knowrob:endTime rdf:resource="&knowrob;timepoint_1398864735.8466668"/&gt;
+    &lt;knowrob:objectActedOn  rdf:resource="&knowrob;Cup_dsf784635"/&gt;
+    &lt;knowrob:toLocation rdf:resource="&knowrob;drawer_island_left_lower"/&gt;
+&lt;/owl:NamedIndividual&gt;
+</pre>
 
-Combining Semantic Map entities with action logs
+The RDF triples can be accessed using the `rdf_has` predicate:
+
+    owl_individual_of(Task, knowrob:''PuttingSomethingSomewhere''),
+    rdf_has(Task, knowrob:''objectActedOn'', Obj),
+    rdf_has(Task, knowrob:''toLocation'', Loc).
+
+Complex robot tasks can be decomposed into primitive actions and movements.
+If the sub-actions for lower-level actions are already modeled,
+tasks can be described conveniently on a rather abstract level,
+like the already mentioned `PuttingSomethingSomewhere` actions
+which has no sub-actions but may has successor and predecessor actions:
+
+    owl_individual_of(Task, knowrob:''PuttingSomethingSomewhere''),
+    rdf_has(Task, knowrob:''nextEvent'', Next),
+    rdf_has(Task, knowrob:''previousEvent'', Prev).
+
 ',2);
 
-INSERT INTO Tutorial VALUES(442,'episodes','Episodic memory','Episode statistics','
-Timeline
+INSERT INTO Tutorial VALUES(442,'actions','Action ontology','Action requirements','
+Actions can have prerequisites in terms of components or capabilities
+a robot needs to have in order to execute them.
+The Semantic Robot Description Language (SRDL) allows to describe robot components,
+robot capabilities, and dependencies of actions.
 
-    % bind an episode
+The following are just some examples, a full overview of SRDL can be found later in the tutorial. 
+
+    required_cap_for_action(knowrob:''PuttingSomethingSomewhere'', Cap).
+
+After loading a robot definition, the action requirements
+can be matched against the available capabilities to determine which ones are missing:
+
+    owl_parse(''package://knowrob_srdl/owl/PR2.owl''),
+    missing_cap_for_action(knowrob:''PuttingSomethingSomewhere'', pr2:''PR2Robot1'', M).
+',3);
+
+/*
+INSERT INTO Tutorial VALUES(443,'episodes','Episodic memory','Robot action logs','
+openEASE provides a set of predicates for querying action logs.
+First, let''s load an episode of a robot performing a pick and place task:
+
+    load_experiment(''/episodes/Safe-Interaction/hospital-pick-and-place_0/episode1/cram_log.owl'').
+
+    task(T),
+    findall(_SubTask, subtask(T, _SubTask), SubTasks),
+    not(SubTasks =  []).
+
+    task_type(T,knowrob:''GraspingSomething''),
+    task_start(T, Start),
+    task_end(T, Start).
+
+    task(T),
+    rdf_has(T, knowrob:''goalLocation'', LocationDesignator),
+    rdf_has(map:''Fridge_87fguihg'', knowrob:''equatedDesignator'', LocationDesignator).
+
+',4);
+*/
+
+INSERT INTO Tutorial VALUES(444,'actions','Action ontology','Action statistics','
+
+
     experiment(E),
-    % find all instances of knowrob:''PurposefulAction''
     findall(_Y-(_T0-_T1), (
         rdfs_instance_of(_X, knowrob:''PurposefulAction''),
         event_class_name(_X,_Y),
@@ -420,7 +494,6 @@ Timeline
     ), _Actions),
     pairs_keys_values(_Actions, ClassNames, _Times),
     pairs_keys_values(_Times, StartTimes, EndTimes),
-    % show the timeline
     add_timeline(''actions'', ''Logged Actions'', ClassNames, StartTimes, EndTimes).
 
 Failures
@@ -434,7 +507,7 @@ Failures
     pairs_keys_values(Distrib, Types, Nums),
     add_diagram(errordist, ''Error distribution'', piechart, xlabel, ylabel, 350, 350, ''11px'', [[Types, Nums]]).
 
-',3);
+',4);
 
 /*INSERT INTO Tutorial VALUES(2,'getting_started','Getting started','Loading data','Experiment data may consist of different components -- semantic annotations
 that are stored in OWL files, images that have been recorded during the task
