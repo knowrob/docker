@@ -724,9 +724,60 @@ INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize obj
 /*****************************************************************************************/
 /*****************************************************************************************/
 
-INSERT INTO Tutorial VALUES(660,'srdl','Semantic robot description','Foo Bar Baz',
-'
+INSERT INTO Tutorial VALUES(660,'srdl','Semantic robot description','Introduction',
+'Inside KnowRob Framework, we also represent symbolic descriptions of robot components and capabilities. Such a knowledge can help us find out if a certain robot has all prerequisites for executing an action. The semantic descriptions of robots are defined using the Semantic Robot Description Language (SRDL). 
+
+In order to start capability reasonig. First we need to register the ros package which loads SRDL into our Prolog session:
+
+    register_ros_package(''knowrob_srdl'').
 ',1);
+
+INSERT INTO Tutorial VALUES(661,'srdl','Semantic robot description','Kinematic Robot Model',
+'The Semantic Robot Description Language (SRDL) is a logical language for describing robot hardware, software and capabilities. More information on the usage of SRDL for modeling a robot, for answering queries about its hardware configuration and for checking requirements of actions on robot components. Several SRDL models for popular robots (e.g. PR2, Baxter, TUM-Rosie, Amigo) are already contained in the mod_srdl package in the KnowRob stack. In order to facilitate the creation of an SRDL model for a new robot, there is a converter by A. Perzylo and P. Freyer that can read an URDF robot model and convert the kinematic structure to SRDL (www.knowrob.org). 
+
+For this exercise, we can load the SRDLs of PR2 and Baxter:
+
+    owl_parse(''package://knowrob_srdl/owl/PR2.owl''), owl_parse(''package://knowrob_srdl/owl/baxter.owl'').
+',2);
+
+INSERT INTO Tutorial VALUES(662,'srdl','Semantic robot description','Components of a robot',
+'Read all components of a robot. There is no distinction between robots and components any more, robots are just complex components that consist of many parts.
+
+    sub_component(pr2:''PR2Robot1'', Sub).
+
+
+Filter the list of components to only those of a given type, e.g. a Camera:
+
+    sub_component(pr2:''PR2Robot1'', Sub),  owl_individual_of(Sub, srdl2comp:''Camera'').
+
+
+Check whether a component of a certain type exists on a robot (or, in general, as part of another component):
+
+    comp_type_available(pr2:''PR2Robot1'', srdl2comp:''Camera'').
+',3);
+
+INSERT INTO Tutorial VALUES(663,'srdl','Semantic robot description','Capabilities of a robot',
+'Add an action to our Prolog session so that we can reason about which capabilities are needed for it:
+
+    register_ros_package(knowrob_actions), owl_parse(''package://knowrob_actions/owl/serve_drink.owl'').
+
+
+Check which capabilities exists on a robot:
+
+    cap_available_on_robot(Cap, pr2:''PR2Robot1'').
+
+
+
+Capabilities an action depends on:
+
+    required_cap_for_action(serve_drink:''ServeADrink'', C).
+
+
+Missing capability of the given robot for an action:
+
+    missing_cap_for_action(serve_drink:''ServeADrink'', baxter:baxter_baxter1, C).
+',4);
+
 
 /*****************************************************************************************/
 /*****************************************************************************************/
