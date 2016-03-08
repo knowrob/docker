@@ -11,8 +11,16 @@ create table tutorial (
 INSERT INTO Tutorial VALUES(110,'overview','openEASE Tutorials','Tutorial List',
 '
   * <a class="tut_cat_link" onclick="loadTutorial(''getting_started'',1)">Getting started</a>
-  * <a class="tut_cat_link" onclick="loadTutorial(''actions'',1)">Action ontology</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''map'',1)">Semantic map</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''actions'',1)">Actions and tasks</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''objects'',1)">Objects and locations</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''srdl'',1)">Semantic robot description</a>
 ',1);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
 
 INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user interface',
 'The user interface consists of six panes with different purposes.
@@ -379,7 +387,21 @@ including the representation of semantic maps, tasks and actions, objects and lo
 as well as representation of kinematic chains and robot capabilities.
 ',7);
 
-INSERT INTO Tutorial VALUES(440,'actions','Episodic memory','Action representation (1)','
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
+INSERT INTO Tutorial VALUES(330,'map','Semantic map','Foo Bar Baz',
+'
+',1);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
+INSERT INTO Tutorial VALUES(440,'actions','Actions and Tasks','Action representation (1)','
 In openEASE, instances of actions are represented in the ABOX of the OWL reasoner.
 These action instances may be
 
@@ -401,7 +423,7 @@ Following query yields in all action classes defined in the core ontology:
 
 ',1);
 
-INSERT INTO Tutorial VALUES(441,'actions','Episodic memory','Action representation (2)','
+INSERT INTO Tutorial VALUES(441,'actions','Actions and Tasks','Action representation (2)','
 Episodic memory can be loaded using the `load_experiments` predicate that parses
 the OWL file with the high-level description, and does some housekeeping to
 set up search paths for the other information sources.
@@ -441,7 +463,7 @@ which has no sub-actions but may has successor and predecessor actions:
 
 ',2);
 
-INSERT INTO Tutorial VALUES(442,'actions','Action ontology','Action requirements','
+INSERT INTO Tutorial VALUES(442,'actions','Actions and Tasks','Action requirements','
 Actions can have prerequisites in terms of components or capabilities
 a robot needs to have in order to execute them.
 The Semantic Robot Description Language (SRDL) allows to describe robot components,
@@ -480,8 +502,49 @@ First, let''s load an episode of a robot performing a pick and place task:
 ',4);
 */
 
-INSERT INTO Tutorial VALUES(444,'actions','Action ontology','Action statistics','
+/*
+INSERT INTO Tutorial VALUES(444,'episodes','Episodic memory','Robot action logs','
+openEASE provides a set of predicates for querying action logs.
+First, let''s load an episode of a robot performing a pick and place task:
 
+Combining Semantic Map entities with action logs
+
+',4);
+*/
+
+INSERT INTO Tutorial VALUES(445,'actions','Actions and Tasks','Action statistics','
+The comprehensive robot action logs of manipulation task episodes allows to
+statistically investigate the plan execution.
+openEASE offers a set of different diagram types for this purpose
+which are introduced in this tutorial page.
+
+Failure recovery is an important aspect of plan executioners.
+It requires the detection of failures during runtime based on
+sensory data.
+In openEASE, action logs usually contain information about the
+success of an action.
+This is valuable information that can help to identify problematic actions
+and to investigate why the action failed.
+Failures are represented as instances of failure classes.
+In most episodes on openEASE, the base class of action failures
+is `CRAMFailure`.
+Following code shows all logged failures in a pie chart:
+
+    findall(Type-Num, (
+        owl_subclass_of(T, knowrob:''CRAMFailure''),
+        rdf_split_url(_, Type, T),
+        findall(F, failure_type(F, T), Failures),
+        length(Failures, Num)
+    ), Distrib),
+    pairs_keys_values(Distrib, Types, Nums),
+    add_diagram(errordist, ''Error distribution'', piechart, xlabel, ylabel, 350, 350, ''11px'', [[Types, Nums]]).
+
+In this query, all failure instances of a given failure class are queried using the `failure_type` predicate.
+The name of the failure type and the number of instances are then used to parametrize the pie chart
+which is send to the browser client using the predicate `add_diagram`.
+
+Following query can be used to generate a timeline over all performed
+actions in an episode:
 
     experiment(E),
     findall(_Y-(_T0-_T1), (
@@ -496,18 +559,146 @@ INSERT INTO Tutorial VALUES(444,'actions','Action ontology','Action statistics',
     pairs_keys_values(_Times, StartTimes, EndTimes),
     add_timeline(''actions'', ''Logged Actions'', ClassNames, StartTimes, EndTimes).
 
-Failures
-
-    findall(Type-Num, (
-        owl_subclass_of(T, knowrob:''CRAMFailure''),
-        rdf_split_url(_, Type, T),
-        findall(F, failure_type(F, T), Failures),
-        length(Failures, Num)
-    ), Distrib),
-    pairs_keys_values(Distrib, Types, Nums),
-    add_diagram(errordist, ''Error distribution'', piechart, xlabel, ylabel, 350, 350, ''11px'', [[Types, Nums]]).
+First, `rdfs_instance_of` is used to bind a `PurposefulAction` and the predicate
+`event_interval` is used in order to query the start and end time of that action.
+All matching actions are collected by the Prolog backtracker and saved into
+the list `_Actions`. The event names and intervals are then used as arguments
+for the call of the predicate `add_timeline` which causes the server to send
+a diagram message to the browser client.
 
 ',4);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
+INSERT INTO Tutorial VALUES(550,'objects','Objects and locations','Visualize objects',
+'We have separated the semantic environment map and the set of (smaller) objects inside the environment,
+such as objects inside the cupboards and drawers.
+This is commonly a good practice since it allows to use the same (often mostly static) map in different settings.
+In real tasks, the set of objects is usually detected by the robot during operation and updated over time,
+but for testing purposes, we load some objects from a file. 
+
+    owl_parse(''package://knowrob_map_data/owl/ccrl2_semantic_map.owl''),
+    owl_parse(''package://knowrob_basics_tutorial/owl/ccrl2_map_objects.owl'').
+    
+Once the map and the example objects have been loaded,
+you can add the objects to the 3D canvas.
+If definitions for CAD models of objects are loaded, these models are automatically used for visualizing object instances.
+Otherwise, the system uses grey boxes as default visualization models.
+
+    marker_update(object(''http://knowrob.org/kb/ias_semantic_map.owl#SemanticEnvironmentMap0'')).
+
+Similarly, we can also visualize small objects in the kitchen:
+
+    findall(A, ((
+        owl_individual_of(A, knowrob:''FoodUtensil'');
+        owl_individual_of(A, knowrob:''FoodVessel'');
+        owl_individual_of(A, knowrob:''FoodOrDrink'')
+    )), Objs),
+    member(Obj,Objs),
+    marker_update(object(Obj)).
+
+Composed objects and their parts are linked by a ''parts'' hierarchy,
+described using the `properPhysicalParts` property in OWL.
+This property is transitive, i.e. a part of a part of an object is also a part of the object itself.
+You can read all parts and sub-parts of an object using `owl_has`,
+which takes the transitivity into account.
+In the example below, `Handle160` is a part of `Door70`, which by itself is part of `Refrigerator67`. 
+
+    owl_has(knowrob:''Refrigerator67'', knowrob:properPhysicalParts, P).
+',1);
+
+INSERT INTO Tutorial VALUES(551,'objects','Objects and locations','Query for objects',
+'Since all objects in the map are instances of the respective object classes,
+one can query for objects that have certain properties or belong to a certain class.
+
+For example, a query for perishable objects can be written as:
+
+    owl_individual_of(A, knowrob:''Perishable'').
+
+Ìnstances of the class `HandTool` (e.g. silverware) can be grasped by the robot:
+
+    owl_individual_of(A, knowrob:''HandTool'').
+
+In the kitchen domain, instances of the class `FoodVessel` (i.e. pieces of tableware)
+might be important for the plan execution:
+
+    owl_individual_of(A, knowrob:''FoodVessel'').
+
+When grasping an object, the robot has to compute a grasping point on the object.
+In openEASE, we decompose objects into functional parts so that we can reason 
+with object parts. This allows, for example, to compute a grasping point
+on the handle part of an object.
+The query for all objects with handles can be written as:
+
+    owl_has(A, knowrob:properPhysicalParts, H),
+    owl_individual_of(H,  knowrob:''Handle'').
+',2);
+
+INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Qualitative spatial relations',
+'Qualitative spatial relations between objects can be computed using computable relations.
+
+For example, the computable raltion `in-ContGeneric` checks wether the contains relation holds
+for an object and a container.
+This allows, for instance, to find the container that contains the object `cheese1`:
+
+    rdf_triple(knowrob:''in-ContGeneric'', ''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1'', C).
+
+Furthermore, it can be used to query for all object that are located in a given container:
+
+    rdf_triple(knowrob:''in-ContGeneric'', O, knowrob:''Refrigerator67'').
+
+Another computable relation is the `on-Physical` relation that checks
+if an object is on top of another object:
+
+    rdf_triple(knowrob:''on-Physical'', A, knowrob:''Dishwasher37'').
+',3);
+
+INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object locations',
+'Commonsense knowledge about typical object locations was acquired by the
+[Open Mind Indoor Common Sense](http://openmind.hri-us.com/) (OMICS) project.
+We processed the natural language database entries and translated them to well-defined concepts
+within the openEASE ontology as described in
+[Putting People''s Common Sense into Knowledge Bases of Household Robots](http://ias.cs.tum.edu/_media/spezial/bib/kunze10omics.pdf).
+
+You have to register the `knowrob_omics` package first:
+
+    register_ros_package(knowrob_omics).
+
+To query the probability of finding an object in a given room type you can use the following query:
+
+    probability_given(knowrob:''OmicsLocations'', Obj, knowrob:''Kitchen'', Pr).
+
+If you are interested in what type of room you could find a given object use the following query: 
+
+    bayes_probability_given(knowrob:''OmicsLocations'', Room, knowrob:''Sandwich'',Pr).
+',4);
+
+
+INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Visualize objects',
+'*TODO* Object Poses Over Time
+
+*TODO* Designator equated
+  - dough size during pizza rolling
+
+*TODO* Integration with Perception
+',5);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
+INSERT INTO Tutorial VALUES(660,'srdl','Semantic robot description','Foo Bar Baz',
+'
+',1);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
 
 /*INSERT INTO Tutorial VALUES(2,'getting_started','Getting started','Loading data','Experiment data may consist of different components -- semantic annotations
 that are stored in OWL files, images that have been recorded during the task
