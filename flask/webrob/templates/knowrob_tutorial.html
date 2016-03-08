@@ -295,7 +295,9 @@
     <div id="page-content" style="width:100%; height:100%;">
         <div class="ui-layout-center" id="editor-container">
             <div id="markers"></div>
-            <div id="chart"></div>	
+            <div id="chart">
+This pane can visualize statistical data using different chart types.
+            </div>	
         </div>
 
         <div class="ui-layout-west">
@@ -318,8 +320,15 @@
         </div>
         
         <div class="ui-layout-east">
-            <div id="designator"></div>
-            <div id="mjpeg"></div>
+            <div id="designator">
+This pane enables the user to inspect the internal data structures of the robot's beliefs
+including object, action, and location descriptions used by the robot.
+            </div>
+            <div id="mjpeg">
+This pane is used for displaying images captured by the robot's camera.
+It's also possible to play videos in this pane (captured during task execution or generated
+by openEASE episode replay).
+            </div>
         </div>
     </div>
   </div>

@@ -30,7 +30,7 @@ INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user in
   * The *3D display pane hl_markers* in the upper middle can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
   * The *visual analytics pane hl_chart* in the lower middle can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization pane with the results of queries.
   * The *belief pane hl_designator* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
-  * The *image pane hl_mjpeg* in the lower right is used for displaying images caputed by the robot''s camera.
+  * The *image pane hl_mjpeg* in the lower right is used for displaying images captured by the robot''s camera.
 
 All Panes except for the *3D display pane hl_markers* can be opened or closed by clicking the dark *grey bars hlc_ui-layout-toggler* on the edges or resized by dragging them.
 
