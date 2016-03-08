@@ -567,14 +567,10 @@ which is send to the browser client using the predicate `add_diagram`.
 Following query can be used to generate a timeline over all performed
 actions in an episode:
 
-    experiment(E),
     findall(_Y-(_T0-_T1), (
         rdfs_instance_of(_X, knowrob:''PurposefulAction''),
         event_class_name(_X,_Y),
-        once((
-            subtask_all(E,_X),
-            event_interval(_X,_T0,_T1)
-        ))
+        event_interval(_X,_T0,_T1)
     ), _Actions),
     pairs_keys_values(_Actions, ClassNames, _Times),
     pairs_keys_values(_Times, StartTimes, EndTimes),
