@@ -100,6 +100,50 @@
             require_episode: false,
             global_viewer: function() { return rosViewer.rosViewer; }
         });
+    var imageWidth = function() { return 0.0; };
+    var imageHeight = function() { return 0.0; };
+    var ui = window;
+
+    function resizeImage() {
+        return imageResizer($('#mjpeg_image'), $('#mjpeg'), imageWidth(), imageHeight());
+    };
+    
+    function on_marker_dblclick(marker) {};
+    function on_marker_delete(ns) {};
+    function on_episode_selected(lib) {};
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    
+    function on_designator_received(designatorHtml) {
+        document.getElementById('designator').innerHTML = designatorHtml;
+        $('#designator').change();
+    };
+    
+    function on_image_received(imageHtml, imageWidth, imageHeight) {
+        ui.imageWidth = imageWidth;
+        ui.imageHeight = imageHeight;
+        document.getElementById('mjpeg').innerHTML = imageHtml;
+        $('#mjpeg').change();
+        $('#mjpeg').resize();
+    };
+    
+    function on_register_nodes() {
+    console.info("ON REGISTER NODES!!!!");
+        var visClient, graphClient;
+        visClient = new DataVisClient({
+            ros: parent.client.ros,
+            containerId: '#chart',
+            topic: 'data_vis_msgs'
+        });
+        // FIXME(daniel): task tree allways takes a lot of space
+        //graphClient = new TaskTreeVisClient({
+        //    ros: parent.client.ros,
+        //    containerId: '#chart',
+        //    topic: 'task_tree_msgs'
+        //});
+    };
+    
+    function on_camera_pose_received(pose) {};
     
     $(document).ready(function () {
         client.init();
@@ -153,6 +197,10 @@
         $('#designator').change(function() { pageLayout.open('east'); });
         $('#mjpeg').change(function() { pageLayout.open('east'); });
         $('#chart').change(function() { centerLayout.open('south'); });
+        $('#mjpeg').resize(function(){
+            var timeout = function(){ if(resizeImage()) window.setTimeout(timeout, 10); };
+            if(resizeImage()) window.setTimeout(timeout, 10);
+        });
         
         loadTutorial('overview', 1);
     });

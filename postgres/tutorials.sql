@@ -123,9 +123,9 @@ holds true. For example:
 
 Yields in:
 <pre>
-    RobotUnbound = ''PR3''
-    RobotUnbound = ''BOXY''
-    RobotUnbound = ''JUSTIN''
+    RobotUnbound = PR2
+    RobotUnbound = BOXY
+    RobotUnbound = JUSTIN
 </pre>
 
 Relations between entities can be expressed in a similar fashion.
@@ -148,22 +148,23 @@ This allows, for instance, to query for all robots with a ''Kinect'' component:
 
 Yields in
 <pre>
-    Robot = ''PR2''
-    Robot = ''BOXY''
+    Robot = PR2
+    Robot = BOXY
 </pre>
 
 We can also easily query for robots with a ''Kinect'' component and a ''Gripper'' component available:
 
-    robot(Robot), Components = [''Kinect'', ''Gripper''], forall( member(Component,  Components), has_component(Robot, Component) ).
+    robot(Robot), Components = [''Kinect'', ''Gripper''], forall( member(_Component,  Components), has_component(Robot, _Component) ).
 
 Yields in
 <pre>
-    Robot = ''PR2''
+    Robot = PR2
 </pre>
 
-In above query, the predicate `forall` is used to successively bind one of the component names to the `Component` variable
-in order to check if `has_component(Robot, Component)` holds true.
+In above query, the predicate `forall` is used to successively bind one of the component names to the `_Component` variable
+in order to check if `has_component(Robot, _Component)` holds true.
 The call only yields *true* for robots with both components available.
+Note that variable that start with an underscore are not returned as result.
 
 This tutorial is only a brief introduction to logic programming with Prolog.
 Please visit the [SWI Prolog](http://www.swi-prolog.org) website or one of the
@@ -326,14 +327,27 @@ using the `marker` predicate.
 Properties of markers, such as the pose, can be dynamically manipulated by calling predicates that
 change the property value.
 
-    marker(arrow(''A''),Arrow), marker_translation(Arrow, [0.0,0.0,0.0]), marker_scale(Arrow, [0.5,0.5,0.5]),
+    marker(arrow(''A''),Arrow), marker_translation(Arrow, [0.0,0.0,0.0]), marker_scale(Arrow, [1.0,0.4,0.4]).,
     marker(cube(''B''),Cube), marker_translation(Cube, [0.0,1.0,0.0]), marker_scale(Cube, [0.5,0.5,0.5]),
     marker(sphere(''C''),Sphere), marker_translation(Sphere, [0.0,2.0,0.0]), marker_scale(Sphere, [0.5,0.5,0.5]).
 
 The second argument of the `marker` predicate is an object that holds the state of the marker.
 Internally, this object is mapped to the marker name so that marker objects and marker names can be used
-to identify a marker. For example, `marker_position(arrow(''A''), [0.0,0.0,0.0])` can also be used to
-modify the position of the arrow marker.
+to identify a marker. For example following query can also be used to modify the position of the arrow marker:
+
+    marker_translation(arrow(''A''), [0.0,1.0,0.0]).
+
+Marker properties can be modified dynamically, for instance, in order to change the color os a marker:
+
+    marker_color(arrow(''A''), [0.4,0.4,0.9]).
+
+Additionally, markers can be highlighted using the `marker_highlight` predicate:
+
+    marker_highlight(arrow(''A'')).
+
+And the highlight can be removed again by calling:
+
+    marker_highlight_remove(arrow(''A'')).
 
 openEASE supports the visualization of objects using 3D surface meshes in the STL or Collada file formats.
 These meshes can either be attached to an object instance or to an object class,
@@ -365,6 +379,8 @@ For example, meshes in the package `pr2_description` are searched at `http://$IP
 If you would like to reset the canvas to be empty, please use following call:
 
     marker_remove(all).
+
+**Note:** To get an full overview about the marker API, please take a look at the [github project page](https://github.com/knowrob/knowrob/tree/master/knowrob_vis).
 
 **Note:** Remove individual markers with `marker_remove` by binding a marker name to the predicate argument.',6);
 
@@ -493,22 +509,24 @@ First, let''s load an episode of a robot performing a pick and place task:
     task_type(T,knowrob:''GraspingSomething''),
     task_start(T, Start),
     task_end(T, Start).
-
-    task(T),
-    rdf_has(T, knowrob:''goalLocation'', LocationDesignator),
-    rdf_has(map:''Fridge_87fguihg'', knowrob:''equatedDesignator'', LocationDesignator).
-
 ',4);
 */
 
 /*
 INSERT INTO Tutorial VALUES(444,'episodes','Episodic memory','Robot action logs','
-openEASE provides a set of predicates for querying action logs.
-First, let''s load an episode of a robot performing a pick and place task:
-
 Combining Semantic Map entities with action logs
 
+    task(T),
+    rdf_has(T, knowrob:''goalLocation'', LocationDesignator),
+    rdf_has(map:''Fridge_87fguihg'', knowrob:''equatedDesignator'', LocationDesignator).
 ',4);
+*/
+
+/*
+INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Pattern language',
+'
+*TODO* Pattern language
+',6);
 */
 
 INSERT INTO Tutorial VALUES(445,'actions','Actions and Tasks','Action statistics','
@@ -632,7 +650,7 @@ might be important for the plan execution:
 
 When grasping an object, the robot has to compute a grasping point on the object.
 In openEASE, we decompose objects into functional parts so that we can reason 
-with object parts. This allows, for example, to compute a grasping point
+about object parts. This allows, for example, to compute a grasping point
 on the handle part of an object.
 A query for all objects with handles can be written as:
 
@@ -713,11 +731,13 @@ If you are interested in what type of room you could find a given object use the
     bayes_probability_given(knowrob:''OmicsLocations'', Room, knowrob:''Sandwich'',Pr).
 ',5);
 
+/*
 INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize objects',
 '
 *TODO* Designator/Perception integration
   - dough size during pizza rolling
 ',6);
+*/
 
 /*****************************************************************************************/
 /*****************************************************************************************/
