@@ -248,7 +248,7 @@ by Prolog predicates is transformed into a representation that is compatible to 
 **Note:** For modeling with OWL, use the [Protege OWL editor](http://protege.stanford.edu/download/protege/4.1/installanywhere/) (version 4.x) which makes exploring and editing OWL files much easier and have a look at the documentation.
 ',4);
 
-INSERT INTO Tutorial VALUES(97643634,'getting_started','Getting started','KnowRob Packages',
+INSERT INTO Tutorial VALUES(224,'getting_started','Getting started','KnowRob Packages',
 'If your application requires functionality beyond that one already provided by the standard KnowRob packages,
 you will need to create your own KnowRob package.
 The following description assumes that you would like to add knowledge in terms of OWL ontologies,
@@ -280,7 +280,6 @@ Once you have set up your package like this, you can register it in openEASE usi
 
     register_ros_package(your_package).
 
-
 Like in any other ROS package, you will need to specify your dependencies in the `package.xml`.
 Which packages to depend on depends on which functionality you would like to use.
 You only need to list the direct dependencies, their dependencies are automatically included as well.
@@ -294,7 +293,7 @@ your packages.
 
 **Note:** At the moment, it is not possible to compile code in user packages on openEASE. Thus, you can not include languages such as Java or C++ in your package.',5);
 
-INSERT INTO Tutorial VALUES(224,'getting_started','Getting started','Marker Visualization',
+INSERT INTO Tutorial VALUES(225,'getting_started','Getting started','Marker Visualization',
 'openEASE includes a browser-based visualization canvas that can display 3D data such as the environment map or the robot itself.
 The canvas is based on [rosbridge](http://wiki.ros.org/rosbridge)
 and the [robotwebtools](http://robotwebtools.org/) libraries that provide tools for displaying information from ROS in a browser.
@@ -369,7 +368,7 @@ If you would like to reset the canvas to be empty, please use following call:
 
 **Note:** Remove individual markers with `marker_remove` by binding a marker name to the predicate argument.',6);
 
-INSERT INTO Tutorial VALUES(225,'getting_started','Getting started','Next steps','
+INSERT INTO Tutorial VALUES(226,'getting_started','Getting started','Next steps','
 After a successful [registration](https://data.open-ease.org/user/register) and
 login you are now able to run the different experiments provided by the AI research group by choosing one of the application from the dropdown menu.
 You can switch the experiments in the upper right of the openEASE menu bar.
@@ -518,6 +517,10 @@ statistically investigate the plan execution.
 openEASE offers a set of different diagram types for this purpose
 which are introduced in this tutorial page.
 
+Let''s first load the action of a robot performing amnioulation tasks:
+
+    load_experiment(''/episodes/Pick-and-Place/pr2-general-pick-and-place_0/episode1/log.owl'').
+
 Failure recovery is an important aspect of plan executioners.
 It requires the detection of failures during runtime based on
 sensory data.
@@ -618,7 +621,7 @@ For example, a query for perishable objects can be written as:
 
     owl_individual_of(A, knowrob:''Perishable'').
 
-Ìnstances of the class `HandTool` (e.g. silverware) can be grasped by the robot:
+Instances of the class `HandTool` (e.g. silverware) can be grasped by the robot:
 
     owl_individual_of(A, knowrob:''HandTool'').
 
@@ -631,10 +634,10 @@ When grasping an object, the robot has to compute a grasping point on the object
 In openEASE, we decompose objects into functional parts so that we can reason 
 with object parts. This allows, for example, to compute a grasping point
 on the handle part of an object.
-The query for all objects with handles can be written as:
+A query for all objects with handles can be written as:
 
     owl_has(A, knowrob:properPhysicalParts, H),
-    owl_individual_of(H,  knowrob:''Handle'').
+    owl_individual_of(H, knowrob:''Handle'').
 ',2);
 
 INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Qualitative spatial relations',
@@ -656,7 +659,41 @@ if an object is on top of another object:
     rdf_triple(knowrob:''on-Physical'', A, knowrob:''Dishwasher37'').
 ',3);
 
-INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object locations',
+INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object poses',
+'Object poses are represented as instances of the class `SemanticMapPerception`
+which is a subclass of `Event` and thus has properties that define the 
+time interval of the event.
+The event is related to the object using the `objectActedOn` property.
+It is intended, that there can be multiple `SemanticMapPerception` events
+for the same object in order to represent pose changes over time.
+
+The OWL individual that represents the `SemanticMapPerception` can be written as:
+
+<pre>
+&lt;owl:NamedIndividual rdf:about="&map_obj;SemanticMapPerception138"&gt;
+    &lt;rdf:type rdf:resource="&knowrob;SemanticMapPerception"/&gt;
+    &lt;knowrob:startTime rdf:resource="&map_obj;timepoint_1336487125"/&gt;
+    &lt;knowrob:eventOccursAt rdf:resource="&map_obj;RotationMatrix3D137"/&gt;
+    &lt;knowrob:objectActedOn rdf:resource="&map_obj;cup1"/&gt;
+&lt;/owl:NamedIndividual&gt;
+</pre>
+
+The actual pose of the object is represented in the `RotationMatrix3D137` instance
+that contains a 4x4 transformation matrix.
+In order to look up all object poses associated to an object of interest,
+use the `rdf_has` predicate.
+
+    rdf_has(Event, knowrob:objectActedOn, ''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1''),
+    owl_individual_of(Event, knowrob;''SemanticMapPerception'').
+
+In most cases, we are interested in the latest object pose while ignoring earlier pose estimates.
+For convinience, openEASE offers the predicate `current_object_pose` in order to query
+the latest perceived object pose.
+
+    current_object_pose(''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1'', Pose).
+',4);
+
+INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Object locations',
 'Commonsense knowledge about typical object locations was acquired by the
 [Open Mind Indoor Common Sense](http://openmind.hri-us.com/) (OMICS) project.
 We processed the natural language database entries and translated them to well-defined concepts
@@ -674,17 +711,13 @@ To query the probability of finding an object in a given room type you can use t
 If you are interested in what type of room you could find a given object use the following query: 
 
     bayes_probability_given(knowrob:''OmicsLocations'', Room, knowrob:''Sandwich'',Pr).
-',4);
-
-
-INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Visualize objects',
-'*TODO* Object Poses Over Time
-
-*TODO* Designator equated
-  - dough size during pizza rolling
-
-*TODO* Integration with Perception
 ',5);
+
+INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize objects',
+'
+*TODO* Designator/Perception integration
+  - dough size during pizza rolling
+',6);
 
 /*****************************************************************************************/
 /*****************************************************************************************/
