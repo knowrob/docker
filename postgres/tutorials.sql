@@ -717,25 +717,6 @@ A query for all objects with handles can be written as:
     owl_individual_of(H, knowrob:''Handle'').
 ',2);
 
-INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Qualitative spatial relations',
-'Qualitative spatial relations between objects can be computed using computable relations.
-
-For example, the computable raltion `in-ContGeneric` checks wether the contains relation holds
-for an object and a container.
-This allows, for instance, to find the container that contains the object `cheese1`:
-
-    rdf_triple(knowrob:''in-ContGeneric'', ''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1'', C).
-
-Furthermore, it can be used to query for all object that are located in a given container:
-
-    rdf_triple(knowrob:''in-ContGeneric'', O, knowrob:''Refrigerator67'').
-
-Another computable relation is the `on-Physical` relation that checks
-if an object is on top of another object:
-
-    rdf_triple(knowrob:''on-Physical'', A, knowrob:''Dishwasher37'').
-',3);
-
 INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object poses',
 'Object poses are represented as instances of the class `SemanticMapPerception`
 which is a subclass of `Event` and thus has properties that define the 
@@ -789,6 +770,25 @@ If you are interested in what type of room you could find a given object use the
 
     bayes_probability_given(knowrob:''OmicsLocations'', Room, knowrob:''Sandwich'',Pr).
 ',5);
+
+INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Qualitative spatial relations',
+'Qualitative spatial relations between objects can be computed using computable relations.
+
+For example, the computable raltion `in-ContGeneric` checks wether the contains relation holds
+for an object and a container.
+This allows, for instance, to find the container that contains the object `cheese1`:
+
+    rdf_triple(knowrob:''in-ContGeneric'', ''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1'', C).
+
+Furthermore, it can be used to query for all object that are located in a given container:
+
+    rdf_triple(knowrob:''in-ContGeneric'', O, knowrob:''Refrigerator67'').
+
+Another computable relation is the `on-Physical` relation that checks
+if an object is on top of another object:
+
+    rdf_triple(knowrob:''on-Physical'', A, knowrob:''Dishwasher37'').
+',3);
 
 /*
 INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize objects',
