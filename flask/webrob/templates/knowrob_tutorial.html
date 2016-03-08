@@ -279,11 +279,12 @@
           for (i = 0; i < elems.length; i++) {
             elems[i].style.backgroundColor = highlight ? "#144F78" : "#BBB";
             elems[i].style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
-            elems[i].change();
+            //elems[i].change();
           }
         }
         else if(type === "id") {
           document.getElementById(name).style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
+          //document.getElementById(name).style.margin = highlight ? "-5px !important" : "0px !important";
           $('#'+name).change();
         }
       }
