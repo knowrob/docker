@@ -407,9 +407,72 @@ as well as representation of kinematic chains and robot capabilities.
 /*****************************************************************************************/
 /*****************************************************************************************/
 
-INSERT INTO Tutorial VALUES(330,'map','Semantic map','Foo Bar Baz',
-'
+INSERT INTO Tutorial VALUES(330,'map','Semantic map','Semantic Map Representation',
+'Semantic maps are descriptions of an environment in terms of localized object instances and are stored in OWL files. Much of the environment- and object-related functionality in KnowRob depends of having a valid semantic map, so you may want to create one for your robot''s environment.
+
+<img src="http://knowrob.org/_media/part-of-hierarchy-map.png" alt="Smiley face" height="168" width="320">
+
+There are different ways how to create a semantic map in OWL:
+
+  * Semantic Map Editor: The Semantic Map Editor is a graphical editor for semantic maps. It can be used to create object instances and to set their positions. The current version is rather specific for indoor environments though and, for example, offers only a limited set of object types to be added to the map. You can easily adapt the list of classes in the source code, but this cannot conveniently be configured at the moment.
+  * SemanticMapToOWL: If you already have a map datastructure and would like to create a semantic map from your program, the SemanticMapToOWL ROS service is probably the easiest solution. It accepts a SemanticMap message and returns the OWL data as a string.
+  * Robot perception system: If you have integrated a perception system with KnowRob, a kind of semantic map is automatically created by the objects the robot perceives. You can save the in-memory map to an OWL file using the methods in the owl_export module.
+  * Manual creation of the OWL file: In some cases, it may actually be the fastest to create the map manually in a good text editor in which you can copy and paste the object instances and their pose matrices. Especially if you would like to set many semantic object properties beyond their poses, this may be a good option. If you plan to do this, you should have well understood how object poses are represented in KnowRob.
+
+Loading a semantic map:
+ 
+    owl_parse(''package://iai_semantic_maps/owl/kitchen.owl'').
+
+Visualization of the loaded map:
+ 
+    marker_update(object(''http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j'')).
 ',1);
+
+INSERT INTO Tutorial VALUES(331,'map','Semantic map','Reasoning about Articulated Objects',
+'Articulated objects, e.g. cupboards, that have doors or drawers are represented in a special way to describe, on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable. Like for other composed objects, there is a part-of hierarchy (properPhysicalParts). Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door). In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
+
+Joints are described using the following properties, which are compatible to the representation used by the ROS articulation stack:
+
+  * Type: At the moment, rotational and prismatic joints are supported (knowrob:''Hinge'' and knowrob:''PrismaticJoint'')
+  * Parent, Child: resp. object instances
+  * Pose: like for normal objects using e.g. a SemanticMapPerception instance
+  * Direction: vector giving the opening direction of a prismatic joint
+  * Radius: radius of a rotational joint (e.g. between handle and hinge)
+  * Qmin, Qmax: lower and upper joint limits
+
+Reading Articulation Information:
+
+There are some helper predicates for reading, creating, updating and deleting joints from articulated objects. This task is on the one hand rather common, on the other hand somewhat complex because the structure visualized in the previous image needs to be established. To create a joint of type knowrob:''HingedJoint'' between two object parts at position (1,1,1) with unit orientation, radius 0.33m and joint limits 0.1 and 0.5 respectively, one can use the following statement: 
+
+    create_joint_information(knowrob:''HingedJoint'', 
+    iai_maps:''iai_kitchen_sink_area_left_middle_drawer_handle'', 
+    iai_maps:''iai_kitchen_sink_area_left_bottom_drawer_main'', 
+    [1,0,0,1,0,1,0,1,0,0,1,1,0,0,0,1], [], ''0.33'', ''0.1'', ''0.5'', Joint).
+
+
+If a prismatic joint is to be created instead, the empty list [] needs to be replaced with a unit vector describing the joint''s direction, e.g. [0,0,1] for a joint opening in z-direction, and the joint type needs to be set as ''PrismaticJoint''. Joint information can conveniently be read using the following predicate that requires a joint instance as argument:
+
+    read_joint_information(Joint, Type, Parent, Child, Pose, Direction, Radius, Qmin, Qmax).
+
+
+To update joint information, one can use the following predicate:
+
+    update_joint_information(Joint, knowrob:''HingedJoint'', [1,0,0,2,0,1,0,2,0,0,1,2,0,0,0,1], [1,2,3], 0.32, 1.2, 1.74).
+',2);
+
+INSERT INTO Tutorial VALUES(332,'map','Semantic map','Inferring likely storage locations',
+'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket. There are different techniques for inferring the location where an object should be placed:
+
+  * Using assertions of the storagePlaceFor property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
+
+  * A finer-grained solution is based on organizational principles that places objects at the location where semantically similar objects are stored. It requires some (partial) knowledge about the distribution of other objects in the environment.
+
+Querying for likely storage locations:
+
+The simple option based on the storagePlaceFor predicate can be queried as follows in order to determine where an object (instance or class) shall be stored, or which known objects are to be stored in a given container
+
+    owl_subclass_of(T, knowrob:''StorageConstruct''), class_properties(T, knowrob:''typePrimaryFunction-StoragePlaceFor'', knowrob:''Perishable''), owl_individual_of(Obj, T), marker_highlight(object(Obj)).
+',3);
 
 /*****************************************************************************************/
 /*****************************************************************************************/
