@@ -413,7 +413,21 @@ Visualization of the loaded map:
     marker_update(object(''http://knowrob.org/kb/IAI-kitchen.owl#IAIKitchenMap_PM580j'')).
 ',1);
 
-INSERT INTO Tutorial VALUES(331,'map','Semantic map','Reasoning about Articulated Objects',
+INSERT INTO Tutorial VALUES(331,'map','Semantic map','Inferring likely storage locations',
+'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket. There are different techniques for inferring the location where an object should be placed:
+
+  * Using assertions of the `storagePlaceFor` property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
+
+  * A finer-grained solution is based on organizational principles that places objects at the location where semantically similar objects are stored. It requires some (partial) knowledge about the distribution of other objects in the environment.
+
+Querying for likely storage locations:
+
+The simple option based on the storagePlaceFor predicate can be queried as follows in order to determine where an object (instance or class) shall be stored, or which known objects are to be stored in a given container
+
+    owl_subclass_of(T, knowrob:''StorageConstruct''), class_properties(T, knowrob:''typePrimaryFunction-StoragePlaceFor'', knowrob:''Perishable''), owl_individual_of(Obj, T), marker_highlight(object(Obj)).
+',2);
+
+INSERT INTO Tutorial VALUES(332,'map','Semantic map','Reasoning about Articulated Objects',
 ' `Articulated objects`, e.g. cupboards, that have doors or drawers are represented in a special way to describe, on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable. Like for other composed objects, there is a part-of hierarchy (properPhysicalParts). Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door). In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
 
 Joints are described using the following properties, which are compatible to the representation used by the ROS articulation stack:
@@ -443,21 +457,8 @@ If a prismatic joint is to be created instead, the empty list [] needs to be rep
 To update joint information, one can use the following predicate:
 
     update_joint_information(Joint, knowrob:''HingedJoint'', [1,0,0,2,0,1,0,2,0,0,1,2,0,0,0,1], [1,2,3], 0.32, 1.2, 1.74).
-',2);
-
-INSERT INTO Tutorial VALUES(332,'map','Semantic map','Inferring likely storage locations',
-'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket. There are different techniques for inferring the location where an object should be placed:
-
-  * Using assertions of the `storagePlaceFor` property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
-
-  * A finer-grained solution is based on organizational principles that places objects at the location where semantically similar objects are stored. It requires some (partial) knowledge about the distribution of other objects in the environment.
-
-Querying for likely storage locations:
-
-The simple option based on the storagePlaceFor predicate can be queried as follows in order to determine where an object (instance or class) shall be stored, or which known objects are to be stored in a given container
-
-    owl_subclass_of(T, knowrob:''StorageConstruct''), class_properties(T, knowrob:''typePrimaryFunction-StoragePlaceFor'', knowrob:''Perishable''), owl_individual_of(Obj, T), marker_highlight(object(Obj)).
 ',3);
+
 
 /*****************************************************************************************/
 /*****************************************************************************************/
