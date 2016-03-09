@@ -399,10 +399,10 @@ INSERT INTO Tutorial VALUES(330,'map','Semantic map','Semantic Map Representatio
 
 There are different ways how to create a semantic map in OWL:
 
-  * Semantic Map Editor: The Semantic Map Editor is a graphical editor for semantic maps. It can be used to create object instances and to set their positions. The current version is rather specific for indoor environments though and, for example, offers only a limited set of object types to be added to the map. You can easily adapt the list of classes in the source code, but this cannot conveniently be configured at the moment.
-  * SemanticMapToOWL: If you already have a map datastructure and would like to create a semantic map from your program, the SemanticMapToOWL ROS service is probably the easiest solution. It accepts a SemanticMap message and returns the OWL data as a string.
-  * Robot perception system: If you have integrated a perception system with KnowRob, a kind of semantic map is automatically created by the objects the robot perceives. You can save the in-memory map to an OWL file using the methods in the owl_export module.
-  * Manual creation of the OWL file: In some cases, it may actually be the fastest to create the map manually in a good text editor in which you can copy and paste the object instances and their pose matrices. Especially if you would like to set many semantic object properties beyond their poses, this may be a good option. If you plan to do this, you should have well understood how object poses are represented in KnowRob.
+  * *Semantic Map Editor*: The Semantic Map Editor is a graphical editor for semantic maps. It can be used to create object instances and to set their positions. The current version is rather specific for indoor environments though and, for example, offers only a limited set of object types to be added to the map. You can easily adapt the list of classes in the source code, but this cannot conveniently be configured at the moment.
+  * *SemanticMapToOWL*: If you already have a map datastructure and would like to create a semantic map from your program, the SemanticMapToOWL ROS service is probably the easiest solution. It accepts a SemanticMap message and returns the OWL data as a string.
+  * *Robot perception system*: If you have integrated a perception system with KnowRob, a kind of semantic map is automatically created by the objects the robot perceives. You can save the in-memory map to an OWL file using the methods in the owl_export module.
+  * *Manual creation of the OWL file*: In some cases, it may actually be the fastest to create the map manually in a good text editor in which you can copy and paste the object instances and their pose matrices. Especially if you would like to set many semantic object properties beyond their poses, this may be a good option. If you plan to do this, you should have well understood how object poses are represented in KnowRob.
 
 Loading a semantic map:
  
@@ -414,20 +414,20 @@ Visualization of the loaded map:
 ',1);
 
 INSERT INTO Tutorial VALUES(331,'map','Semantic map','Reasoning about Articulated Objects',
-'Articulated objects, e.g. cupboards, that have doors or drawers are represented in a special way to describe, on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable. Like for other composed objects, there is a part-of hierarchy (properPhysicalParts). Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door). In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
+' `Articulated objects`, e.g. cupboards, that have doors or drawers are represented in a special way to describe, on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable. Like for other composed objects, there is a part-of hierarchy (properPhysicalParts). Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door). In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
 
 Joints are described using the following properties, which are compatible to the representation used by the ROS articulation stack:
 
-  * Type: At the moment, rotational and prismatic joints are supported (knowrob:''Hinge'' and knowrob:''PrismaticJoint'')
-  * Parent, Child: resp. object instances
-  * Pose: like for normal objects using e.g. a SemanticMapPerception instance
-  * Direction: vector giving the opening direction of a prismatic joint
-  * Radius: radius of a rotational joint (e.g. between handle and hinge)
-  * Qmin, Qmax: lower and upper joint limits
+  * *Type*: At the moment, rotational and prismatic joints are supported (knowrob:''Hinge'' and knowrob:''PrismaticJoint'')
+  * *Parent, Child*: resp. object instances
+  * *Pose*: like for normal objects using e.g. a SemanticMapPerception instance
+  * *Direction*: vector giving the opening direction of a prismatic joint
+  * *Radius*: radius of a rotational joint (e.g. between handle and hinge)
+  * *Qmin, Qmax*: lower and upper joint limits
 
-Reading Articulation Information:
+*Reading Articulation Information*
 
-There are some helper predicates for reading, creating, updating and deleting joints from articulated objects. This task is on the one hand rather common, on the other hand somewhat complex because the structure visualized in the previous image needs to be established. To create a joint of type knowrob:''HingedJoint'' between two object parts at position (1,1,1) with unit orientation, radius 0.33m and joint limits 0.1 and 0.5 respectively, one can use the following statement: 
+There are some helper predicates for reading, creating, updating and deleting joints from `articulated objects`. This task is on the one hand rather common, on the other hand somewhat complex because the structure visualized in the previous image needs to be established. To create a joint of type knowrob:''HingedJoint'' between two object parts at position (1,1,1) with unit orientation, radius 0.33m and joint limits 0.1 and 0.5 respectively, one can use the following statement: 
 
     create_joint_information(knowrob:''HingedJoint'', 
     iai_maps:''iai_kitchen_sink_area_left_middle_drawer_handle'', 
@@ -448,7 +448,7 @@ To update joint information, one can use the following predicate:
 INSERT INTO Tutorial VALUES(332,'map','Semantic map','Inferring likely storage locations',
 'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket. There are different techniques for inferring the location where an object should be placed:
 
-  * Using assertions of the storagePlaceFor property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
+  * Using assertions of the `storagePlaceFor` property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
 
   * A finer-grained solution is based on organizational principles that places objects at the location where semantically similar objects are stored. It requires some (partial) knowledge about the distribution of other objects in the environment.
 
@@ -755,7 +755,7 @@ INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Visualize obj
 /*****************************************************************************************/
 
 INSERT INTO Tutorial VALUES(660,'srdl','Semantic robot description','Introduction',
-'Inside KnowRob Framework, we also represent symbolic descriptions of robot components and capabilities. Such a knowledge can help us find out if a certain robot has all prerequisites for executing an action. The semantic descriptions of robots are defined using the Semantic Robot Description Language (SRDL). 
+'Inside `KnowRob Framework`, we also represent symbolic descriptions of robot components and capabilities. Such a knowledge can help us find out if a certain robot has all prerequisites for executing an action. The semantic descriptions of robots are defined using the `Semantic Robot Description Language` (SRDL). 
 
 In order to start capability reasonig. First we need to register the ros package which loads SRDL into our Prolog session:
 
@@ -763,9 +763,9 @@ In order to start capability reasonig. First we need to register the ros package
 ',1);
 
 INSERT INTO Tutorial VALUES(661,'srdl','Semantic robot description','Kinematic Robot Model',
-'The Semantic Robot Description Language (SRDL) is a logical language for describing robot hardware, software and capabilities. More information on the usage of SRDL for modeling a robot, for answering queries about its hardware configuration and for checking requirements of actions on robot components. Several SRDL models for popular robots (e.g. PR2, Baxter, TUM-Rosie, Amigo) are already contained in the mod_srdl package in the KnowRob stack. In order to facilitate the creation of an SRDL model for a new robot, there is a converter by A. Perzylo and P. Freyer that can read an URDF robot model and convert the kinematic structure to SRDL (www.knowrob.org). 
+'`The Semantic Robot Description Language (SRDL)` is a logical language for describing robot hardware, software and capabilities. More information on the usage of SRDL for modeling a robot, for answering queries about its hardware configuration and for checking requirements of actions on robot components. Several SRDL models for popular robots (e.g. `PR2`, `Baxter`, `UNIHB-Boxy`, `Amigo`) are already contained in the mod_srdl package in the KnowRob stack. In order to facilitate the creation of an SRDL model for a new robot, there is a converter by A. Perzylo and P. Freyer that can read an URDF robot model and convert the kinematic structure to SRDL (www.knowrob.org). 
 
-For this exercise, we can load the SRDLs of PR2 and Baxter:
+For this exercise, we can load the SRDLs of `PR2` and `Baxter`:
 
     owl_parse(''package://knowrob_srdl/owl/PR2.owl''), owl_parse(''package://knowrob_srdl/owl/baxter.owl'').
 ',2);
