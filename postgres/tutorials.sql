@@ -481,7 +481,7 @@ To update joint information, one can use the following predicate:
 /*****************************************************************************************/
 
 INSERT INTO Tutorial VALUES(440,'actions','Actions and Tasks','Action representation (1)','
-In openEASE, instances of actions are represented in the ABOX of the OWL reasoner.
+In openEASE, instances of actions are represented in the ABOX of the ontology.
 These action instances may be
 
   * actually observed or performed actions (something that happened at a certain time)
