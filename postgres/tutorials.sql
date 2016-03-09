@@ -11,9 +11,9 @@ create table tutorial (
 INSERT INTO Tutorial VALUES(110,'overview','openEASE Tutorials','Tutorial List',
 '
   * <a class="tut_cat_link" onclick="loadTutorial(''getting_started'',1)">Getting started</a>
+  * <a class="tut_cat_link" onclick="loadTutorial(''objects'',1)">Objects and locations</a>
   * <a class="tut_cat_link" onclick="loadTutorial(''map'',1)">Semantic map</a>
   * <a class="tut_cat_link" onclick="loadTutorial(''actions'',1)">Actions and tasks</a>
-  * <a class="tut_cat_link" onclick="loadTutorial(''objects'',1)">Objects and locations</a>
   * <a class="tut_cat_link" onclick="loadTutorial(''srdl'',1)">Semantic robot description</a>
 ',1);
 
@@ -26,7 +26,7 @@ INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user in
 'The user interface consists of six panes with different purposes.
 
   * The *Prolog interaction area hl_console* in the upper left consists of the *history pane hl_history* in the top and the *query field hl_user&#95;query* at the bottom. Prolog queries are to be typed in the *query field hl_user&#95;query*, whereas the history of the queries with their respective results will be shown in the *history pane hl_history*.
-  * The pane in which this tutorial text is now displayed, the *query list pane hl_library*, usually contains a list of prepared queries with English translation. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field hl_user&#95;query*.
+  * The pane in which this tutorial text is now displayed, the *query list pane hl_library*, usually contains a list of prepared queries with descriptions in English. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field hl_user&#95;query*.
   * The *3D display pane hl_markers* in the upper middle can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
   * The *visual analytics pane hl_chart* in the lower middle can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization pane with the results of queries.
   * The *belief pane hl_designator* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
@@ -103,14 +103,14 @@ In a Prolog program, a presence of a fact indicates a statement that is true. An
 
     robot(''PR2'').
 
-Yields in
+Yields
 <pre>
 true.
 </pre>
 
     robot(''PR3'').
 
-Yields in
+Yields
 <pre>
 false.
 </pre>
@@ -121,7 +121,7 @@ holds true. For example:
 
     robot(RobotUnbound).
 
-Yields in:
+Yields
 <pre>
     RobotUnbound = PR2
     RobotUnbound = BOXY
@@ -164,7 +164,7 @@ Yields in
 In above query, the predicate `forall` is used to successively bind one of the component names to the `_Component` variable
 in order to check if `has_component(Robot, _Component)` holds true.
 The call only yields *true* for robots with both components available.
-Note that variable that start with an underscore are not returned as result.
+Note that the bound values of variables starting with an underscore are not returned as a result.
 
 This tutorial is only a brief introduction to logic programming with Prolog.
 Please visit the [SWI Prolog](http://www.swi-prolog.org) website or one of the
@@ -175,12 +175,12 @@ INSERT INTO Tutorial VALUES(223,'getting_started','Getting started','Web Ontolog
 that are stored in the [Web Ontology Language](http://en.wikipedia.org/wiki/Web_Ontology_Language) (OWL),
 images that have been recorded during the task
 which are stored as files on the disk, and position data that is stored in an
-efficient high-volume database. The integration of these information sources
-is transparent to the user, and all of them can be accessed via the same
-Prolog query interface.
+efficient high-volume database. 
+The integration of these information sources is made transparent to the user,
+and they can be accessed via the same Prolog query interface.
 
 In openEASE, all knowledge is represented in the Web Ontology Language.
-This XML-based format allows to formally describe relational knowledge in a Description Logics (DL) dialect.
+This XML-based format allows one to formally describe relational knowledge in a Description Logics (DL) dialect.
 The OWL language is characterized by formal semantics and is built upon a W3C XML standard
 for objects called the [Resource Description Framework](https://en.wikipedia.org/wiki/Resource_Description_Framework) (RDF).
 
@@ -197,12 +197,12 @@ The subject denotes the resource, and the predicate denotes traits or aspects of
 &lt;/owl:NamedIndividual&gt;
 </pre>
 
-Above OWL statement declares a subject with the name "http://knowrob.org/kb/PR2.owl#PR2Robot1".
+The OWL statement above declares a subject with the name "http://knowrob.org/kb/PR2.owl#PR2Robot1".
 `rdf:type` is a predicate that relates the robot with the corresponding type in the taxonomy.
 Similarly, the relations `srdl2-comp:succeedingLink` and `srdl2-comp:subComponent` are used to span
 a component hierarchy that describes which components belong to the PR2 robot.
 
-In openEASE, you can load OWL files using the `owl_parse` predicate that parses
+In openEASE, you can load OWL files using the `owl_parse` predicate which parses
 the OWL file with the high-level description.
 The `owl_parse` predicate understands global
 paths in the filesystem as well as URLs of the forms `http://...` and
@@ -229,7 +229,7 @@ This includes, for example, to query for individuals of a given class:
 
     owl_individual_of(A, knowrob:''PR2'').
 
-When OWL files are loaded into the system, they are internally stored as triples `rdf(Subject, Predicate, Object)`.
+When OWL files are loaded into the system, the expressions are internally stored as triples `rdf(Subject, Predicate, Object)`.
 Using the predicate `rdf_has` we can query for the RDF triples that are declared in the OWL file.
 This allows, for instance, to query for all sub-components of the PR2 robot.
 
@@ -240,33 +240,41 @@ It is important to understand that KnowRob separates knowledge about the world
 (which are implemented in plain Prolog).
 OWL''s strict formal semantics, its typing and the existing reasoning methods are the main reasons for this separation.
 In order to profit from these properties, it is thus necessary that information which is read from external sources
-by Prolog predicates is transformed into a representation that is compatible to the OWL knowledge. 
+by Prolog predicates is transformed into a representation that is compatible to the OWL knowledge.
 
-**TODO** namespaces
+It is tedious to always write out the complete URL that defines the name of the individual.
+To overcome this, you can define namespaces in OWL files as well as in the Prolog knowledge base:
 
-**Note:** As usual, the predicate `rdf_has` supports an arbitrary number of arguments to be bound or unbound.
+    rdf_db:rdf_register_ns(pr2, ''http://knowrob.org/kb/PR2.owl#'', [keep(true)]),
+    rdf_db:rdf_register_ns(srdl2comp, ''http://knowrob.org/kb/srdl2-comp.owl#'', [keep(true)]).
+
+Now we can write the `rdf_has` query as:
+
+    rdf_has(pr2:''PR2Robot1'', srdl2comp:''subComponent'', Components).
+
+**Note:** As usual, the predicate `rdf_has` supports arbitrary argument to be bound or unbound.
 
 **Note:** For modeling with OWL, use the [Protege OWL editor](http://protege.stanford.edu/download/protege/4.1/installanywhere/) (version 4.x) which makes exploring and editing OWL files much easier and have a look at the documentation.
 ',4);
 
 INSERT INTO Tutorial VALUES(224,'getting_started','Getting started','KnowRob Packages',
-'If your application requires functionality beyond that one already provided by the standard KnowRob packages,
-you will need to create your own KnowRob package.
+'If your application requires functionality beyond what is already provided by the standard `KnowRob` packages,
+you will need to create your own `KnowRob` package.
 The following description assumes that you would like to add knowledge in terms of OWL ontologies,
 or implement new Prolog predicates, or both. If you would just like to link against Java libraries provided by KnowRob,
 you don''t have to follow the description below, but can just implement a normal ROS package that depends on the respective KnowRob packages.
 
-KnowRob packages are normal ROS packages that, in addition, contain some special files and folders.
+`KnowRob` packages are normal ROS packages that, in addition, contain some special files and folders.
 This common structure allows tools like [rosprolog](http://www.ros.org/wiki/rosprolog) to automatically load the package and all its dependencies.
 <pre>
-  your_package
+  your\_package
   |- package.xml
   |- CMakeLists.txt
   |- owl
-  |  \\- your_file.owl
+  |  \\- your\_file.owl
   |- prolog
      |- init.pl
-     \\- your_module.pl
+     \\- your\_module.pl
 </pre>
 
 The example above assumes that you would like to create a package `your_package` with an OWL ontology `your_file.owl`
@@ -295,7 +303,7 @@ your packages.
 **Note:** At the moment, it is not possible to compile code in user packages on openEASE. Thus, you can not include languages such as Java or C++ in your package.',5);
 
 INSERT INTO Tutorial VALUES(225,'getting_started','Getting started','Marker Visualization',
-'openEASE includes a browser-based visualization canvas that can display 3D data such as the environment map or the robot itself.
+'openEASE includes a browser-based visualization canvas in the 3D display pane that can display 3D data such as the environment map or the robot itself.
 The canvas is based on [rosbridge](http://wiki.ros.org/rosbridge)
 and the [robotwebtools](http://robotwebtools.org/) libraries that provide tools for displaying information from ROS in a browser.
 
@@ -327,7 +335,7 @@ using the `marker` predicate.
 Properties of markers, such as the pose, can be dynamically manipulated by calling predicates that
 change the property value.
 
-    marker(arrow(''A''),Arrow), marker_translation(Arrow, [0.0,0.0,0.0]), marker_scale(Arrow, [1.0,0.4,0.4]).,
+    marker(arrow(''A''),Arrow), marker_translation(Arrow, [0.0,0.0,0.0]), marker_scale(Arrow, [1.0,0.4,0.4]),
     marker(cube(''B''),Cube), marker_translation(Cube, [0.0,1.0,0.0]), marker_scale(Cube, [0.5,0.5,0.5]),
     marker(sphere(''C''),Sphere), marker_translation(Sphere, [0.0,2.0,0.0]), marker_scale(Sphere, [0.5,0.5,0.5]).
 
@@ -408,16 +416,32 @@ as well as representation of kinematic chains and robot capabilities.
 /*****************************************************************************************/
 
 INSERT INTO Tutorial VALUES(330,'map','Semantic map','Semantic Map Representation',
-'Semantic maps are descriptions of an environment in terms of localized object instances and are stored in OWL files. Much of the environment- and object-related functionality in KnowRob depends of having a valid semantic map, so you may want to create one for your robot''s environment.
+'Semantic maps are descriptions of an environment in terms of localized object instances and are stored in OWL files.
+Much of the environment- and object-related functionality in KnowRob depends of having a valid semantic map, so you may want to create one for your robot''s environment.
+
+The figure below shows the structure of a semantic map of a sample environment containing a drawer and a refrigerator.
 
 <img src="http://knowrob.org/_media/part-of-hierarchy-map.png" alt="Smiley face" height="168" width="320">
 
 There are different ways how to create a semantic map in OWL:
 
-  * *Semantic Map Editor*: The Semantic Map Editor is a graphical editor for semantic maps. It can be used to create object instances and to set their positions. The current version is rather specific for indoor environments though and, for example, offers only a limited set of object types to be added to the map. You can easily adapt the list of classes in the source code, but this cannot conveniently be configured at the moment.
-  * *SemanticMapToOWL*: If you already have a map datastructure and would like to create a semantic map from your program, the SemanticMapToOWL ROS service is probably the easiest solution. It accepts a SemanticMap message and returns the OWL data as a string.
-  * *Robot perception system*: If you have integrated a perception system with KnowRob, a kind of semantic map is automatically created by the objects the robot perceives. You can save the in-memory map to an OWL file using the methods in the owl_export module.
-  * *Manual creation of the OWL file*: In some cases, it may actually be the fastest to create the map manually in a good text editor in which you can copy and paste the object instances and their pose matrices. Especially if you would like to set many semantic object properties beyond their poses, this may be a good option. If you plan to do this, you should have well understood how object poses are represented in KnowRob.
+  * *Semantic Map Editor*: The Semantic Map Editor is a graphical editor for semantic maps. It can be used to create object instances and to set their positions.
+The current version is rather specific for indoor environments though and, for example,
+offers only a limited set of object types to be added to the map.
+You can easily adapt the list of classes in the source code, but this cannot conveniently be configured at the moment.
+  * *SemanticMapToOWL*: If you already have a map datastructure and would like to create a semantic map from your program,
+the SemanticMapToOWL ROS service is probably the easiest solution. It accepts a SemanticMap message and returns the OWL data as a string.
+  * *Robot perception system*: If you have integrated a perception system with KnowRob,
+a kind of semantic map is automatically created by the objects the robot perceives.
+You can save the in-memory map to an OWL file using the methods in the owl_export module.
+  * *Manual creation of the OWL file*: In some cases, it may actually be the fastest to create the map manually
+in a good text editor in which you can copy and paste the object instances and their pose matrices.
+Especially if you would like to set many semantic object properties beyond their poses,
+this may be a good option. If you plan to do this, you should have well understood how object poses are represented in KnowRob.
+
+Let''s first clear the canvas:
+
+    marker_remove(all).
 
 Loading a semantic map:
  
@@ -429,7 +453,8 @@ Visualization of the loaded map:
 ',1);
 
 INSERT INTO Tutorial VALUES(331,'map','Semantic map','Inferring likely storage locations',
-'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket. There are different techniques for inferring the location where an object should be placed:
+'For some tasks, robots need to reason about the nominal locations of objects, for example when cleaning up or when unpacking a shopping basket.
+There are different techniques for inferring the location where an object should be placed:
 
   * Using assertions of the `storagePlaceFor` property is a rather generic, though not very adaptive technique that allows to state e.g. that perishable items belong into the refrigerator. It does not require any knowledge about the environment, but since it works on the level of object classes, it cannot choose between containers of the same type, e.g. different cupboards.
 
@@ -437,13 +462,21 @@ INSERT INTO Tutorial VALUES(331,'map','Semantic map','Inferring likely storage l
 
 Querying for likely storage locations:
 
-The simple option based on the storagePlaceFor predicate can be queried as follows in order to determine where an object (instance or class) shall be stored, or which known objects are to be stored in a given container
+The simple option based on the `storagePlaceFor` predicate can be queried as follows in order
+to determine where an object (instance or class) shall be stored, or which known objects are to be stored in a given container
 
-    owl_subclass_of(T, knowrob:''StorageConstruct''), class_properties(T, knowrob:''typePrimaryFunction-StoragePlaceFor'', knowrob:''Perishable''), owl_individual_of(Obj, T), marker_highlight(object(Obj)).
+    owl_subclass_of(T, knowrob:''StorageConstruct''),
+    class_properties(T, knowrob:''typePrimaryFunction-StoragePlaceFor'', knowrob:''Perishable''),
+    owl_individual_of(Obj, T),
+    marker_highlight(object(Obj)).
 ',2);
 
 INSERT INTO Tutorial VALUES(332,'map','Semantic map','Reasoning about Articulated Objects',
-' `Articulated objects`, e.g. cupboards, that have doors or drawers are represented in a special way to describe, on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable. Like for other composed objects, there is a part-of hierarchy (properPhysicalParts). Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door). In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
+' `Articulated objects`, e.g. cupboards, that have doors or drawers are represented in a special way to describe,
+on the one hand, the component hierarchy, and, on the other hand, which connections are fixed and which are movable.
+Like for other composed objects, there is a part-of hierarchy (properPhysicalParts).
+Joints are parts of the cupboard/parent object, and are fixed-to (connectedTo-Rigidly) both the parent and the child (e.g. the door).
+In addition, the child is hingedTo or prismaticallyConnectedTo the parent.
 
 Joints are described using the following properties, which are compatible to the representation used by the ROS articulation stack:
 
@@ -456,22 +489,28 @@ Joints are described using the following properties, which are compatible to the
 
 *Reading Articulation Information*
 
-There are some helper predicates for reading, creating, updating and deleting joints from `articulated objects`. This task is on the one hand rather common, on the other hand somewhat complex because the structure visualized in the previous image needs to be established. To create a joint of type knowrob:''HingedJoint'' between two object parts at position (1,1,1) with unit orientation, radius 0.33m and joint limits 0.1 and 0.5 respectively, one can use the following statement: 
+There are some helper predicates for reading, creating, updating and deleting joints from `articulated objects`.
+This task is on the one hand rather common, on the other hand somewhat complex because the structure visualized in the previous image needs to be established.
+To create a joint of type knowrob:''HingedJoint'' between two object parts at position (1,1,1) with unit orientation,
+radius 0.33m and joint limits 0.1 and 0.5 respectively, one can use the following statement: 
 
     create_joint_information(knowrob:''HingedJoint'', 
-    iai_maps:''iai_kitchen_sink_area_left_middle_drawer_handle'', 
-    iai_maps:''iai_kitchen_sink_area_left_bottom_drawer_main'', 
-    [1,0,0,1,0,1,0,1,0,0,1,1,0,0,0,1], [], ''0.33'', ''0.1'', ''0.5'', Joint).
+        iai_maps:''iai_kitchen_sink_area_left_middle_drawer_handle'', 
+        iai_maps:''iai_kitchen_sink_area_left_bottom_drawer_main'', 
+        [1,0,0,1,0,1,0,1,0,0,1,1,0,0,0,1], [], ''0.33'', ''0.1'', ''0.5'', Joint).
 
 
-If a prismatic joint is to be created instead, the empty list [] needs to be replaced with a unit vector describing the joint''s direction, e.g. [0,0,1] for a joint opening in z-direction, and the joint type needs to be set as ''PrismaticJoint''. Joint information can conveniently be read using the following predicate that requires a joint instance as argument:
+If a prismatic joint is to be created instead, the empty list [] needs to be replaced with a unit vector describing the joint''s direction,
+e.g. [0,0,1] for a joint opening in z-direction, and the joint type needs to be set as ''PrismaticJoint''.
+Joint information can conveniently be read using the following predicate that requires a joint instance as argument:
 
     read_joint_information(Joint, Type, Parent, Child, Pose, Direction, Radius, Qmin, Qmax).
 
 
 To update joint information, one can use the following predicate:
 
-    update_joint_information(Joint, knowrob:''HingedJoint'', [1,0,0,2,0,1,0,2,0,0,1,2,0,0,0,1], [1,2,3], 0.32, 1.2, 1.74).
+    update_joint_information(Joint, knowrob:''HingedJoint'',
+        [1,0,0,2,0,1,0,2,0,0,1,2,0,0,0,1], [1,2,3], 0.32, 1.2, 1.74).
 ',3);
 
 
@@ -594,10 +633,8 @@ INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Pattern langu
 */
 
 INSERT INTO Tutorial VALUES(445,'actions','Actions and Tasks','Action statistics','
-The comprehensive robot action logs of manipulation task episodes allows to
-statistically investigate the plan execution.
-openEASE offers a set of different diagram types for this purpose
-which are introduced in this tutorial page.
+The comprehensive robot action logs of manipulation tasks available on openEASE allows to statistically investigate the plan execution of this task.
+openEASE offers a set of different diagram types for visualizing this information, which are introduced in this tutorial page.
 
 Let''s first load the action of a robot performing amnioulation tasks:
 
@@ -631,14 +668,18 @@ which is send to the browser client using the predicate `add_diagram`.
 Following query can be used to generate a timeline over all performed
 actions in an episode:
 
+    experiment(E),
     findall(_Y-(_T0-_T1), (
         rdfs_instance_of(_X, knowrob:''PurposefulAction''),
         event_class_name(_X,_Y),
-        event_interval(_X,_T0,_T1)
+        once((
+            subtask_all(E,_X),
+            event_interval(_X,_T0,_T1)
+        ))
     ), _Actions),
+    not(_Actions=[]),
     pairs_keys_values(_Actions, ClassNames, _Times),
-    pairs_keys_values(_Times, StartTimes, EndTimes),
-    add_timeline(''actions'', ''Logged Actions'', ClassNames, StartTimes, EndTimes).
+    pairs_keys_values(_Times, StartTimes, EndTimes).
 
 First, `rdfs_instance_of` is used to bind a `PurposefulAction` and the predicate
 `event_interval` is used in order to query the start and end time of that action.
@@ -718,10 +759,10 @@ A query for all objects with handles can be written as:
     owl_individual_of(H, knowrob:''Handle'').
 ',2);
 
-INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object poses',
+INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Object poses',
 'Object poses are represented as instances of the class `SemanticMapPerception`
-which is a subclass of `Event` and thus has properties that define the 
-time interval of the event.
+which is a subclass of `Event` and thus has properties
+describing the timeinterval over which the pose event holds.
 The event is related to the object using the `objectActedOn` property.
 It is intended, that there can be multiple `SemanticMapPerception` events
 for the same object in order to represent pose changes over time.
@@ -743,16 +784,16 @@ In order to look up all object poses associated to an object of interest,
 use the `rdf_has` predicate.
 
     rdf_has(Event, knowrob:objectActedOn, ''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1''),
-    owl_individual_of(Event, knowrob;''SemanticMapPerception'').
+    owl_individual_of(Event, knowrob:''SemanticMapPerception'').
 
 In most cases, we are interested in the latest object pose while ignoring earlier pose estimates.
 For convinience, openEASE offers the predicate `current_object_pose` in order to query
 the latest perceived object pose.
 
     current_object_pose(''http://knowrob.org/kb/ccrl2_map_objects.owl#cheese1'', Pose).
-',4);
+',3);
 
-INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Object locations',
+INSERT INTO Tutorial VALUES(553,'objects','Objects and locations','Object locations',
 'Commonsense knowledge about typical object locations was acquired by the
 [Open Mind Indoor Common Sense](http://openmind.hri-us.com/) (OMICS) project.
 We processed the natural language database entries and translated them to well-defined concepts
@@ -770,9 +811,9 @@ To query the probability of finding an object in a given room type you can use t
 If you are interested in what type of room you could find a given object use the following query: 
 
     bayes_probability_given(knowrob:''OmicsLocations'', Room, knowrob:''Sandwich'',Pr).
-',5);
+',4);
 
-INSERT INTO Tutorial VALUES(552,'objects','Objects and locations','Qualitative spatial relations',
+INSERT INTO Tutorial VALUES(554,'objects','Objects and locations','Qualitative spatial relations',
 'Qualitative spatial relations between objects can be computed using computable relations.
 
 For example, the computable raltion `in-ContGeneric` checks wether the contains relation holds
@@ -789,7 +830,7 @@ Another computable relation is the `on-Physical` relation that checks
 if an object is on top of another object:
 
     rdf_triple(knowrob:''on-Physical'', A, knowrob:''Dishwasher37'').
-',3);
+',5);
 
 /*
 INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize objects',
@@ -805,15 +846,22 @@ INSERT INTO Tutorial VALUES(555,'objects','Objects and locations','Visualize obj
 /*****************************************************************************************/
 
 INSERT INTO Tutorial VALUES(660,'srdl','Semantic robot description','Introduction',
-'Inside `KnowRob Framework`, we also represent symbolic descriptions of robot components and capabilities. Such a knowledge can help us find out if a certain robot has all prerequisites for executing an action. The semantic descriptions of robots are defined using the `Semantic Robot Description Language` (SRDL). 
+'Inside `KnowRob Framework`, we also represent symbolic descriptions of robot components and capabilities.
+Such knowledge can help us find out whether a certain robot has all prerequisites for executing an action.
+The semantic descriptions of robots are defined using the `Semantic Robot Description Language` (SRDL). 
 
-In order to start capability reasonig. First we need to register the ros package which loads SRDL into our Prolog session:
+In order to start capability reasonig, first we need to register the ros package which loads SRDL into our Prolog session:
 
     register_ros_package(''knowrob_srdl'').
 ',1);
 
 INSERT INTO Tutorial VALUES(661,'srdl','Semantic robot description','Kinematic Robot Model',
-'`The Semantic Robot Description Language (SRDL)` is a logical language for describing robot hardware, software and capabilities. More information on the usage of SRDL for modeling a robot, for answering queries about its hardware configuration and for checking requirements of actions on robot components. Several SRDL models for popular robots (e.g. `PR2`, `Baxter`, `UNIHB-Boxy`, `Amigo`) are already contained in the mod_srdl package in the KnowRob stack. In order to facilitate the creation of an SRDL model for a new robot, there is a converter by A. Perzylo and P. Freyer that can read an URDF robot model and convert the kinematic structure to SRDL (www.knowrob.org). 
+'`The Semantic Robot Description Language (SRDL)` is a logical language for describing robot hardware, software and capabilities.
+More information on the usage of SRDL for modeling a robot, for answering queries about its hardware configuration and for checking requirements of actions on robot components
+can be found on this [page](http://www.knowrob.org/doc/srdl2_tutorial).
+Several SRDL models for popular robots (e.g. `PR2`, `Baxter`, `UNIHB-Boxy`, `Amigo`) are already contained in the mod_srdl package in the KnowRob stack.
+In order to facilitate the creation of an SRDL model for a new robot,
+there is a converter by A. Perzylo and P. Freyer that can read an URDF robot model and convert the kinematic structure to SRDL (www.knowrob.org). 
 
 For this exercise, we can load the SRDLs of `PR2` and `Baxter`:
 
@@ -821,7 +869,9 @@ For this exercise, we can load the SRDLs of `PR2` and `Baxter`:
 ',2);
 
 INSERT INTO Tutorial VALUES(662,'srdl','Semantic robot description','Components of a robot',
-'Read all components of a robot. There is no distinction between robots and components any more, robots are just complex components that consist of many parts.
+'Here are some example queries for reasoning about robot components.
+
+Read all components of a robot. There is no distinction between robots and components any more, robots are just complex components that consist of many parts.
 
     sub_component(pr2:''PR2Robot1'', Sub).
 
@@ -837,21 +887,21 @@ Check whether a component of a certain type exists on a robot (or, in general, a
 ',3);
 
 INSERT INTO Tutorial VALUES(663,'srdl','Semantic robot description','Capabilities of a robot',
-'Add an action to our Prolog session so that we can reason about which capabilities are needed for it:
+'Here are some example queries for reasoning about robot capabilities.
 
-    register_ros_package(knowrob_actions), owl_parse(''package://knowrob_actions/owl/serve_drink.owl'').
+Add an action to our Prolog session so that we can reason about which capabilities are needed for it:
+
+    register_ros_package(knowrob_actions),
+    owl_parse(''package://knowrob_actions/owl/serve_drink.owl'').
 
 
 Check which capabilities exists on a robot:
 
     cap_available_on_robot(Cap, pr2:''PR2Robot1'').
 
-
-
 Capabilities an action depends on:
 
     required_cap_for_action(serve_drink:''ServeADrink'', C).
-
 
 Missing capability of the given robot for an action:
 
