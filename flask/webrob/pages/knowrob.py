@@ -21,6 +21,7 @@ __author__ = 'danielb@cs.uni-bremen.de'
 def download_static(filename):
     return send_from_directory(os.path.join(app.root_path, "static"), filename)
 
+@app.route('/episode_data/<path:filename>')
 @app.route('/knowrob/knowrob_data/<path:filename>')
 @login_required
 def download_logged_image(filename):
