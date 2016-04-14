@@ -219,7 +219,14 @@
         // hook for links of class "show_code" that pastes the content of the
         // previous code block into the query field
         $( "a.show_code" ).click(function( event ) {
-            ui.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+            ui.console.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+            event.preventDefault();
+        });
+        $( "button.show_code" ).click(function( event ) {
+        console.info('button.show_code');
+        console.info($(this));
+        console.info($(this)['0'].value);
+            ui.console.setQueryValue( $(this)['0'].value );
             event.preventDefault();
         });
         
@@ -281,6 +288,7 @@
             </div>
         </div>
         <div id="library">
+        <!--
             <select name="examplequery" id="examplequery"
             {% if current_user.is_authenticated and current_user.has_role('admin') %}
                 ondblclick="ui.setQueryText()"
@@ -288,6 +296,10 @@
                 onchange="ui.console.addSelectedToQueryform('examplequery')">
                 <option value=0></option>
             </select>
+        -->
+        <!--
+            <button class="query_lib_button" type="button">Foo bar baz lorem ipsume dolores foo bar</button>
+        -->
         </div>
     </div>
   
