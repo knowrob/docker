@@ -57,7 +57,6 @@
                 var categories = Object.keys(queryLibMap);
                 categories.sort();
                 for(var i=0; i<categories.length; i++) {
-                    queryLib.push({q: "", text: ""});
                     queryLib.push({q: "", text: "----- " + categories[i] + " -----"});
                     queryLib.push.apply(queryLib, queryLibMap[categories[i]]);
                 }
@@ -220,13 +219,6 @@
         // previous code block into the query field
         $( "a.show_code" ).click(function( event ) {
             ui.console.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
-            event.preventDefault();
-        });
-        $( "button.show_code" ).click(function( event ) {
-        console.info('button.show_code');
-        console.info($(this));
-        console.info($(this)['0'].value);
-            ui.console.setQueryValue( $(this)['0'].value );
             event.preventDefault();
         });
         
