@@ -26,6 +26,12 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
 {% endblock %}
 
 {% block content %}
@@ -255,7 +261,7 @@
     });
   </script>
 
-  <div id="page-content">
+<div id="page-content">
     <div class="ui-layout-center" id="editor-container">
         <div id="markers"></div>
         <div id="chart"></div>	
@@ -284,7 +290,7 @@
             <div id="library_bottom">
                 <div id="library_buttons">
                     <ul class="query_button_group">
-                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editQueries()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.show_library_editor()" title="Edit the query library"></a></li>
                     {% if current_user.is_authenticated and current_user.has_role('admin') %}
                         <li><a href="#" class="query_button admin_button icon_save" id="btn_query_save" onclick="ui.saveQueries()" title="Save the query library on the openEASE server"></a></li>
                         <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
@@ -302,29 +308,38 @@
     </div>
     
     <div class="pane ui-layout-south">
-      <div id="logo_container">
-        <a href="http://www.robohow.eu" class="media" title="http://www.robohow.eu"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/robohow-logo.png') }}" class="media" alt="" />
-        </a>
-        <a href="http://www.roboearth.org" class="media" title="http://www.roboearth.org"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/roboearth-logo.png') }}" class="media" alt="" />
-        </a>
-        <a href="http://www.sherpa-project.eu" class="media" title="http://www.sherpa-project.eu"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/sherpa-logo.png') }}" class="media" alt="" />
-        </a>
-        <a href="http://www.saphari.eu" class="media" title="http://www.saphari.eu"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/saphari-logo.png') }}" class="media" alt="" />
-        </a>    
-        <a href="http://dfg.de/" class="media" title="http://www.acat-project.eu/"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/acat-logo.png') }}" class="media" alt="" />
-        </a>
-        <a href="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html" class="media" title="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/fp7-logo.png') }}" class="media" alt="" />
-        </a>
-        <a href="http://dfg.de/" class="media" title="http://dfg.de/"  rel="nofollow">
-          <img src="{{ url_for('static', filename='logos/dfg.jpg') }}" class="media" alt="" />
-        </a>
-      <div>
+        <div id="logo_container">
+            <a href="http://www.robohow.eu" class="media" title="http://www.robohow.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/robohow-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.roboearth.org" class="media" title="http://www.roboearth.org"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/roboearth-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.sherpa-project.eu" class="media" title="http://www.sherpa-project.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/sherpa-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.saphari.eu" class="media" title="http://www.saphari.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/saphari-logo.png') }}" class="media" alt="" />
+            </a>    
+            <a href="http://dfg.de/" class="media" title="http://www.acat-project.eu/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/acat-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html" class="media" title="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/fp7-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://dfg.de/" class="media" title="http://dfg.de/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/dfg.jpg') }}" class="media" alt="" />
+            </a>
+        <div>
     </div>
+</div>
+</div> <!-- TODO: why is this required? -->
+    
+<div id="library-editor" class="modal">
+  <div class="modal-content">
+      <span class="close">×</span>
+      <div id="library-editor-content"></div>
   </div>
+</div>
+
 {% endblock %}
