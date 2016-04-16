@@ -143,7 +143,8 @@
       var knowrobLayout = $('#page-content').layout({
         stateManagement__enabled: true,
         south: {
-          minSize: 60
+          minSize: 60,
+          maxSize: 60
         },
         west: {
           minSize: 250,
@@ -254,7 +255,7 @@
     });
   </script>
 
-  <div id="page-content" style="width:100%; height:100%;">
+  <div id="page-content">
     <div class="ui-layout-center" id="editor-container">
         <div id="markers"></div>
         <div id="chart"></div>	
@@ -269,29 +270,29 @@
             <div id="console_bottom">
                 <div id="query_buttons">
                     <ul class="query_button_group">
-                        <li><a href="#" class="query_button" id="btn_query"  onclick="ui.console.query()">Query</a></li>
-                        <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.console.nextSolution()">Next Solution</a></li>
-                {% if current_user.is_authenticated and current_user.has_role('admin') %}
-                        <li><a href="#" class="query_button admin_button" id="btn_query_save" onclick="ui.saveQuery()">Save</a></li>
-                {% endif %}
+                        <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
+                        <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
                     </ul>
                     <div class="clear">&nbsp;</div>
                 </div>
             </div>
         </div>
         <div id="library">
-        <!--
-            <select name="examplequery" id="examplequery"
-            {% if current_user.is_authenticated and current_user.has_role('admin') %}
-                ondblclick="ui.setQueryText()"
-            {% endif %}
-                onchange="ui.console.addSelectedToQueryform('examplequery')">
-                <option value=0></option>
-            </select>
-        -->
-        <!--
-            <button class="query_lib_button" type="button">Foo bar baz lorem ipsume dolores foo bar</button>
-        -->
+            <div id="library_top">
+                <div id="library_content"></div>
+            </div>
+            <div id="library_bottom">
+                <div id="library_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editQueries()" title="Edit the query library"></a></li>
+                    {% if current_user.is_authenticated and current_user.has_role('admin') %}
+                        <li><a href="#" class="query_button admin_button icon_save" id="btn_query_save" onclick="ui.saveQueries()" title="Save the query library on the openEASE server"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_download" id="btn_query_download" onclick="ui.downloadQueries()" title="Download the query library from the FTP server"></a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
   
@@ -325,7 +326,5 @@
         </a>
       <div>
     </div>
-
-    <div id="measure-container" style="visibility: hidden; display: inline-block;" />
   </div>
 {% endblock %}

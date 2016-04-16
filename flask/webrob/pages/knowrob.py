@@ -16,6 +16,7 @@ from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+@app.route('/static/<path:filename>')
 @app.route('/knowrob/static/<path:filename>')
 @login_required
 def download_static(filename):
