@@ -118,32 +118,6 @@
         //    topic: 'task_tree_msgs'
         //});
     };
-    
-    function querySelectKeyEvent(event) {
-        if (event.key == ' ') { // ENTER
-            ui.console.query();
-            return false;
-        }
-    {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        else if(event.keyCode == 46) { // DEL
-            ui.deleteQuery();
-            return false;
-        }
-        else if(event.key == 'u') { // UP
-            ui.queryUp();
-            return false;
-        }
-        else if(event.key == 'd') { // DOWN
-            ui.queryDown();
-            return false;
-        }
-        else if(event.key == 'a') { // ADD
-            ui.addQuery();
-            return false;
-        }
-    {% endif %}
-        return true;
-    };
 
     function resize() {
       var knowrobLayout = $('#page-content').layout({
@@ -219,8 +193,6 @@
         });
         ui.init();
         resize();
-        
-        $('#examplequery').keyup(querySelectKeyEvent);
       
         // hook for links of class "show_code" that pastes the content of the
         // previous code block into the query field
@@ -290,7 +262,7 @@
             <div id="library_bottom">
                 <div id="library_buttons">
                     <ul class="query_button_group">
-                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.show_library_editor()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.showLibraryEditor()" title="Edit the query library"></a></li>
                     {% if current_user.is_authenticated and current_user.has_role('admin') %}
                         <li><a href="#" class="query_button admin_button icon_save" id="btn_query_save" onclick="ui.saveQueries()" title="Save the query library on the openEASE server"></a></li>
                         <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
@@ -337,7 +309,8 @@
     
 <div id="library-editor" class="modal">
   <div class="modal-content">
-      <span class="close">×</span>
+      <span class="library-editor-button icon_close"></span>
+      <span class="library-editor-button icon_add"></span>
       <div id="library-editor-content"></div>
   </div>
 </div>
