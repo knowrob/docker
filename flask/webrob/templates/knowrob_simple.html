@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block content %}
-  <script type="text/javascript">
+<script type="text/javascript">
     var ui;
     
     function on_marker_dblclick(marker) {
@@ -51,7 +51,8 @@
                 for(var i=0; i<queries.length; i++) {
                     var category = queries[i][0];
                     var title = queries[i][1];
-                    var query = queries[i][2]+"."; // TODO: check trailing dot
+                    var query = queries[i][2];
+                    if(!query.endsWith(".")) query += ".";
                     
                     if(queryLibMap[category]==undefined)
                         queryLibMap[category]=[];
@@ -73,10 +74,9 @@
     };
     
     function on_marker_delete(ns) {
-        // FIXME
-        //if(that.selectedMarker != undefined && ns === that.selectedMarker) {
-        //    ui.initQueryLibrary();
-        //}
+        if(parent.client.selectedMarker != undefined && ns === parent.client.selectedMarker) {
+            ui.initQueryLibrary();
+        }
     };
     
     function on_designator_received(designatorHtml) {
@@ -193,45 +193,8 @@
         });
         ui.init();
         resize();
-      
-        // hook for links of class "show_code" that pastes the content of the
-        // previous code block into the query field
-        $( "a.show_code" ).click(function( event ) {
-            ui.console.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
-            event.preventDefault();
-        });
-        
-        {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        LEFT_MENU_LIST.push({ text: "Query Library",
-                submenu: [
-                    {
-                        text: "Save Library",
-                        onclick: ui.saveQueries
-                    },
-                    {
-                        text: "Rename Selected",
-                        onclick: ui.setQueryText
-                    },
-                    {
-                        text: "Move Selected Up",
-                        onclick: ui.queryUp,
-                        shortcut: "u"
-                    },
-                    {
-                        text: "Move Selected Down",
-                        onclick: ui.queryDown,
-                        shortcut: "d"
-                    },
-                    {
-                        text: "Insert After Selected",
-                        onclick: ui.addQuery,
-                        shortcut: "a"
-                    }
-                ]
-            });
-        {% endif %}
     });
-  </script>
+</script>
 
 <div id="page-content">
     <div class="ui-layout-center" id="editor-container">
@@ -305,7 +268,7 @@
         <div>
     </div>
 </div>
-</div> <!-- TODO: why is this required? -->
+</div> <!-- TODO: why is this required? Can't find the opening tag :/ -->
     
 <div id="library-editor" class="modal">
   <div class="modal-content">
