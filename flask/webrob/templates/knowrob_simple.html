@@ -7,6 +7,8 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
   
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
+  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
   
@@ -194,6 +196,10 @@
     };
     
     $(document).ready(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true
+        });
         ui = new KnowrobUI(parent.client, {
             use_console_overlay: true
         });
@@ -234,9 +240,8 @@
                         <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editLibrary()" title="Edit the query library"></a></li>
                         <li><a href="#" class="query_button admin_button icon_diff" id="btn_query_diff" onclick="ui.diffQueries()" title="Diff the query library against the openEASE server"></a></li>
                     {% if current_user.is_authenticated and current_user.has_role('admin') %}
-                        <li><a href="#" class="query_button admin_button icon_save" id="btn_query_save" onclick="ui.saveQueries()" title="Save the query library on the openEASE server"></a></li>
-                        <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
                         <li><a href="#" class="query_button admin_button icon_download" id="btn_query_download" onclick="ui.downloadQueries()" title="Download the query library from the FTP server"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
                     {% endif %}
                     </ul>
                 </div>
@@ -279,10 +284,14 @@
     
 <div id="library-editor" class="modal">
   <div class="modal-content">
+      <span class="library-editor-header"></span>
       <span class="library-editor-button icon_close"></span>
       <span class="library-editor-button icon_add"></span>
       <div id="library-editor-content"></div>
   </div>
+</div>
+<div id="dialog" title="Confirmation Required">
+  Are you sure about this?
 </div>
 
 {% endblock %}

@@ -10,6 +10,9 @@ import random
 import string
 import shutil
 
+import StringIO
+from ftplib import FTP
+
 from webrob.app_and_db import app
 from webrob.utility import admin_required
 from webrob.models.experiments import Project, Tag
@@ -17,18 +20,100 @@ from webrob.models.db import *
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
-@app.route('/episode_queries')
-def episode_queries():
-    if 'exp-category' in session and 'exp-name' in session: 
-        category = session['exp-category']
-        episode = session['exp-name']
-        data = experiment_load_queries(category, episode)
-        if data == None:
-            app.logger.info("No episode data available for %s/%s" % (category, episode))
-            return jsonify(result=None)
-        return jsonify(data)
-    else:
+@app.route('/download_episode')
+@app.route('/download_episode/<category>/<exp>')
+def download_episode(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    
+    data = experiment_load_queries(category, exp)
+    if data == None:
+        app.logger.info("No episode data available for %s/%s" % (category, exp))
         return jsonify(result=None)
+    return jsonify(data)
+
+@app.route('/upload_episode', methods=['POST'])
+@app.route('/upload_episode/<category>/<exp>', methods=['POST'])
+@admin_required
+def upload_episode(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)
+    
+    experiment_create_directory(category, exp)
+    episodeData = experiment_load_queries(category, exp)
+    if episodeData != None:
+        for key in data: episodeData[key] = data[key]
+        experiment_save_queries(category, exp, episodeData)
+    else:
+        app.logger.info("Can not find " + category + "/" + exp)
+    return jsonify(result=None)
+
+@app.route('/download_episode_ftp', methods=['POST'])
+@app.route('/download_episode_ftp/<category>/<exp>', methods=['POST'])
+def download_episode_ftp(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)
+        
+    # TODO: error handling!
+    ftp = FTP(data['server']) # connect to host, default port
+    ftp.login(data['user'], data['pw'])
+    ftp.cwd(category+'/'+exp)
+    
+    outStr = StringIO.StringIO()
+    ftp.retrlines('RETR queries.json', outStr.write)
+    episode_data_str = outStr.getvalue()
+    outStr.close()
+    
+    ftp.quit()
+    
+    return jsonify(json.loads(episode_data_str))
+
+@app.route('/upload_episode_ftp', methods=['POST'])
+@app.route('/upload_episode_ftp/<category>/<exp>', methods=['POST'])
+@admin_required
+def upload_episode_ftp(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)['options']
+    query_library = json.loads(request.data)['lib']
+    app.logger.info(str(query_library))
+        
+    # TODO: error handling!
+    ftp = FTP(data['server']) # connect to host, default port
+    ftp.login(data['user'], data['pw'])
+    ftp.cwd(category+'/'+exp)
+    # read query lib from FTP
+    outStr = StringIO.StringIO()
+    ftp.retrlines('RETR queries.json', outStr.write)
+    episode_data_str = outStr.getvalue()
+    outStr.close()
+    episode_data = json.loads(episode_data_str)
+    # update with request data
+    for key in query_library: episode_data[key] = query_library[key]
+    # store update library
+    query_library_string = json.dumps(episode_data, indent=4, separators=(',', ': '))
+    ftp.storbinary('STOR queries.json', io.BytesIO(query_library_string))
+    ftp.quit()
+    
+    return jsonify(result=None)
 
 @app.route('/episode_set/<category>/<episode>')
 def episode_set(category, episode):
@@ -63,27 +148,6 @@ def admin_experiments():
 def episode_data(category, exp):
     create_queries_file(category, exp)
     return send_from_directory('/episodes/'+category+'/'+exp, 'queries.json')
-
-@app.route('/knowrob/exp_save', methods=['POST'])
-@app.route('/knowrob/exp_save/<category>/<exp>', methods=['POST'])
-@admin_required
-def experiment_save(category=None, exp=None):
-    if category==None:
-        if 'exp-category' in session: category = session['exp-category']
-        else: return jsonify(result=None)
-    if exp==None:
-        if 'exp-name' in session: exp = session['exp-name']
-        else: return jsonify(result=None)
-     
-    data = json.loads(request.data)
-    experiment_create_directory(category, exp)
-    episodeData = experiment_load_queries(category, exp)
-    if episodeData != None:
-        for key in data: episodeData[key] = data[key]
-        experiment_save_queries(category, exp, episodeData)
-    else:
-        app.logger.info("Can not find " + category + "/" + exp)
-    return jsonify(result=None)
 
 @app.route('/knowrob/exp_del/<cat>/<exp>', methods=['POST'])
 @admin_required
