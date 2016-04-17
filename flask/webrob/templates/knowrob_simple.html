@@ -31,7 +31,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
-  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}" ></script>
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}"
+ ></script>
+ 
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/html.css') }}" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/annotated.css') }}" />
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch.min.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch-formatters.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -225,7 +231,8 @@
             <div id="library_bottom">
                 <div id="library_buttons">
                     <ul class="query_button_group">
-                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.showLibraryEditor()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editLibrary()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_diff" id="btn_query_diff" onclick="ui.diffQueries()" title="Diff the query library against the openEASE server"></a></li>
                     {% if current_user.is_authenticated and current_user.has_role('admin') %}
                         <li><a href="#" class="query_button admin_button icon_save" id="btn_query_save" onclick="ui.saveQueries()" title="Save the query library on the openEASE server"></a></li>
                         <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
