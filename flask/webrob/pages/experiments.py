@@ -4,6 +4,7 @@ from flask_user import login_required
 from flask_user import current_user
 from flask_user import current_app
 
+import io
 import os
 import json
 import random
@@ -94,7 +95,6 @@ def upload_episode_ftp(category=None, exp=None):
         else: return jsonify(result=None)
     data = json.loads(request.data)['options']
     query_library = json.loads(request.data)['lib']
-    app.logger.info(str(query_library))
         
     # TODO: error handling!
     ftp = FTP(data['server']) # connect to host, default port
