@@ -1,166 +1,138 @@
-{% extends "knowrob.html" %}
+{% extends "layout.html" %}
 
+{% block head %}
+<!-- TODO: use prolog only on parent frame -->
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
+  
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/BarChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Timeline.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DataVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TaskTreeVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}"
+ ></script>
+ 
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/html.css') }}" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/annotated.css') }}" />
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch.min.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch-formatters.min.js') }}"></script>
+{% endblock %}
 
 {% block content %}
-  <script type="text/javascript">
-    {% if current_user.is_authenticated and current_user.has_role('admin') %}
-    LEFT_MENU_LIST.push({ "text": "Admin", "submenu": [
-        {
-            text: "Query Library",
-            submenu: [
-                {
-                    text: "Save Library",
-                    onclick: save_queries
-                },
-                {
-                    text: "Rename Selected",
-                    onclick: set_query_text
-                },
-                {
-                    text: "Move Selected Up",
-                    onclick: query_up,
-                    shortcut: "u"
-                },
-                {
-                    text: "Move Selected Down",
-                    onclick: query_down,
-                    shortcut: "d"
-                },
-                {
-                    text: "Insert After Selected",
-                    onclick: add_query,
-                    shortcut: "a"
+<script type="text/javascript">
+    var ui;
+    
+    function on_marker_dblclick(marker) {
+        var prolog = parent.client.newProlog();
+        prolog.jsonQuery("term_to_atom("+marker.ns+",MarkerName), "+
+            "marker_queries(MarkerName, MarkerQueries).",
+            function(result) {
+                prolog.finishClient();
+                
+                // parse query and add to category--queries map
+                var queryLibMap = {};
+                var queries = result.solution.MarkerQueries;
+                for(var i=0; i<queries.length; i++) {
+                    var category = queries[i][0];
+                    var title = queries[i][1];
+                    var query = queries[i][2];
+                    if(!query.endsWith(".")) query += ".";
+                    
+                    if(queryLibMap[category]==undefined)
+                        queryLibMap[category]=[];
+                    queryLibMap[category].push({q: query, text: title});
                 }
-            ]
-        }
-    ]});
-    
-    function ensure_selected() {
-        if(document.getElementById("examplequery").selectedIndex<1) {
-            window.alert("Please select a query.");
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    function selected_query_index() {
-        return document.getElementById("examplequery").selectedIndex;
-    }
-    function selected_query_text() {
-        var x = document.getElementById("examplequery");
-        if(!ensure_selected()) return None;
-        return x.options[x.selectedIndex].firstChild.data;
-    }
-    function set_query_text() {
-        var text = window.prompt("Please enter natural language "+
-            "representation for the Prolog query",selected_query_text());
-        if(text) {
-            var x = document.getElementById("examplequery");
-            x.options[x.selectedIndex].firstChild.data = text;
-        }
-    }
-    function selected_query_code() {
-        var x = document.getElementById("examplequery");
-        if(!ensure_selected()) return None;
-        return x.options[x.selectedIndex].value;
-    }
-    function add_query() {
-        var x = document.getElementById("examplequery");
-        var i = selected_query_index()+1;
-        var text = window.prompt("Please enter natural language "+
-            "representation for the Prolog query","");
-        if(text) {
-            var opt = document.createElement('option');
-            opt.value = '';
-            opt.innerHTML = text;
-            if(x.selectedIndex+1 < x.options.length) {
-                x.insertBefore(opt, x.options[x.selectedIndex+1]);
+                
+                // flatten the map into queryLib array
+                var queryLib = [];
+                var categories = Object.keys(queryLibMap);
+                categories.sort();
+                for(var i=0; i<categories.length; i++) {
+                    queryLib.push({q: "", text: "----- " + categories[i] + " -----"});
+                    queryLib.push.apply(queryLib, queryLibMap[categories[i]]);
+                }
+                
+                ui.initQueryLibrary(queryLib);
             }
-            else {
-                x.appendChild(opt);
-            }
-        }
-    }
-    function delete_query() {
-        if(!ensure_selected()) return;
-        if(window.confirm('Do you really want to delete the query "'+selected_query_text()+'"')) {
-            var x = document.getElementById("examplequery");
-            x.removeChild( x.options[x.selectedIndex] );
-        }
-    }
-    function save_query() {
-        if(!ensure_selected()) return;
-        var x = document.getElementById("examplequery");
-        x.options[x.selectedIndex].value = ace.edit('user_query').getValue();
-    }
-    function query_move(increment) {
-        if(!ensure_selected()) return;
-        var x = document.getElementById("examplequery");
-        var selIndex = x.selectedIndex;
-        if(selIndex + increment <= 0) return;
-        var selValue = x.options[selIndex].value;
-        var selText = x.options[selIndex].text;
-        x.options[selIndex].value = x.options[selIndex + increment].value;
-        x.options[selIndex].text = x.options[selIndex + increment].text;
-        x.options[selIndex + increment].value = selValue;
-        x.options[selIndex + increment].text = selText;
-        x.selectedIndex = selIndex + increment;
-    }
-    function query_up() { query_move(-1); }
-    function query_down() { query_move(1); }
+        );
+    };
     
-    function save_queries() {
-        var experimentData = { query: [] };
-        var x = document.getElementById("examplequery");
-        for(var i=1; i<x.options.length; i++) {
-            experimentData.query.push({
-                q: x.options[i].value,
-                text: x.options[i].text
-            });
-        };
-        $.ajax({
-            url: "/knowrob/exp_save",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(experimentData),  
-            dataType: "json",
-            success: function (data) {}
-        }).done( function (request) {});
-    }
-    {% endif %}
+    function on_marker_delete(ns) {
+        if(parent.client.selectedMarker != undefined && ns === parent.client.selectedMarker) {
+            ui.initQueryLibrary();
+        }
+    };
     
-    function query_select_key_event(event) {
-        if (event.key == ' ') { // ENTER
-            knowrob.query();
-            return false;
-        }
-    {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        else if(event.keyCode == 46) { // DEL
-            delete_query();
-            return false;
-        }
-        else if(event.key == 'u') { // UP
-            query_up();
-            return false;
-        }
-        else if(event.key == 'd') { // DOWN
-            query_down();
-            return false;
-        }
-        else if(event.key == 'a') { // ADD
-            add_query();
-            return false;
-        }
-    {% endif %}
-        return true;
+    function on_designator_received(designatorHtml) {
+        document.getElementById('designator').innerHTML = designatorHtml;
+        $('#designator').change();
+    };
+    
+    function on_image_received(imageHtml, imageWidth, imageHeight) {
+        ui.imageWidth = imageWidth;
+        ui.imageHeight = imageHeight;
+        
+        document.getElementById('mjpeg').innerHTML = imageHtml;
+        $('#mjpeg').change();
+        $('#mjpeg').resize();
+    };
+    
+    function on_camera_pose_received(pose) {
+        ui.setCameraPose(pose);
+    };
+    
+    function on_episode_selected(lib) {
+        ui.initQueryLibrary(lib.query);
+    };
+    
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    
+    function on_register_nodes() {
+        var visClient, graphClient;
+        visClient = new DataVisClient({
+            ros: parent.client.ros,
+            containerId: '#chart',
+            topic: 'data_vis_msgs'
+        });
+        // FIXME(daniel): task tree allways takes a lot of space
+        //graphClient = new TaskTreeVisClient({
+        //    ros: parent.client.ros,
+        //    containerId: '#chart',
+        //    topic: 'task_tree_msgs'
+        //});
     };
 
-    $(document).ready(function () {
-      var knowrobLayout = $('#page').layout({
+    function resize() {
+      var knowrobLayout = $('#page-content').layout({
         stateManagement__enabled: true,
         south: {
-          minSize: 60
+          minSize: 60,
+          maxSize: 60
         },
         west: {
           minSize: 250,
@@ -206,7 +178,7 @@
             center: {
               paneSelector: "#markers",
               onresize: function() {
-               if( knowrob ) knowrob.resize_canvas();
+               if( ui ) ui.resizeCanvas();
               },
               minSize: 50
             },
@@ -216,55 +188,110 @@
               minSize: 50
             }
       });
-      knowrob.resize_canvas();
+      ui.resizeCanvas();
       
       $('#designator').change(function() { knowrobLayout.open('east'); });
       $('#mjpeg').change(function() { knowrobLayout.open('east'); });
       $('#chart').change(function() { centerLayout.open('south'); });
-      
-      $('#examplequery').keyup(query_select_key_event);
+    };
+    
+    $(document).ready(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true
+        });
+        ui = new KnowrobUI(parent.client, {
+            use_console_overlay: true
+        });
+        ui.init();
+        resize();
     });
-  </script>
+</script>
 
-  <div class="ui-layout-center" id="editor-container">
-    <div id="markers">
+<div id="page-content">
+    <div class="ui-layout-center" id="editor-container">
+        <div id="markers"></div>
+        <div id="chart"></div>	
     </div>
-    <div id="chart"></div>
-  </div>
 
-  <div class="ui-layout-west">
-    <div id="console">
-      <div id="console_top">
-        <div id="history"></div>
-        <div id="user_query">member(A, [a,b,c]).</div>
-      </div>
-      <div id="console_bottom">
-        <div id="query_buttons">
-          <ul class="query_button_group">
-            <li><a href="#" class="query_button" id="btn_query"  onclick="knowrob.query()">Query</a></li>
-            <li><a href="#" class="query_button" id="btn_query_next" onclick="knowrob.next_solution()">Next Solution</a></li>
-      {% if current_user.is_authenticated and current_user.has_role('admin') %}
-            <li><a href="#" class="query_button admin_button" id="btn_query_save" onclick="save_query()">Save</a></li>
-      {% endif %}
-          </ul>
-          <div class="clear">&nbsp;</div>
+    <div class="ui-layout-west">
+        <div id="console">
+            <div id="console_top">
+                <div id="history"></div>
+                <div id="user_query">member(A, [a,b,c]).</div>
+            </div>
+            <div id="console_bottom">
+                <div id="query_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
+                        <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
+                    </ul>
+                    <div class="clear">&nbsp;</div>
+                </div>
+            </div>
         </div>
-      </div>
+        <div id="library">
+            <div id="library_top">
+                <div id="library_content"></div>
+            </div>
+            <div id="library_bottom">
+                <div id="library_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editLibrary()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_diff" id="btn_query_diff" onclick="ui.diffQueries()" title="Diff the query library against the openEASE server"></a></li>
+                    {% if current_user.is_authenticated and current_user.has_role('admin') %}
+                        <li><a href="#" class="query_button admin_button icon_download" id="btn_query_download" onclick="ui.downloadQueries()" title="Download the query library from the FTP server"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="library">
-      <select name="examplequery" id="examplequery"
-      {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        ondblclick="set_query_text()"
-      {% endif %}
-        onchange="knowrob.add_selected_to_queryform('examplequery')">
-        <option value=0></option>
-      </select>
-    </div>
-  </div>
   
-  <div class="ui-layout-east">
-    <div id="designator"></div>
-    <div id="mjpeg"></div>
+    <div class="ui-layout-east">
+        <div id="designator"></div>
+        <div id="mjpeg"></div>
+    </div>
+    
+    <div class="pane ui-layout-south">
+        <div id="logo_container">
+            <a href="http://www.robohow.eu" class="media" title="http://www.robohow.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/robohow-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.roboearth.org" class="media" title="http://www.roboearth.org"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/roboearth-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.sherpa-project.eu" class="media" title="http://www.sherpa-project.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/sherpa-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.saphari.eu" class="media" title="http://www.saphari.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/saphari-logo.png') }}" class="media" alt="" />
+            </a>    
+            <a href="http://dfg.de/" class="media" title="http://www.acat-project.eu/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/acat-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html" class="media" title="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/fp7-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://dfg.de/" class="media" title="http://dfg.de/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/dfg.jpg') }}" class="media" alt="" />
+            </a>
+        <div>
+    </div>
+</div>
+</div> <!-- TODO: why is this required? Can't find the opening tag :/ -->
+    
+<div id="library-editor" class="modal">
+  <div class="modal-content">
+      <span class="library-editor-header"></span>
+      <span class="library-editor-button icon_close"></span>
+      <span class="library-editor-button icon_add"></span>
+      <div id="library-editor-content"></div>
   </div>
-  <div id="measure-container" style="visibility: hidden; display: inline-block;" />
+</div>
+<div id="dialog" title="Confirmation Required">
+  Are you sure about this?
+</div>
+
 {% endblock %}

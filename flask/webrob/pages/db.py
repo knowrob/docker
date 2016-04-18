@@ -26,7 +26,7 @@ def db_docu_text(key):
 @app.route('/db/page/user_roles')
 @admin_required
 def db_page_user_roles():
-    return render_template('admin_db_user_roles.html', **locals())
+    return render_template('admin/db_user_roles.html', **locals())
 
 @app.route('/db/find/user_roles', methods=['POST'])
 @admin_required
@@ -79,7 +79,7 @@ def db_page_route(table):
         if c['nullable']: c['nullable'] = 'true'
         else: c['nullable'] = 'false'
     
-    return render_template('admin_db_table.html', **locals())
+    return render_template('admin/db_table.html', **locals())
 
 @app.route('/db/find/<table>', methods=['POST'])
 @admin_required

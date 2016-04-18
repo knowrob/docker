@@ -4,11 +4,15 @@ from flask_user import login_required
 from flask_user import current_user
 from flask_user import current_app
 
+import io
 import os
 import json
 import random
 import string
 import shutil
+
+import StringIO
+from ftplib import FTP
 
 from webrob.app_and_db import app
 from webrob.utility import admin_required
@@ -16,6 +20,106 @@ from webrob.models.experiments import Project, Tag
 from webrob.models.db import *
 
 __author__ = 'danielb@cs.uni-bremen.de'
+
+@app.route('/download_episode')
+@app.route('/download_episode/<category>/<exp>')
+def download_episode(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    
+    data = experiment_load_queries(category, exp)
+    if data == None:
+        app.logger.info("No episode data available for %s/%s" % (category, exp))
+        return jsonify(result=None)
+    return jsonify(data)
+
+@app.route('/upload_episode', methods=['POST'])
+@app.route('/upload_episode/<category>/<exp>', methods=['POST'])
+@admin_required
+def upload_episode(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)
+    
+    experiment_create_directory(category, exp)
+    episodeData = experiment_load_queries(category, exp)
+    if episodeData != None:
+        for key in data: episodeData[key] = data[key]
+        experiment_save_queries(category, exp, episodeData)
+    else:
+        app.logger.info("Can not find " + category + "/" + exp)
+    return jsonify(result=None)
+
+@app.route('/download_episode_ftp', methods=['POST'])
+@app.route('/download_episode_ftp/<category>/<exp>', methods=['POST'])
+def download_episode_ftp(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)
+        
+    # TODO: error handling!
+    ftp = FTP(data['server']) # connect to host, default port
+    ftp.login(data['user'], data['pw'])
+    ftp.cwd(category+'/'+exp)
+    
+    outStr = StringIO.StringIO()
+    ftp.retrlines('RETR queries.json', outStr.write)
+    episode_data_str = outStr.getvalue()
+    outStr.close()
+    
+    ftp.quit()
+    
+    return jsonify(json.loads(episode_data_str))
+
+@app.route('/upload_episode_ftp', methods=['POST'])
+@app.route('/upload_episode_ftp/<category>/<exp>', methods=['POST'])
+@admin_required
+def upload_episode_ftp(category=None, exp=None):
+    if category==None:
+        if 'exp-category' in session: category = session['exp-category']
+        else: return jsonify(result=None)
+    if exp==None:
+        if 'exp-name' in session: exp = session['exp-name']
+        else: return jsonify(result=None)
+    data = json.loads(request.data)['options']
+    query_library = json.loads(request.data)['lib']
+        
+    # TODO: error handling!
+    ftp = FTP(data['server']) # connect to host, default port
+    ftp.login(data['user'], data['pw'])
+    ftp.cwd(category+'/'+exp)
+    # read query lib from FTP
+    outStr = StringIO.StringIO()
+    ftp.retrlines('RETR queries.json', outStr.write)
+    episode_data_str = outStr.getvalue()
+    outStr.close()
+    episode_data = json.loads(episode_data_str)
+    # update with request data
+    for key in query_library: episode_data[key] = query_library[key]
+    # store update library
+    query_library_string = json.dumps(episode_data, indent=4, separators=(',', ': '))
+    ftp.storbinary('STOR queries.json', io.BytesIO(query_library_string))
+    ftp.quit()
+    
+    return jsonify(result=None)
+
+@app.route('/episode_set/<category>/<episode>')
+def episode_set(category, episode):
+    session['exp-category'] = category
+    session['exp-name'] = episode
+    return jsonify(result=None)
 
 @app.route('/knowrob/admin/experiments')
 @admin_required
@@ -37,34 +141,13 @@ def admin_experiments():
         data['cat'] = cat
         data['exp'] = exp
         exp_data.append(data)
-    return render_template('admin_experiments.html', **locals())
+    return render_template('admin/experiments.html', **locals())
 
 @app.route('/knowrob/exp_data/<category>/<exp>')
 @login_required
 def episode_data(category, exp):
     create_queries_file(category, exp)
     return send_from_directory('/episodes/'+category+'/'+exp, 'queries.json')
-
-@app.route('/knowrob/exp_save', methods=['POST'])
-@app.route('/knowrob/exp_save/<category>/<exp>', methods=['POST'])
-@admin_required
-def experiment_save(category=None, exp=None):
-    if category==None:
-        if 'exp-category' in session: category = session['exp-category']
-        else: return jsonify(result=None)
-    if exp==None:
-        if 'exp-name' in session: exp = session['exp-name']
-        else: return jsonify(result=None)
-     
-    data = json.loads(request.data)
-    experiment_create_directory(category, exp)
-    episodeData = experiment_load_queries(category, exp)
-    if episodeData != None:
-        for key in data: episodeData[key] = data[key]
-        experiment_save_queries(category, exp, episodeData)
-    else:
-        app.logger.info("Can not find " + category + "/" + exp)
-    return jsonify(result=None)
 
 @app.route('/knowrob/exp_del/<cat>/<exp>', methods=['POST'])
 @admin_required
@@ -118,21 +201,6 @@ def get_exp_meta_data():
         exp_data.append(data)
     
     return jsonify(experiments=exp_data)
-
-
-def get_experiment_url(category, exp):
-    if category is not None and exp is not None:
-        episode_url = ''
-        if 'video' in session and session['video']==True:
-            episode_url += '/video/'
-        else:
-            episode_url += '/knowrob/'
-        episode_url += 'exp/'
-        if len(category)>0: episode_url += category + '/'
-        episode_url += exp
-        return episode_url
-    else:
-        return None
 
 def get_experiment_download_url():
     if 'exp-category' in session and 'exp-name' in session:

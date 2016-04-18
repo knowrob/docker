@@ -45,8 +45,9 @@ clone_knowrob_repo() {
 }
 
 clone_knowrob() {
-  clone_knowrob_repo knowrob         https://github.com/knowrob/knowrob.git           master
-  clone_knowrob_repo knowrob_addons  https://github.com/knowrob/knowrob_addons.git    master
+  clone_knowrob_repo knowrob            https://github.com/knowrob/knowrob.git           master
+  clone_knowrob_repo knowrob_addons     https://github.com/knowrob/knowrob_addons.git    master
+  clone_knowrob_repo knowrob_tutorials  https://github.com/knowrob/knowrob_tutorials.git master
   clone_knowrob_repo knowrob_dev     https://github.com/code-iai/knowrob_dev.git      master
   clone_knowrob_repo iai_maps        https://github.com/code-iai/iai_maps.git         master
   clone_knowrob_repo iai_common_msgs https://github.com/code-iai/iai_common_msgs.git  master

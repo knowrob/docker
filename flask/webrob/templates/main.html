@@ -1,0 +1,126 @@
+{% extends "layout_header.html" %}
+
+{% block head %}
+  <meta charset="utf-8" />
+  <link rel="stylesheet" media="all" type="text/css" href="{{ url_for('static', filename='lib/font/font.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/screen.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap/css/bootstrap.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/user.css') }}"/>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/iosOverlay.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/spin.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/prettify.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-1.11.1.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/three.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/ColladaLoader.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/STLLoader.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ColladaAnimationCompress/ColladaLoader2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/depthcloud/DepthCloud.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Arrow.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Axes.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Grid.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/MeshResource.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/TriangleList.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerControl.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerHandle.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarker.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerMenu.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGridClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGrid.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/rasterizeHTML.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/indicator.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerArrayClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/Marker.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/urdf/UrdfClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/urdf/Urdf.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/Viewer.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/SceneNode.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/Highlighter.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/MouseHandler.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/OrbitControls.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/designator/desig.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_bold.typeface.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_regular.typeface.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/BarChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Timeline.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DataVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TaskTreeVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
+  
+  <link rel="shortcut icon" href="/static/icons/favicon.png" type="image/x-icon" /> 
+{% endblock %}
+
+{% block content %}
+  <script type="text/javascript">
+    var auth = '{{ authentication }}';
+    var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
+    var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
+    var client = new KnowrobClient({
+            flask_user: flask_user,
+            ros_url: rosUrl,
+            authentication: auth,
+            auth_url: '/api/v1.0/auth_by_session',
+            meshPath: '/meshes/',
+            category: '{{ category }}',
+            episode: '{{ exp }}',
+            user_interfaces: OPENEASE_USER_IFACES,
+            menu: menu,
+            require_episode: true,
+            use_console_overlay: true
+        });
+    
+    $(document).ready(function () {
+        client.init();
+        $(window).load(client.updateLocation);
+        $(window).bind('hashchange', client.updateLocation);
+    });
+  </script>
+  
+  <div class="page" id="page" />
+  <script type="text/javascript">
+    // Declare page frames: Each user interface of openEASE is
+    // put into an iframe that is child of #page
+    for(var i in OPENEASE_USER_IFACES) {
+        var frame = document.createElement("iframe");
+        frame.id = OPENEASE_USER_IFACES[i].id+'-frame';
+        frame.className = 'content-frame';
+        frame.src = OPENEASE_USER_IFACES[i].src;
+        document.getElementById('page').appendChild(frame);
+    };
+  </script>
+{% endblock %}
