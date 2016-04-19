@@ -22,7 +22,9 @@ from webrob.models.users import Role, User
 from werkzeug.security import generate_password_hash
 
 def add_user(app,db,user_manager,name,mail,pw,roles):
-    if pw==None or len(pw)<4: return
+    if pw==None or len(pw)<4:
+        app.logger.warn("User %s has no password specified." % (name))
+        return
     
     user = User.query.filter(User.username==name).first()
     if user: return user

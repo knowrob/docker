@@ -197,3 +197,8 @@ def log():
 def get_history_file():
   userDir = get_user_dir()
   return os.path.join(get_user_dir(), "query.history")
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e))
+    return redirect(url_for('user.login'))
