@@ -57,14 +57,15 @@ twitter = oauth.remote_app('twitter',
 
 google = oauth.remote_app('google',
     base_url='https://www.google.com/accounts/',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
     request_token_url=None,
     request_token_params={'scope': 'https://www.googleapis.com/auth/userinfo.email', 'response_type': 'code'},
     access_token_url='https://accounts.google.com/o/oauth2/token',
     access_token_method='POST',
     access_token_params={'grant_type': 'authorization_code'},
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
     consumer_key=GOOGLE_APP_ID,
-    consumer_secret=GOOGLE_APP_SECRET)
+    consumer_secret=GOOGLE_APP_SECRET
+)
 
 @github.tokengetter
 @facebook.tokengetter
@@ -92,7 +93,7 @@ def google_login():
       next=request.args.get('next') or request.referrer or None))
 
 @app.route('/github/login')
-def google_login():
+def github_login():
     if session.has_key('oauth_token'): del session['oauth_token']
     return twitter.authorize(callback=url_for('github_authorized',
       next=request.args.get('next') or request.referrer or None))
