@@ -43,6 +43,19 @@
                 
                 <a id="sign-up-button" class="btn btn-lg btn-primary btn-block" href="{{ url_for('user.register') }}" type="submit">Register</a>
                 
+                <div class="remote-login-box">
+                    <div class="remote-login-header">Sign in with</div>
+                    
+                    <a id="github-login-button" class="remote-login-button icon_github" title="http://www.github.com"
+                        href="/github/login" type="submit"></a>
+                    <a id="google-login-button" class="remote-login-button icon_google" title="http://www.google.com"
+                        href="/google/login" type="submit"></a>
+                    <a id="twitter-login-button" class="remote-login-button icon_twitter" title="http://www.twitter.com"
+                        href="/twitter/login" type="submit"></a>
+                    <a id="facebook-login-button" class="remote-login-button icon_facebook" title="http://www.facebook.com"
+                        href="/facebook/login" type="submit"></a>
+                </div>
+                
             </form>
 {% for error in form.username.errors %}
             <p class="error"><strong>Error:</strong> {{ error }}</p>

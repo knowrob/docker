@@ -6,6 +6,7 @@ import os
 import json
 import urllib
 import base64
+import traceback
 
 from urlparse import urlparse
 
@@ -19,11 +20,13 @@ from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+@app.route('/static/<path:filename>')
 @app.route('/knowrob/static/<path:filename>')
 @login_required
 def download_static(filename):
     return send_from_directory(os.path.join(app.root_path, "static"), filename)
 
+@app.route('/episode_data/<path:filename>')
 @app.route('/knowrob/knowrob_data/<path:filename>')
 @login_required
 def download_logged_image(filename):
@@ -204,3 +207,9 @@ def log():
 def get_history_file():
   userDir = get_user_dir()
   return os.path.join(get_user_dir(), "query.history")
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e))
+    app.logger.error(traceback.format_exc())
+    return redirect(url_for('user.login'))

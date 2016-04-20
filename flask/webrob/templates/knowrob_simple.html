@@ -7,6 +7,8 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
   
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
+  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
   
@@ -26,10 +28,22 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}"
+ ></script>
+ 
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/html.css') }}" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/annotated.css') }}" />
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch.min.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch-formatters.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-  <script type="text/javascript">
+<script type="text/javascript">
     var ui;
     
     function on_marker_dblclick(marker) {
@@ -45,7 +59,8 @@
                 for(var i=0; i<queries.length; i++) {
                     var category = queries[i][0];
                     var title = queries[i][1];
-                    var query = queries[i][2]+"."; // TODO: check trailing dot
+                    var query = queries[i][2];
+                    if(!query.endsWith(".")) query += ".";
                     
                     if(queryLibMap[category]==undefined)
                         queryLibMap[category]=[];
@@ -57,7 +72,6 @@
                 var categories = Object.keys(queryLibMap);
                 categories.sort();
                 for(var i=0; i<categories.length; i++) {
-                    queryLib.push({q: "", text: ""});
                     queryLib.push({q: "", text: "----- " + categories[i] + " -----"});
                     queryLib.push.apply(queryLib, queryLibMap[categories[i]]);
                 }
@@ -68,10 +82,9 @@
     };
     
     function on_marker_delete(ns) {
-        // FIXME
-        //if(that.selectedMarker != undefined && ns === that.selectedMarker) {
-        //    ui.initQueryLibrary();
-        //}
+        if(parent.client.selectedMarker != undefined && ns === parent.client.selectedMarker) {
+            ui.initQueryLibrary();
+        }
     };
     
     function on_designator_received(designatorHtml) {
@@ -113,38 +126,13 @@
         //    topic: 'task_tree_msgs'
         //});
     };
-    
-    function querySelectKeyEvent(event) {
-        if (event.key == ' ') { // ENTER
-            ui.console.query();
-            return false;
-        }
-    {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        else if(event.keyCode == 46) { // DEL
-            ui.deleteQuery();
-            return false;
-        }
-        else if(event.key == 'u') { // UP
-            ui.queryUp();
-            return false;
-        }
-        else if(event.key == 'd') { // DOWN
-            ui.queryDown();
-            return false;
-        }
-        else if(event.key == 'a') { // ADD
-            ui.addQuery();
-            return false;
-        }
-    {% endif %}
-        return true;
-    };
 
     function resize() {
       var knowrobLayout = $('#page-content').layout({
         stateManagement__enabled: true,
         south: {
-          minSize: 60
+          minSize: 60,
+          maxSize: 60
         },
         west: {
           minSize: 250,
@@ -208,54 +196,19 @@
     };
     
     $(document).ready(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true
+        });
         ui = new KnowrobUI(parent.client, {
             use_console_overlay: true
         });
         ui.init();
         resize();
-        
-        $('#examplequery').keyup(querySelectKeyEvent);
-      
-        // hook for links of class "show_code" that pastes the content of the
-        // previous code block into the query field
-        $( "a.show_code" ).click(function( event ) {
-            ui.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
-            event.preventDefault();
-        });
-        
-        {% if current_user.is_authenticated and current_user.has_role('admin') %}
-        LEFT_MENU_LIST.push({ text: "Query Library",
-                submenu: [
-                    {
-                        text: "Save Library",
-                        onclick: ui.saveQueries
-                    },
-                    {
-                        text: "Rename Selected",
-                        onclick: ui.setQueryText
-                    },
-                    {
-                        text: "Move Selected Up",
-                        onclick: ui.queryUp,
-                        shortcut: "u"
-                    },
-                    {
-                        text: "Move Selected Down",
-                        onclick: ui.queryDown,
-                        shortcut: "d"
-                    },
-                    {
-                        text: "Insert After Selected",
-                        onclick: ui.addQuery,
-                        shortcut: "a"
-                    }
-                ]
-            });
-        {% endif %}
     });
-  </script>
+</script>
 
-  <div id="page-content" style="width:100%; height:100%;">
+<div id="page-content">
     <div class="ui-layout-center" id="editor-container">
         <div id="markers"></div>
         <div id="chart"></div>	
@@ -263,37 +216,82 @@
 
     <div class="ui-layout-west">
         <div id="console">
-        <div id="console_top">
-            <div id="history"></div>
-            <div id="user_query">member(A, [a,b,c]).</div>
-        </div>
-        <div id="console_bottom">
-            <div id="query_buttons">
-            <ul class="query_button_group">
-                <li><a href="#" class="query_button" id="btn_query"  onclick="ui.console.query()">Query</a></li>
-                <li><a href="#" class="query_button" id="btn_query_next" onclick="ui.console.nextSolution()">Next Solution</a></li>
-        {% if current_user.is_authenticated and current_user.has_role('admin') %}
-                <li><a href="#" class="query_button admin_button" id="btn_query_save" onclick="ui.saveQuery()">Save</a></li>
-        {% endif %}
-            </ul>
-            <div class="clear">&nbsp;</div>
+            <div id="console_top">
+                <div id="history"></div>
+                <div id="user_query">member(A, [a,b,c]).</div>
+            </div>
+            <div id="console_bottom">
+                <div id="query_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
+                        <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
+                    </ul>
+                    <div class="clear">&nbsp;</div>
+                </div>
             </div>
         </div>
-        </div>
         <div id="library">
-        <select name="examplequery" id="examplequery"
-        {% if current_user.is_authenticated and current_user.has_role('admin') %}
-            ondblclick="ui.setQueryText()"
-        {% endif %}
-            onchange="ui.console.addSelectedToQueryform('examplequery')">
-            <option value=0></option>
-        </select>
+            <div id="library_top">
+                <div id="library_content"></div>
+            </div>
+            <div id="library_bottom">
+                <div id="library_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button admin_button icon_edit" id="btn_query_edit" onclick="ui.editLibrary()" title="Edit the query library"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_diff" id="btn_query_diff" onclick="ui.diffQueries()" title="Diff the query library against the openEASE server"></a></li>
+                    {% if current_user.is_authenticated and current_user.has_role('admin') %}
+                        <li><a href="#" class="query_button admin_button icon_download" id="btn_query_download" onclick="ui.downloadQueries()" title="Download the query library from the FTP server"></a></li>
+                        <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
-    
+  
     <div class="ui-layout-east">
         <div id="designator"></div>
         <div id="mjpeg"></div>
     </div>
+    
+    <div class="pane ui-layout-south">
+        <div id="logo_container">
+            <a href="http://www.robohow.eu" class="media" title="http://www.robohow.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/robohow-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.roboearth.org" class="media" title="http://www.roboearth.org"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/roboearth-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.sherpa-project.eu" class="media" title="http://www.sherpa-project.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/sherpa-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://www.saphari.eu" class="media" title="http://www.saphari.eu"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/saphari-logo.png') }}" class="media" alt="" />
+            </a>    
+            <a href="http://dfg.de/" class="media" title="http://www.acat-project.eu/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/acat-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html" class="media" title="http://cordis.europa.eu/fp7/ict/programme/challenge2_en.html"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/fp7-logo.png') }}" class="media" alt="" />
+            </a>
+            <a href="http://dfg.de/" class="media" title="http://dfg.de/"  rel="nofollow">
+                <img src="{{ url_for('static', filename='logos/dfg.jpg') }}" class="media" alt="" />
+            </a>
+        <div>
+    </div>
+</div>
+</div> <!-- TODO: why is this required? Can't find the opening tag :/ -->
+    
+<div id="library-editor" class="modal">
+  <div class="modal-content">
+      <span class="library-editor-header"></span>
+      <span class="library-editor-button icon_close"></span>
+      <span class="library-editor-button icon_add"></span>
+      <div id="library-editor-content"></div>
   </div>
+</div>
+<div id="dialog" title="Confirmation Required">
+  Are you sure about this?
+</div>
+
 {% endblock %}

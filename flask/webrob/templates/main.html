@@ -17,6 +17,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-1.11.1.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
@@ -41,6 +42,8 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerMenu.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGridClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGrid.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/rasterizeHTML.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/indicator.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerArrayClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/Marker.js') }}"></script>
@@ -78,6 +81,8 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
+  
+  <link rel="shortcut icon" href="/static/icons/favicon.png" type="image/x-icon" /> 
 {% endblock %}
 
 {% block content %}
@@ -106,7 +111,7 @@
     });
   </script>
   
-  <div class="page" id="page" style="overflow: hidden;" />
+  <div class="page" id="page" />
   <script type="text/javascript">
     // Declare page frames: Each user interface of openEASE is
     // put into an iframe that is child of #page

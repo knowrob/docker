@@ -8,7 +8,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl python-all python-
 RUN easy_install pymongo
 # NOTE: At the moment Flask-Misaka==0.3 is incompatible with latest misaka==2.0.0
 # @see https://github.com/singingwolfboy/flask-misaka/issues/11
-RUN pip install Flask misaka==1.0.2 Flask-Misaka==0.3 flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado
+RUN pip install Flask misaka==1.0.2 Flask-Misaka==0.3 Flask-OAuth flask-user flask-babel flask-mail psycopg2 python-jsonrpc tornado
 WORKDIR /opt/webapp
 
 # flag used in nginx configuration

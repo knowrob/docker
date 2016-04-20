@@ -8,7 +8,6 @@ user_roles = db.Table('user_roles',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
 
-
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
