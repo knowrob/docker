@@ -6,28 +6,25 @@ from flask import session, request, redirect, url_for
 from flask_oauth import OAuth
 from flask_login import login_user
 
+from sqlalchemy.exc import IntegrityError
+
 import requests
 from json import loads
 
 from webrob.app_and_db import app, db
 from webrob.models.users import User
-
 from webrob.startup.init_app import add_user
+from webrob.config.settings import FACEBOOK_APP_TOKENS, TWITTER_APP_TOKENS, GITHUB_APP_TOKENS, GOOGLE_APP_TOKENS
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+GOOGLE_OAUTH_USERINFO = 'https://www.googleapis.com/oauth2/v1/userinfo'
+
 oauth = OAuth()
 
-# TODO: reset secrets and read them from environment
-FACEBOOK_APP_ID = '1614655168857888'
-FACEBOOK_APP_SECRET = '669369048a6d5cfb13c28ea58977e8e1'
-TWITTER_APP_ID = 'CpiU3g4u0ZBsKqkc0a6LpFX7H'
-TWITTER_APP_SECRET = 'Jwv797wfGu4eDEeQmI6pA6S3ET30bGh8ALrhFmMcfRvsJCNOnk'
-GOOGLE_APP_ID = '1092402106799-asoo7defvibhapnlmutimgbc8tkh7r3o.apps.googleusercontent.com'
-GOOGLE_APP_SECRET = 'HlsdG6ItJ7wMydWOnkJHdUB9'
-GOOGLE_OAUTH_USERINFO = 'https://www.googleapis.com/oauth2/v1/userinfo'
-GITHUB_APP_ID = 'da3ba583bc1a3de8b12d'
-GITHUB_APP_SECRET = 'db37c38d09e0f43da8139d96a8b185a5681e7a02'
+def tokens_defined(tokens):
+    (tok0,tok1) = tokens
+    return len(tok0)>0 and len(tok1)>0
 
 github = oauth.remote_app('github',
     base_url='https://api.github.com/',
@@ -36,28 +33,28 @@ github = oauth.remote_app('github',
     authorize_url='https://github.com/login/oauth/authorize',
     request_token_url=None,
     request_token_params=None,
-    consumer_key=GITHUB_APP_ID,
-    consumer_secret=GITHUB_APP_SECRET
-)
+    consumer_key=GITHUB_APP_TOKENS[0],
+    consumer_secret=GITHUB_APP_TOKENS[1]
+) if tokens_defined(GITHUB_APP_TOKENS) else None
 
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
     request_token_url=None,
     access_token_url='/oauth/access_token',
     authorize_url='https://www.facebook.com/dialog/oauth',
-    consumer_key=FACEBOOK_APP_ID,
-    consumer_secret=FACEBOOK_APP_SECRET,
+    consumer_key=FACEBOOK_APP_TOKENS[0],
+    consumer_secret=FACEBOOK_APP_TOKENS[1],
     request_token_params={'scope': 'email'}
-)
+) if tokens_defined(FACEBOOK_APP_TOKENS) else None
 
 twitter = oauth.remote_app('twitter',
     base_url='https://api.twitter.com/1/',
     request_token_url='https://api.twitter.com/oauth/request_token',
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
-    consumer_key=TWITTER_APP_ID,
-    consumer_secret=TWITTER_APP_SECRET
-)
+    consumer_key=TWITTER_APP_TOKENS[0],
+    consumer_secret=TWITTER_APP_TOKENS[1]
+) if tokens_defined(TWITTER_APP_TOKENS) else None
 
 google = oauth.remote_app('google',
     base_url='https://www.google.com/accounts/',
@@ -67,9 +64,9 @@ google = oauth.remote_app('google',
     access_token_url='https://accounts.google.com/o/oauth2/token',
     access_token_method='POST',
     access_token_params={'grant_type': 'authorization_code'},
-    consumer_key=GOOGLE_APP_ID,
-    consumer_secret=GOOGLE_APP_SECRET
-)
+    consumer_key=GOOGLE_APP_TOKENS[0],
+    consumer_secret=GOOGLE_APP_TOKENS[1]
+) if tokens_defined(GOOGLE_APP_TOKENS) else None
 
 def remote_app_login(remote_app, authorized):
     if session.has_key('oauth_token'): del session['oauth_token']
@@ -89,16 +86,25 @@ def remote_app_authorized(response, oauth_token_key, get_user_information):
         return redirect('/')
     session['oauth_token'] = (response[oauth_token_key], '')
     session['logged_in'] = True
-    (name,mail) = get_user_information(response)
+    (name,mail,pw) = get_user_information(response)
     session['user_container_name'] = name
     session['username'] = name
-    # FIXME(daniel): Name or email could be used already. Ideas:
-    #       - Offer to reset credentials for used mail
-    #       - Show name/mail selection dialog
-    flask_user = add_user(app, db, app.user_manager,
-                          name, mail, response[oauth_token_key], [])
-    login_user(flask_user)
-    return redirect(request.args.get('next') or '/')
+    
+    try:
+        flask_user = add_user(app, db, app.user_manager, name, mail, pw, [])
+        if not app.user_manager.verify_password(pw,flask_user):
+            # Username is taken, unable to sign in
+            # TODO: do something here: tell the user at least
+            app.logger.warn('Remote app password not matching.')
+            return redirect('/')
+        login_user(flask_user)
+        return redirect(request.args.get('next') or '/')
+    except IntegrityError, e:
+        # Mail is taken, unable to sign in
+        # TODO: do something here: tell the user at least
+        app.logger.warn('Duplicate key violates unique key restriction. ')
+        app.logger.warn(str(e))
+        return redirect('/')
 
 def get_user_name(login):
     return login.replace(' ', '').replace('@','_').replace('.', '_')
@@ -126,9 +132,11 @@ def github_login(): return remote_app_login(github, 'github_authorized')
 @github.authorized_handler
 def github_authorized(response):
     def user_information(response):
-        user_name = github.get('/user').data['login']
-        return (get_user_name(user_name, 'github.com'),
-                get_user_mail(user_name, 'github.com'))
+        github_user = github.get('/user').data
+        user_name = github_user['login']
+        return (get_user_name(user_name),
+                get_user_mail(user_name, 'github.com'),
+                response['access_token'])
     try:
         return remote_app_authorized(response, 'access_token', user_information)
     except KeyError, e:
@@ -140,9 +148,12 @@ def github_authorized(response):
 @facebook.authorized_handler
 def facebook_authorized(response):
     def user_information(response):
-        user_name = facebook.get('/me').data['name']
+        facebook_user = facebook.get('/me').data
+        user_name = facebook_user['name']
+        # NOTE: The access_token changes with each call and thus can not be used as password
         return (get_user_name(user_name),
-                get_user_mail(user_name, 'facebook.com'))
+                get_user_mail(user_name, 'facebook.com'),
+                facebook_user['id'])
     try:
         return remote_app_authorized(response, 'access_token', user_information)
     except KeyError, e:
@@ -155,7 +166,8 @@ def facebook_authorized(response):
 def twitter_authorized(response):
     def user_information(response):
         return (get_user_name(response['screen_name']),
-                get_user_mail(response['screen_name'], 'twitter.com'))
+                get_user_mail(response['screen_name'], 'twitter.com'),
+                response['oauth_token_secret'])
     try:
         return remote_app_authorized(response, 'oauth_token', user_information)
     except KeyError, e:
@@ -174,7 +186,8 @@ def google_authorized(response):
             return redirect(request.args.get('next') or '/')
         data = loads(r.text)
         return (get_user_name(data['name']),
-                get_user_mail(data['name'], 'google.com'))
+                get_user_mail(data['name'], 'google.com'),
+                response['id_token'])
     try:
         return remote_app_authorized(response, 'access_token', user_information)
     except KeyError, e:

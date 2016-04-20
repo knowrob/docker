@@ -4,6 +4,7 @@ from flask_user import login_required
 
 import os
 import json
+import traceback
 
 from urlparse import urlparse
 
@@ -201,4 +202,5 @@ def get_history_file():
 @app.errorhandler(Exception)
 def unhandled_exception(e):
     app.logger.error('Unhandled Exception: %s', (e))
+    app.logger.error(traceback.format_exc())
     return redirect(url_for('user.login'))

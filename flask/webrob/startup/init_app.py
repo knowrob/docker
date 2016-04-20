@@ -19,7 +19,7 @@ from webrob.startup.init_db import *
 from webrob.startup.init_webapp import *
 from webrob.models.users import Role, User
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def add_user(app,db,user_manager,name,mail,pw,roles):
     if pw==None or len(pw)<4:
