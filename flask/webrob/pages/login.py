@@ -15,7 +15,6 @@ def track_login(sender, user, **extra):
     session['user_container_name'] = user.username
     session['username'] = user.username
     session['api_token'] = user.api_token
-    session['application_name'] = 'knowrob/hydro-knowrob-daemon'
 
 @user_logged_out.connect_via(app)
 def track_logout(sender, user, **extra):

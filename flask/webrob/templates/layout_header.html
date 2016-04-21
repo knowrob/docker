@@ -40,7 +40,7 @@
     ];
   
     function FlaskUser(){
-        this.username = '{{ current_user.username }}';
+        this.username = '{{ current_user.displayname or current_user.username }}';
         this.mail     = '{{ current_user.email }}';
         this.isLoggedIn = function() {
             return '{{ current_user.is_authenticated }}' == 'True';

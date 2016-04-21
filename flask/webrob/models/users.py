@@ -16,6 +16,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean(), nullable=False, default=False)
     username = db.Column(db.String(50), nullable=False, unique=True)
+    displayname = db.Column(db.String(50), nullable=False)
+    remoteapp = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(255), nullable=False, unique=True)
     confirmed_at = db.Column(db.DateTime())
     password = db.Column(db.String(255), nullable=False, default='')

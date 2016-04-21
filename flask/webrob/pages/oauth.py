@@ -35,7 +35,7 @@ github = oauth.remote_app('github',
     request_token_params=None,
     consumer_key=GITHUB_APP_TOKENS[0],
     consumer_secret=GITHUB_APP_TOKENS[1]
-) if tokens_defined(GITHUB_APP_TOKENS) else None
+)
 
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
@@ -45,7 +45,7 @@ facebook = oauth.remote_app('facebook',
     consumer_key=FACEBOOK_APP_TOKENS[0],
     consumer_secret=FACEBOOK_APP_TOKENS[1],
     request_token_params={'scope': 'email'}
-) if tokens_defined(FACEBOOK_APP_TOKENS) else None
+)
 
 twitter = oauth.remote_app('twitter',
     base_url='https://api.twitter.com/1/',
@@ -54,7 +54,7 @@ twitter = oauth.remote_app('twitter',
     authorize_url='https://api.twitter.com/oauth/authenticate',
     consumer_key=TWITTER_APP_TOKENS[0],
     consumer_secret=TWITTER_APP_TOKENS[1]
-) if tokens_defined(TWITTER_APP_TOKENS) else None
+)
 
 google = oauth.remote_app('google',
     base_url='https://www.google.com/accounts/',
@@ -66,12 +66,31 @@ google = oauth.remote_app('google',
     access_token_params={'grant_type': 'authorization_code'},
     consumer_key=GOOGLE_APP_TOKENS[0],
     consumer_secret=GOOGLE_APP_TOKENS[1]
-) if tokens_defined(GOOGLE_APP_TOKENS) else None
+)
+
+def remote_app_registered(name):
+    remote_apps = {
+        'github':   tokens_defined(GITHUB_APP_TOKENS),
+        'facebook': tokens_defined(FACEBOOK_APP_TOKENS),
+        'twitter':  tokens_defined(TWITTER_APP_TOKENS),
+        'google':   tokens_defined(GOOGLE_APP_TOKENS)
+    }
+    if name=='any':
+        return remote_apps.values().count(True)>0
+    elif name in remote_apps:
+        return remote_apps[name]
+    else:
+        return False
+# HACK: need to access this function in login.html template
+app.user_manager.remote_app_registered = remote_app_registered
 
 def remote_app_login(remote_app, authorized):
     if session.has_key('oauth_token'): del session['oauth_token']
-    return remote_app.authorize(callback=url_for(authorized, _external=True,
-      next=request.args.get('next') or request.referrer or None))
+    if remote_app==None: return redirect('/')
+    # remember the next parameter to be used in authorized callback.
+    # OAuth services may not allow parameters in authorize urls (e.g., google)
+    session['next'] = request.args.get('next') or request.referrer or None
+    return remote_app.authorize(callback=url_for(authorized, _external=True, next=None))
 
 def remote_app_authorized(response, oauth_token_key, get_user_information):
     if response is None:
@@ -86,19 +105,27 @@ def remote_app_authorized(response, oauth_token_key, get_user_information):
         return redirect('/')
     session['oauth_token'] = (response[oauth_token_key], '')
     session['logged_in'] = True
-    (name,mail,pw) = get_user_information(response)
-    session['user_container_name'] = name
+    (user_id,name,mail,pw) = get_user_information(response)
+    session['user_container_name'] = user_id
     session['username'] = name
     
     try:
-        flask_user = add_user(app, db, app.user_manager, name, mail, pw, [])
+        flask_user = add_user(db=db,
+                              user_manager=app.user_manager,
+                              name=user_id,
+                              displayname=name,
+                              mail=mail,
+                              pw=pw,
+                              app=app.name
+        )
         if not app.user_manager.verify_password(pw,flask_user):
-            # Username is taken, unable to sign in
+            # Username is taken, unable to sign in (or password value from remote service changed?)
             # TODO: do something here: tell the user at least
             app.logger.warn('Remote app password not matching.')
             return redirect('/')
         login_user(flask_user)
-        return redirect(request.args.get('next') or '/')
+        app.logger.info("Logged in " + str(name))
+        return redirect(session['next'] or '/')
     except IntegrityError, e:
         # Mail is taken, unable to sign in
         # TODO: do something here: tell the user at least
@@ -134,7 +161,8 @@ def github_authorized(response):
     def user_information(response):
         github_user = github.get('/user').data
         user_name = github_user['login']
-        return (get_user_name(user_name),
+        return (str(github_user['id']),
+                get_user_name(user_name),
                 get_user_mail(user_name, 'github.com'),
                 response['access_token'])
     try:
@@ -151,9 +179,11 @@ def facebook_authorized(response):
         facebook_user = facebook.get('/me').data
         user_name = facebook_user['name']
         # NOTE: The access_token changes with each call and thus can not be used as password
-        return (get_user_name(user_name),
+        # FIXME: using id as password is not save
+        return (str(facebook_user['id']),
+                get_user_name(user_name),
                 get_user_mail(user_name, 'facebook.com'),
-                facebook_user['id'])
+                str(facebook_user['id']))
     try:
         return remote_app_authorized(response, 'access_token', user_information)
     except KeyError, e:
@@ -165,7 +195,8 @@ def facebook_authorized(response):
 @twitter.authorized_handler
 def twitter_authorized(response):
     def user_information(response):
-        return (get_user_name(response['screen_name']),
+        return (str(response['user_id']),
+                get_user_name(response['screen_name']),
                 get_user_mail(response['screen_name'], 'twitter.com'),
                 response['oauth_token_secret'])
     try:
@@ -184,10 +215,12 @@ def google_authorized(response):
         if not r.ok:
             app.logger.warn('Google user information request failed.')
             return redirect(request.args.get('next') or '/')
-        data = loads(r.text)
-        return (get_user_name(data['name']),
-                get_user_mail(data['name'], 'google.com'),
-                response['id_token'])
+        google_user = loads(r.text)
+        # FIXME: using id as password is not save
+        return (str(google_user['id']),
+                get_user_name(google_user['name']),
+                get_user_mail(google_user['name'], 'google.com'),
+                str(google_user['id']))
     try:
         return remote_app_authorized(response, 'access_token', user_information)
     except KeyError, e:

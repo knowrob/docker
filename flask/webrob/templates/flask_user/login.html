@@ -43,18 +43,27 @@
                 
                 <a id="sign-up-button" class="btn btn-lg btn-primary btn-block" href="{{ url_for('user.register') }}" type="submit">Register</a>
                 
+                {% if user_manager.remote_app_registered('any') %}
                 <div class="remote-login-box">
                     <div class="remote-login-header">Sign in with</div>
-                    
+                    {% if user_manager.remote_app_registered('github') %}
                     <a id="github-login-button" class="remote-login-button icon_github" title="http://www.github.com"
                         href="/github/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('google') %}
                     <a id="google-login-button" class="remote-login-button icon_google" title="http://www.google.com"
                         href="/google/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('twitter') %}
                     <a id="twitter-login-button" class="remote-login-button icon_twitter" title="http://www.twitter.com"
                         href="/twitter/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('facebook') %}
                     <a id="facebook-login-button" class="remote-login-button icon_facebook" title="http://www.facebook.com"
                         href="/facebook/login" type="submit"></a>
+                    {% endif %}
                 </div>
+                {% endif %}
                 
             </form>
 {% for error in form.username.errors %}
