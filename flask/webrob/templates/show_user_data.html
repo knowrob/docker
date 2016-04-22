@@ -3,7 +3,9 @@
 {% block content_inner %}
 
 <div class="page-centered">
-    <div class="headline"><div class="content-box" id="welcome-headline-box"></div></div>
+    <div class="headline"><div class="content-box" id="welcome-headline-box">
+<h1 class="content-box-header">Welcome to openEASE</h1>You successfully logged into openEASE!<br><br>Through this web interface, we provide access to comprehensive episodic memory of bleeding edge autonomous robotic experiments performed in realistic environments. The episodic memory is represented based on predicate logics using the programming language <a href="http://www.swi-prolog.org/">Prolog</a>. Please consider stepping through the <a href="tutorials">query language tutorials</a> and watching the <a href="http://www.youtube-nocookie.com/embed/iu_Y7mxDjgA">tutorial video</a> linked at the bottom of this page before investigating one of the experiments.<br><br> The experiments are ordered according to their corresponding research projects. To access the experiments, please click on the <a href="knowrob">Knowledge Base</a> menu entry at the top left of this page or select one of the experiments directly from the menu at the top right of this page. This will redirect you to the <a href="knowrob">main user interface</a> of openEASE.
+    </div></div>
 
     <div id="page-body">
         <div class="content-box" id="user-data-box">
@@ -21,17 +23,6 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $.ajax({
-            url: '/db/docu/OVERVIEW',
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            success: function (data) { $("#welcome-headline-box").html(data.result); }
-        });
-    });
-</script>
 
 {% endblock %}
 

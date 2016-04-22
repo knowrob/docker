@@ -17,6 +17,7 @@ from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+# TODO: remove "/knowrob" prefix in some routes or replace by "/kb"
 @app.route('/static/<path:filename>')
 @app.route('/knowrob/static/<path:filename>')
 @login_required
@@ -28,7 +29,8 @@ def download_static(filename):
 @login_required
 def download_logged_image(filename):
     return send_from_directory('/episodes/', filename)
-    
+
+# FIXME: iframe does not work standalone right now, redirect to "/#kb" when used without parent frame
 @app.route('/kb/')
 @app.route('/knowrob/')
 @app.route('/knowrob/exp/<category>/<exp>')
