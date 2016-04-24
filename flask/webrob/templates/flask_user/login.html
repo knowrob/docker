@@ -5,7 +5,9 @@
 
 <div class="page-centered">
     <div class="headline">
-    <div class="content-box" id="welcome-headline-box"></div></div>
+    <div class="content-box" id="welcome-headline-box">
+<h1 class="content-box-header">Welcome to openEASE</h1>openEASE is a web-based knowledge service providing robot and human activity data. It contains semantically annotated data of manipulation actions, including the environment the agent is acting in, the objects it manipulates, the task it performs, and the behavior it generates. The episode representations can include images captured by the robot, other sensor datastreams as well as full-body poses. A powerful query language and inference tools, allow reasoning about the data and retrieving requested information based on semantic queries. Based on the data and using the inference tools robots can answer queries regarding to what they did, why, how, what happened, and what they saw.
+    </div></div>
 
     <div id="page-body">
         <div class="content-box" id="user-data-box">
@@ -43,18 +45,27 @@
                 
                 <a id="sign-up-button" class="btn btn-lg btn-primary btn-block" href="{{ url_for('user.register') }}" type="submit">Register</a>
                 
+                {% if user_manager.remote_app_registered('any') %}
                 <div class="remote-login-box">
                     <div class="remote-login-header">Sign in with</div>
-                    
+                    {% if user_manager.remote_app_registered('github') %}
                     <a id="github-login-button" class="remote-login-button icon_github" title="http://www.github.com"
                         href="/github/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('google') %}
                     <a id="google-login-button" class="remote-login-button icon_google" title="http://www.google.com"
                         href="/google/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('twitter') %}
                     <a id="twitter-login-button" class="remote-login-button icon_twitter" title="http://www.twitter.com"
                         href="/twitter/login" type="submit"></a>
+                    {% endif %}
+                    {% if user_manager.remote_app_registered('facebook') %}
                     <a id="facebook-login-button" class="remote-login-button icon_facebook" title="http://www.facebook.com"
                         href="/facebook/login" type="submit"></a>
+                    {% endif %}
                 </div>
+                {% endif %}
                 
             </form>
 {% for error in form.username.errors %}
@@ -70,16 +81,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $.ajax({
-            url: '/db/docu/WELCOME',
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            success: function (data) { $("#welcome-headline-box").html(data.result); }
-        });
-    });
-</script>
 
 {% endblock %}

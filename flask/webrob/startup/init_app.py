@@ -21,7 +21,7 @@ from webrob.models.users import Role, User
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-def add_user(app,db,user_manager,name,mail,pw,roles):
+def add_user(app,db,user_manager,name,mail,pw,displayname='',remoteapp='',roles=[]):
     if pw==None or len(pw)<4:
         app.logger.warn("User %s has no password specified." % (name))
         return
@@ -29,7 +29,13 @@ def add_user(app,db,user_manager,name,mail,pw,roles):
     user = User.query.filter(User.username==name).first()
     if user: return user
     
-    user = User(username=name, email=mail, active=True, password=user_manager.hash_password(pw), confirmed_at=datetime.datetime.utcnow())
+    user = User(username=name,
+                displayname=displayname,
+                remoteapp=remoteapp,
+                email=mail,
+                active=True,
+                password=user_manager.hash_password(pw),
+                confirmed_at=datetime.datetime.utcnow())
     for r in roles:
         x = Role.query.filter(Role.name==r).first()
         if x==None:
@@ -86,9 +92,11 @@ def init_app(app, db_instance, extra_config_settings={}):
     init_db(app, db_instance)
     init_webapp(app, db_instance)
     
-    add_user(app,db_instance,app.user_manager,'admin',
-             os.environ.get('OPENEASE_MAIL_USERNAME', 'admin@openease.org'),
-             os.environ.get('OPENEASE_ADMIN_PASSWORD'), ['admin'])
+    add_user(app=app,db=db_instance,user_manager=app.user_manager,
+             name='admin',
+             mail=os.environ.get('OPENEASE_MAIL_USERNAME', 'admin@openease.org'),
+             pw=os.environ.get('OPENEASE_ADMIN_PASSWORD'),
+             roles=['admin'])
 
     app.logger.info("Webapp started.")
     return app

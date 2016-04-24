@@ -45,6 +45,7 @@
 {% block content %}
 <script type="text/javascript">
     var ui;
+    var visClient, graphClient;
     
     function on_marker_dblclick(marker) {
         var prolog = parent.client.newProlog();
@@ -113,7 +114,6 @@
     function on_render(camera,scene) {};
     
     function on_register_nodes() {
-        var visClient, graphClient;
         visClient = new DataVisClient({
             ros: parent.client.ros,
             containerId: '#chart',
@@ -205,6 +205,10 @@
         });
         ui.init();
         resize();
+        
+        if(parent.client.nodesRegistered && !visClient) {
+            on_register_nodes();
+        }
     });
 </script>
 

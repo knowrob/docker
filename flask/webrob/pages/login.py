@@ -15,7 +15,6 @@ def track_login(sender, user, **extra):
     session['user_container_name'] = user.username
     session['username'] = user.username
     session['api_token'] = user.api_token
-    session['application_name'] = 'knowrob/hydro-knowrob-daemon'
 
 @user_logged_out.connect_via(app)
 def track_logout(sender, user, **extra):
@@ -42,5 +41,6 @@ def show_user_data():
     if 'exp-category' in session: category = session['exp-category']
     if 'exp-name' in session: exp = session['exp-name']
     
+    # TODO: show_user_data never shown, could be re-enabled as iframe
     return render_template('main.html', **locals())
     #return render_template('show_user_data.html', **locals())

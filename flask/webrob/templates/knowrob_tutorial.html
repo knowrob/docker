@@ -100,12 +100,14 @@
             require_episode: false,
             global_viewer: function() { return rosViewer.rosViewer; }
         });
-    var imageWidth = function() { return 0.0; };
-    var imageHeight = function() { return 0.0; };
+    var imageWidth = function(doc) { return 0.0; };
+    var imageHeight = function(doc) { return 0.0; };
     var ui = window;
 
     function resizeImage() {
-        return imageResizer($('#mjpeg_image'), $('#mjpeg'), imageWidth(), imageHeight());
+        return imageResizer($('#mjpeg_image'), $('#mjpeg'),
+            imageWidth($('#mjpeg_image'))[0],
+            imageHeight($('#mjpeg_image'))[0]);
     };
     
     function on_marker_dblclick(marker) {};

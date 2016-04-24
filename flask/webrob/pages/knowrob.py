@@ -20,6 +20,7 @@ from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+# TODO: remove "/knowrob" prefix in some routes or replace by "/kb"
 @app.route('/static/<path:filename>')
 @app.route('/knowrob/static/<path:filename>')
 @login_required
@@ -37,7 +38,8 @@ def download_logged_image(filename):
 def transfer_logged_video(filename):
     data = base64.b64encode(file_read(session['user_container_name'], filename))
     return '<a href="data:video/mpeg;base64,{}" download="video.mpg">Download video</a>'.format(urllib.quote(data.rstrip('\n')))
-    
+
+# FIXME: iframe does not work standalone right now, redirect to "/#kb" when used without parent frame
 @app.route('/kb/')
 @app.route('/knowrob/')
 @app.route('/knowrob/exp/<category>/<exp>')
