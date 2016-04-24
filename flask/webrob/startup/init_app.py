@@ -19,11 +19,16 @@ from webrob.startup.init_db import *
 from webrob.startup.init_webapp import *
 from webrob.models.users import Role, User
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def add_user(app,db,user_manager,name,mail,pw,roles):
-    if pw==None or len(pw)<4: return
-    if User.query.filter(User.username==name).first(): return
+    if pw==None or len(pw)<4:
+        app.logger.warn("User %s has no password specified." % (name))
+        return
+    
+    user = User.query.filter(User.username==name).first()
+    if user: return user
+    
     user = User(username=name, email=mail, active=True, password=user_manager.hash_password(pw), confirmed_at=datetime.datetime.utcnow())
     for r in roles:
         x = Role.query.filter(Role.name==r).first()
@@ -33,6 +38,8 @@ def add_user(app,db,user_manager,name,mail,pw,roles):
             user.roles.append(x)
     db.session.add(user)
     db.session.commit()
+    
+    return user
 
 def init_app(app, db_instance, extra_config_settings={}):
     # Initialize app config settings
@@ -57,7 +64,7 @@ def init_app(app, db_instance, extra_config_settings={}):
     # Setup Flask-User to handle user account related forms
     from webrob.models.users import User
     db_adapter = SQLAlchemyAdapter(db_instance, User)
-    user_manager = UserManager(db_adapter, app)     # Init Flask-User and bind to app
+    app.user_manager = UserManager(db_adapter, app)     # Init Flask-User and bind to app
 
     # Load all models.py files to register db.Models with SQLAlchemy
     from webrob.models import users
@@ -74,11 +81,12 @@ def init_app(app, db_instance, extra_config_settings={}):
     from webrob.pages import meshes
     from webrob.pages import mongo
     from webrob.pages import tutorials
+    from webrob.pages import oauth
     
     init_db(app, db_instance)
     init_webapp(app, db_instance)
     
-    add_user(app,db_instance,user_manager,'admin',
+    add_user(app,db_instance,app.user_manager,'admin',
              os.environ.get('OPENEASE_MAIL_USERNAME', 'admin@openease.org'),
              os.environ.get('OPENEASE_ADMIN_PASSWORD'), ['admin'])
 
