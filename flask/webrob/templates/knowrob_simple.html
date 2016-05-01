@@ -88,9 +88,10 @@
         }
     };
     
-    function on_designator_received(designatorHtml) {
-        document.getElementById('designator').innerHTML = designatorHtml;
-        $('#designator').change();
+    function on_designator_received(obj) {
+      $('#designator').html('');
+      $('#designator').append(obj);
+      $('#designator').change();
     };
     
     function on_image_received(imageHtml, imageWidth, imageHeight) {
@@ -247,6 +248,7 @@
                         <li><a href="#" class="query_button admin_button icon_download" id="btn_query_download" onclick="ui.downloadQueries()" title="Download the query library from the FTP server"></a></li>
                         <li><a href="#" class="query_button admin_button icon_upload" id="btn_query_upload" onclick="ui.uploadQueries()" title="Upload the query library to the FTP server"></a></li>
                     {% endif %}
+                        <li><a href="#" class="query_button admin_button icon_reset" id="btn_query_reset" onclick="ui.initQueryLibrary()" title="Reset to the episode query library"></a></li>
                     </ul>
                 </div>
             </div>
