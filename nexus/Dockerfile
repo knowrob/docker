@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:14.04
 RUN apt-get -qq update
 RUN apt-get -qq install openjdk-7-jre-headless
 RUN apt-get -qq install wget curl
