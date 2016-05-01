@@ -1,8 +1,8 @@
-FROM ubuntu:12.04
+FROM ubuntu
 MAINTAINER Daniel Beßler, danielb@tzi.de
 
-RUN apt-get update
-RUN apt-get install -y python-all
+RUN apt-get -qq update
+RUN apt-get -qq install -y python-all
 
 WORKDIR /
 ADD . /
