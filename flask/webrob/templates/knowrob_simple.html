@@ -53,31 +53,7 @@
             "marker_queries(MarkerName, MarkerQueries).",
             function(result) {
                 prolog.finishClient();
-                
-                // parse query and add to category--queries map
-                var queryLibMap = {};
-                var queries = result.solution.MarkerQueries;
-                for(var i=0; i<queries.length; i++) {
-                    var category = queries[i][0];
-                    var title = queries[i][1];
-                    var query = queries[i][2];
-                    if(!query.endsWith(".")) query += ".";
-                    
-                    if(queryLibMap[category]==undefined)
-                        queryLibMap[category]=[];
-                    queryLibMap[category].push({q: query, text: title});
-                }
-                
-                // flatten the map into queryLib array
-                var queryLib = [];
-                var categories = Object.keys(queryLibMap);
-                categories.sort();
-                for(var i=0; i<categories.length; i++) {
-                    queryLib.push({q: "", text: "----- " + categories[i] + " -----"});
-                    queryLib.push.apply(queryLib, queryLibMap[categories[i]]);
-                }
-                
-                ui.initQueryLibrary(queryLib);
+                ui.loadObjectQueries(result.solution.MarkerQueries);
             }
         );
     };
