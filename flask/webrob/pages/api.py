@@ -1,7 +1,7 @@
 from flask import jsonify, request, session, redirect
 from flask_login import current_user
 from flask_user import login_required
-import time
+import time,os
 from urlparse import urlparse
 from webrob.app_and_db import app, db
 from webrob.docker import docker_interface
@@ -59,7 +59,8 @@ def start_container(token):
     if user is None:
         return jsonify({'error': 'wrong api token'})
 
-    docker_interface.start_user_container('knowrob/hydro-knowrob-base', user.username)
+    ros_distro = os.getenv('OPENEASE_DOCKER_ROS_DISTRO', 'hydro')
+    docker_interface.start_user_container('knowrob/'+ros_distro+'-knowrob-base', user.username)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})

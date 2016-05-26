@@ -20,6 +20,8 @@ from webrob.config.settings import MAX_HISTORY_LINES
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+ros_distro = os.getenv('OPENEASE_DOCKER_ROS_DISTRO','hydro')
+
 # TODO: remove "/knowrob" prefix in some routes or replace by "/kb"
 @app.route('/static/<path:filename>')
 @app.route('/knowrob/static/<path:filename>')
@@ -45,7 +47,7 @@ def transfer_logged_video(filename):
 @app.route('/knowrob/exp/<category>/<exp>')
 @login_required
 def knowrob(category=None, exp=None):
-    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+    if not ensure_application_started('knowrob/'+ros_distro+'-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     session['video'] = False
     return __knowrob_page__('knowrob_simple.html', session['user_container_name'], category, exp)
@@ -64,7 +66,7 @@ def knowrob_remote(host='172.17.42.1', category=None, exp=None):
 @app.route('/video/exp/<category>/<exp>')
 @login_required
 def video(category=None, exp=None):
-    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+    if not ensure_application_started('knowrob/'+ros_distro+'-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     session['video'] = True
     return __knowrob_page__('video.html', session['user_container_name'], category, exp)
@@ -78,7 +80,7 @@ def __knowrob_page__(template, container_name, category=None, exp=None):
     if exp is not None:      session['exp-name'] = exp
     if 'exp-category' in session: category = session['exp-category']
     if 'exp-name' in session: exp = session['exp-name']
-    
+
     exp_url = get_experiment_download_url()
     return render_template(template, **locals())
 
@@ -92,7 +94,7 @@ def menu():
         if not menu in episode_choices_map:
             episode_choices_map[menu] = []
         episode_choices_map[menu].append((exp,category))
-    
+
     episode_page = '<div class="mega_menu" id="episode-selection">'
     for category in sorted(episode_choices_map.keys()):
         cat_episodes = episode_choices_map[category]
@@ -101,7 +103,7 @@ def menu():
         episode_page += '<div class="mega_menu_column" id="'+div_id+'">'
         episode_page += '<h3 class="category-title">'+category.replace('-',' ')+'</h3>'
         episode_page += '<div class="category-episodes">'
-        
+
         technology_episodes = {}
         for (exp,category) in cat_episodes:
             data = experiment_load_queries(category, exp)
@@ -115,21 +117,21 @@ def menu():
             if "name" not in meta or "platforms" not in meta:
                 app.logger.warn("Meta data missing for episodes for " + str((category, exp)))
                 continue
-            
+
             if not 'published' in meta: meta['published'] = 'true'
             if meta['published'] == 'false': continue
-            
+
             for t in meta['platforms']:
                 if t not in technology_episodes.keys(): technology_episodes[t] = []
                 technology_episodes[t].append((meta['name'], (exp,category)))
-        
+
         for t in sorted(technology_episodes.keys()):
             episode_page += '<h4 class="technology-title">'+t+'</h4>'
             for (name,(exp,category)) in technology_episodes[t]:
                 episode_page += '<a style="cursor: pointer" onclick=client.setEpisode("'+ category +'","'+ exp +'")>'+name+'</a>'
         episode_page += '</div></div>'
     episode_page += '</div>'
-    
+
     menu_left = []
     menu_right = [{
         'text': 'Episode Selection',
@@ -138,7 +140,7 @@ def menu():
             'submenu_page': episode_page
         }]
     }]
-    
+
     return jsonify(menu_left=menu_left, menu_right=menu_right)
 
 @app.route('/knowrob/add_history_item', methods=['POST'])
@@ -148,7 +150,7 @@ def add_history_item():
   hfile = get_history_file()
   # Remove newline characters
   query.replace("\n", " ")
-  
+
   # Read history
   lines = []
   if os.path.isfile(hfile):
@@ -160,37 +162,37 @@ def add_history_item():
   # Remove old history items
   numLines = len(lines)
   lines = lines[max(0, numLines-MAX_HISTORY_LINES):numLines]
-  
+
   with open(hfile, "w") as f:
     f.writelines(lines)
-  
+
   return jsonify(result=None)
 
 @app.route('/knowrob/get_history_item', methods=['POST'])
 @login_required
 def get_history_item():
   index = json.loads(request.data)['index']
-  
+
   if index<0:
     return jsonify(item="", index=-1)
-  
+
   hfile = get_history_file()
   if os.path.isfile(hfile):
     # Read file content
     f = open(hfile)
     lines = f.readlines()
     f.close()
-    
+
     # Clamp index
     if index<0: index=0
     if index>=len(lines): index=len(lines)-1
     if index<0: return jsonify(item="", index=-1)
-    
+
     item = lines[len(lines)-index-1]
     item = item[:len(item)-1]
-    
+
     return jsonify(item=item, index=index)
-  
+
   else:
     return jsonify(item="", index=-1)
 

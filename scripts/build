@@ -50,9 +50,9 @@ if [ "${BUILDOPTS["knowrob"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; 
 	$DIR/start-apt-cacher
 	$DIR/start-nexus
 	echo "Building knowrob"
-	build hydro-swi knowrob/hydro-swi
-	build hydro-knowrob/hydro-knowrob-base knowrob/hydro-knowrob-base
-	build hydro-knowrob/hydro-knowrob-daemon knowrob/hydro-knowrob-daemon
+	build ${OPENEASE_DOCKER_ROS_DISTRO}-swi knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-swi
+	build ${OPENEASE_DOCKER_ROS_DISTRO}-knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-base knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-base
+	build ${OPENEASE_DOCKER_ROS_DISTRO}-knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-daemon knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-daemon
 fi
 
 if [ "${BUILDOPTS["dockerbridge"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then

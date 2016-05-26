@@ -17,30 +17,32 @@ from webrob.docker.docker_application import ensure_application_started
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
+ros_distro = os.getenv('OPENEASE_DOCKER_ROS_DISTRO','hydro')
+
 @app.route('/editor')
 @login_required
 def editor(filename=""):
-    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+    if not ensure_application_started('knowrob/'+ros_distro+'-knowrob-daemon'):
         return redirect(url_for('user.logout'))
-    
+
     error=""
     # determine hostname/IP we are currently using
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = session['user_container_name']
-    
+
     return render_template('editor.html', **locals())
 
 @app.route('/knowrob/pkg_new', methods=['POST'])
 @login_required
 def pkg_new():
     packageName = json.loads(request.data)['packageName']
-    
+
     # Create package root directory
     if docker_interface.file_exists(session['user_container_name'], packageName):
         app.logger.warning("Package already exists.")
         return jsonify(result=None)
-    
+
     # Make sure templates are available
     templatePath = os.path.abspath('webrob/templates/package')
     if not os.path.exists(templatePath):
@@ -66,7 +68,7 @@ def pkg_new():
         app.logger.error(str(sys.exc_info()[0]))
         app.logger.error(str(traceback.format_exc()))
         pkg_del(packageName)
-    
+
     return jsonify(result=None)
 
 @app.route('/knowrob/pkg_del', methods=['POST'])
@@ -126,18 +128,18 @@ def file_write():
     data = json.loads(request.data)
     path = get_file_path(data['file'])
     docker_interface.file_write(session['user_container_name'], data['content'], path)
-    
+
     return jsonify(result=None)
-   
+
 @app.route('/knowrob/file_del', methods=['POST'])
-@login_required 
+@login_required
 def file_del():
     path = get_file_path(json.loads(request.data)['file'])
     docker_interface.file_rm(session['user_container_name'], path, True)
-    
+
     return get_pkg_tree()
 
- 
+
 def get_file_path(fileName):
     """
     Selects package subdir based on file extension.

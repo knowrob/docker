@@ -52,13 +52,15 @@ class DockerManager(object):
 
             user_home_dir = absolute_userpath('')
 
+            ros_version = os.getenv('OPENEASE_DOCKER_ROS_DISTRO', 'hydro')
+            sysout('DOCKER ROS DISTRO: ' + ros_version)
             sysout("Creating user container " + user_container_name)
             env = {"VIRTUAL_HOST": user_container_name,
                    "VIRTUAL_PORT": '9090',
                    "ROS_PACKAGE_PATH": ":".join([
                        "/home/ros/src",
-                       "/opt/ros/hydro/share",
-                       "/opt/ros/hydro/stacks",
+                       "/opt/ros/"+ros_version+"/share",
+                       "/opt/ros/"+ros_version+"/stacks",
                        user_home_dir
             ])}
             if limit_resources:
@@ -73,8 +75,8 @@ class DockerManager(object):
             self.__client.create_container(application_image, detach=True, tty=True, environment=env,
                                            name=user_container_name, mem_limit=mem_limit, cpu_shares=cpu_shares,
                                            memswap_limit=mem_limit*4,
-                                           entrypoint=['/opt/ros/hydro/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
-                
+                                           entrypoint=['/opt/ros/'+ros_version+'/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
+
             # Read links and volumes from webapp_container ENV
             inspect = self.__client.inspect_image(application_image)
             env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
@@ -123,7 +125,7 @@ class DockerManager(object):
                                                detach=True, tty=True, stdin_open=True,
                                                environment=env,
                                                name=container_name)
-                
+
                 # Read links and volumes from webapp_image ENV
                 inspect = self.__client.inspect_image(webapp_image)
                 img_env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
@@ -131,7 +133,7 @@ class DockerManager(object):
                 volumes = img_env['DOCKER_VOLUMES'].split(' ')
                 volumes.append('ease_secret:ro')
                 volumes.append('lft_data')
-                
+
                 sysout("Running webapp container " + container_name)
                 self.__client.start(container_name,
                                     port_bindings={5000: ('127.0.0.1',)},
@@ -163,12 +165,12 @@ class DockerManager(object):
         except (APIError, DockerException), e:
             sysout("Error in get_container_ip: " + str(e.message) + "\n")
             return 'error'
-    
+
     def get_application_image_names(self):
         if self.application_images != None: return self.application_images
-        
+
         self.application_images = []
-        
+
         try:
             all_images = self.__client.images(all=True)
             for img in self.get_named_images(all_images):
@@ -177,33 +179,33 @@ class DockerManager(object):
                 if 'OPEN_EASE_APPLICATION' in env:
                     sysout("OPEN_EASE_APPLICATION: " + str(img) + "\n")
                     self.application_images.append(img)
-                
+
         except Exception, e:
             sysout("Error in get_application_image_names: " + str(e.message) + "\n")
-        
+
         return self.application_images
-    
+
     def get_webapp_image_names(self):
         if self.webapp_images != None: return self.webapp_images
-        
+
         self.webapp_images = []
-        
+
         try:
             all_images = self.__client.images(all=True)
             for img in self.get_named_images(all_images):
                 if img in ['openease/easeapp', 'openease/login']: continue
-                    
+
                 inspect = self.__client.inspect_image(img)
                 env = dict(map(lambda x: x.split("="), inspect['Config']['Env']))
                 if 'OPEN_EASE_WEBAPP' in env:
                     sysout("OPEN_EASE_WEBAPP: " + str(img) + "\n")
                     self.webapp_images.append(img)
-                
+
         except Exception, e:
             sysout("Error in get_webapp_image_names: " + str(e.message) + "\n")
-        
+
         return self.webapp_images
-    
+
     def get_named_images(self, all_images):
         named_images = []
         for img in all_images:
@@ -224,7 +226,7 @@ class DockerManager(object):
         except Exception, e:
             sysout("Error in get_container_env: " + str(e.message) + "\n")
             return 'error'
-    
+
     def get_container_log(self, container_name):
         try:
             logger = self.__client.logs(container_name, stdout=True, stderr=True, stream=False, timestamps=False)
@@ -243,12 +245,12 @@ class DockerManager(object):
             cont = self.__get_container(container_name, self.__client.containers())
             if base_image_name is None or cont is None:
                 return cont is not None
-            
+
             inspect = self.__client.inspect_container(container_name)
             image = inspect['Config']['Image']
-            
+
             return image == base_image_name
-        
+
         except (APIError, DockerException), e:
             sysout("Error in container_exists: " + str(e.message))
             return False
