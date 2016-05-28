@@ -24,5 +24,7 @@ ENV OPEN_EASE_APPLICATION true
 # build the catkin workspace
 RUN /opt/ros/indigo/bin/catkin_make
 
+#RUN ln -s /dev/null /dev/raw1394
+
 # ENTRYPOINT /opt/ros/indigo/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
 
