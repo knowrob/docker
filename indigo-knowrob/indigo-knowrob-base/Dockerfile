@@ -4,12 +4,11 @@ MAINTAINER Ferenc Balint-Benczedi
 RUN apt-get -qq update && apt-get -qq install -y wget apt-utils
 
 # Use apt-cacher container
-RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
-
-# Install ROS
-RUN sh -c '. /etc/lsb-release && echo "deb http://packages.ros.org.ros.informatik.uni-freiburg.de/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
-RUN wget http://packages.ros.org/ros.key -O - | apt-key add - && \
+RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy && \
+    sh -c '. /etc/lsb-release && echo "deb http://packages.ros.org.ros.informatik.uni-freiburg.de/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' && \
+    wget http://packages.ros.org/ros.key -O - | apt-key add - && \
     apt-get -y update && apt-get -y install \
+                curl \
                 libjson-java \
                 libjson-glib-dev \
                 ros-indigo-desktop \
@@ -36,8 +35,8 @@ RUN wget http://packages.ros.org/ros.key -O - | apt-key add - && \
                 ros-indigo-image-transport \
                 ros-indigo-pcl-ros \
                 ros-indigo-pcl-conversions \
-		        ros-indigo-vision-opencv \            
-         		ros-indigo-openni-camera \
+		ros-indigo-vision-opencv \            
+         	ros-indigo-openni-camera \
                 ros-indigo-openni-launch \
                 mongodb-clients \
                 mongodb-dev \
@@ -64,15 +63,25 @@ RUN wget http://packages.ros.org/ros.key -O - | apt-key add - && \
                 emacs \
                 gdb \
                 cmake-curses-gui \
-                git
+                libprotobuf-dev \
+                libleveldb-dev \
+                libsnappy-dev \
+                libopencv-dev \
+                libhdf5-serial-dev \            
+                protobuf-compiler \
+                libboost-all-dev \
+                libgflags-dev \
+                libgoogle-glog-dev \
+                liblmdb-dev \
+                libatlas-base-dev \
+                libatlas-dev \
+                libatlas3-base \
+                git \ 
+                openssh-client openssh-server && \
+	useradd -m -d /home/ros -p ros ros && adduser ros sudo && chsh -s /bin/bash ros && \
+	cp /opt/ros/indigo/setup.sh /etc/profile.d/ros_indigo.sh && rosdep init
 
-
-# create user 'ros'
-RUN useradd -m -d /home/ros -p ros ros && adduser ros sudo && chsh -s /bin/bash ros
 ENV HOME /home/ros
-
-# ROS environment setup
-RUN cp /opt/ros/indigo/setup.sh /etc/profile.d/ros_indigo.sh && rosdep init
 
 WORKDIR /home/ros
 USER ros
@@ -85,23 +94,27 @@ ENV CMAKE_PREFIX_PATH /home/ros/devel:/opt/ros/indigo
 ENV PKG_CONFIG_PATH=/home/ros/local/lib/pkgconfig:/home/ros/devel/lib/pkgconfig:/home/ros/devel/lib/x86_64-linux-gnu/pkgconfig:/opt/ros/indigo/lib/pkgconfig:/opt/ros/indigo/lib/x86_64-linux-gnu/pkgconfig
 ENV PYTHONPATH /home/ros/local/lib/python/site-packages:/home/ros/devel/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages
 
-WORKDIR /home/ros
 RUN mkdir -p /home/ros/local/src && mkdir -p /home/ros/local/xstow
 WORKDIR /home/ros/local/src
 RUN git clone https://github.com/RoboSherlock/uima-uimacpp.git uimacpp && \
-    git clone https://github.com/mongodb/mongo-cxx-driver.git -b 26compat
+    git clone https://github.com/mongodb/mongo-cxx-driver.git -b 26compat && \
+    git clone https://github.com/BVLC/caffe.git
+
 WORKDIR /home/ros/local/src/uimacpp
 RUN ./autogen.sh && ./configure --without-activemq --with-jdk=/usr/lib/jvm/java-7-openjdk-amd64/include --prefix=/home/ros/local/xstow/uimacpp --with-icu=/usr && make install 
 WORKDIR /home/ros/local/src/mongo-cxx-driver
 RUN scons --full --use-system-boost --prefix=/home/ros/local/xstow/mongoclient --ssl --sharedclient install-mongoclient
+WORKDIR /home/ros/local/src/caffe
+RUN mkdir build && cd build && cmake .. -DCPU_ONLY=ON -DCMAKE_INSTALL_PREFIX=/home/ros/local/xstow/caffe && make install
 WORKDIR /home/ros/local/xstow
-RUN xstow uimacpp && xstow mongoclient
 
 
-RUN echo "export LD_LIBRARY_PATH=/home/ros/local/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc && \
+RUN xstow uimacpp && xstow mongoclient && xstow caffe && \
+    echo "export LD_LIBRARY_PATH=/home/ros/local/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /home/ros/.bashrc && \
     echo source /home/ros/devel/setup.bash >> /home/ros/.bashrc && \
     echo source /home/ros/.bashrc >> /home/ros/.bash_profile
+
 
 # set pre-build variables: only packages in /opt/ros
 # set post-build variables:
