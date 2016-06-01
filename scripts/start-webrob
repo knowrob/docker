@@ -119,7 +119,7 @@ runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from postgres_d
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
 stopContainer "dockerbridge"
-runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG knowrob/dockerbridge" true
+runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG -e OPENEASE_DOCKER_ROS_DISTRO=$OPENEASE_DOCKER_ROS_DISTRO knowrob/dockerbridge" true 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
