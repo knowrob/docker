@@ -75,7 +75,7 @@ class DockerManager(object):
             self.__client.create_container(application_image, detach=True, tty=True, environment=env,
                                            name=user_container_name, mem_limit=mem_limit, cpu_shares=cpu_shares,
                                            memswap_limit=mem_limit*4,
-                                           entrypoint=['/opt/ros/'+ros_version+'/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
+                                           entrypoint=['/opt/ros/'+ros_version+'/bin/roslaunch', 'rs_kbreasoning', 'knowrob_robosherlock.launch'])
 
             # Read links and volumes from webapp_container ENV
             inspect = self.__client.inspect_image(application_image)
