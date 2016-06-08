@@ -24,7 +24,7 @@ RUN git clone git@github.com:code-iai/robosherlock_demos.git && \
     git clone https://github.com/code-iai/iai_maps.git && \
     git clone https://github.com/code-iai/iai_common_msgs.git && \
     git clone https://github.com/code-iai/iai_cad_tools.git && \
-    git clone https://github.com/code-iai/designator_integration && \
+    git clone https://github.com/code-iai/designator_integration -b openease_comp &&\
     git clone https://github.com/bbferka/robosherlock.git && \
     git clone https://github.com/bbferka/rs_addons.git && \
     git clone https://github.com/bbferka/rs_turn_table.git && \
@@ -38,6 +38,13 @@ ENV OPEN_EASE_APPLICATION true
 
 # build the catkin workspace
 RUN /opt/ros/indigo/bin/catkin_make
+
+USER root
+RUN git clone https://github.com/cxhernandez/amd_sdk.git && \
+    ./amd_sdk/amd_sdk.sh
+RUN apt-get install opencl-headers && \
+    echo "export LD_LIBRARY_PATH=/opt/AMDAPP/lib/x86_64:${LD_LIBRARY_PATH}" >> /home/ros/.bashrc
+ENV LD_LIBRARY_PATH /opt/AMDAPP/lib/x86_64:/home/ros/local/src/pracmln/libpracmln/install/lib:/home/ros/local/lib:/home/ros/devel/lib:/home/ros/devel/lib/x64_64-linux-gnu:/opt/ros/indigo/lib:/opt/ros/indigo/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/indigo/lib/python2.7/dist-packages
 
 # ENTRYPOINT /opt/ros/indigo/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
 
