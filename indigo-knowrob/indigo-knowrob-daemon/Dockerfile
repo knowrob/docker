@@ -8,7 +8,6 @@ RUN touch /home/ros/.ssh/known_hosts && \
     ssh-keyscan -T 60 github.com >> /home/ros/.ssh/known_hosts && \
     chown -R ros:ros /home/ros/.ssh 
     
-    
 USER ros
 # set up workspace and setup knowrob
 WORKDIR /home/ros/src
@@ -38,13 +37,6 @@ ENV OPEN_EASE_APPLICATION true
 
 # build the catkin workspace
 RUN /opt/ros/indigo/bin/catkin_make
-
-USER root
-RUN git clone https://github.com/cxhernandez/amd_sdk.git && \
-    ./amd_sdk/amd_sdk.sh
-RUN apt-get install opencl-headers && \
-    echo "export LD_LIBRARY_PATH=/opt/AMDAPP/lib/x86_64:${LD_LIBRARY_PATH}" >> /home/ros/.bashrc
-ENV LD_LIBRARY_PATH /opt/AMDAPP/lib/x86_64:/home/ros/local/src/pracmln/libpracmln/install/lib:/home/ros/local/lib:/home/ros/devel/lib:/home/ros/devel/lib/x64_64-linux-gnu:/opt/ros/indigo/lib:/opt/ros/indigo/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/indigo/lib/python2.7/dist-packages
 
 # ENTRYPOINT /opt/ros/indigo/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
 

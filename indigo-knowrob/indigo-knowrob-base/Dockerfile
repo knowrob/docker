@@ -95,9 +95,6 @@ RUN mkdir /home/ros/src && chown -R ros:ros /home/ros && rosdep update && \
 
 ADD mvn-settings.xml /home/ros/.m2/settings.xml
 
-
-
-
 RUN mkdir -p /home/ros/local/src && mkdir -p /home/ros/local/xstow
 WORKDIR /home/ros/local/src
 RUN git clone https://github.com/RoboSherlock/uima-uimacpp.git uimacpp && \
@@ -165,6 +162,14 @@ ENV DOCKER_LINKS mongo_db:mongo
 ENV DOCKER_VOLUMES episode_data:ro mesh_data
 #ENV DOCKER_VOLUMES knowrob_data:ro mesh_data:ro
 
+USER root
+RUN git clone https://github.com/cxhernandez/amd_sdk.git && \
+    ./amd_sdk/amd_sdk.sh
+RUN apt-get install opencl-headers && \
+    echo "export LD_LIBRARY_PATH=/opt/AMDAPP/lib/x86_64:${LD_LIBRARY_PATH}" >> /home/ros/.bashrc
+ENV LD_LIBRARY_PATH /opt/AMDAPP/lib/x86_64:/home/ros/local/src/pracmln/libpracmln/install/lib:/home/ros/local/lib:/home/ros/devel/lib:/home/ros/devel/lib/x64_64-linux-gnu:/opt/ros/indigo/lib:/opt/ros/indigo/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/indigo/lib/python2.7/dist-packages
+
+USER ros
 
 # forward ports: KnowRob webserver + rosbridge
 EXPOSE 1111 9090
