@@ -44,3 +44,25 @@ def show_user_data():
     # TODO: show_user_data never shown, could be re-enabled as iframe
     return render_template('main.html', **locals())
     #return render_template('show_user_data.html', **locals())
+
+@app.route('/remote')
+def openease_remote():
+    if not current_user.is_authenticated:
+        return redirect(url_for('user.login'))
+    if not 'user_container_name' in session:
+        return redirect(url_for('user.logout'))
+    
+    error=""
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    container_name = 'remote/172.17.42.1'
+    role_names = map(lambda x: str(x.name), current_user.roles)
+    
+    category = None
+    exp = None
+    if 'exp-category' in session: category = session['exp-category']
+    if 'exp-name' in session: exp = session['exp-name']
+    
+    # TODO: show_user_data never shown, could be re-enabled as iframe
+    return render_template('main.html', **locals())
