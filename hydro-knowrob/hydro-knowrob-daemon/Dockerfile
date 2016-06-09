@@ -15,9 +15,9 @@ RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 
 # dummy 'add' command to always check out the repositories
 #ADD ./Dockerfile /
-RUN git clone --recursive https://github.com/knowrob/knowrob.git -b indigo-devel
-RUN git clone --recursive https://github.com/knowrob/knowrob_addons.git -b indigo-devel
-RUN git clone --recursive https://github.com/knowrob/knowrob_tutorials.git -b indigo-devel
+RUN git clone --recursive https://github.com/knowrob/knowrob.git -b master
+RUN git clone --recursive https://github.com/knowrob/knowrob_addons.git -b master
+RUN git clone --recursive https://github.com/knowrob/knowrob_tutorials.git -b master
 RUN git clone --recursive https://github.com/code-iai/knowrob_dev.git
 RUN git clone https://github.com/code-iai/iai_maps.git
 RUN git clone https://github.com/code-iai/iai_common_msgs.git
