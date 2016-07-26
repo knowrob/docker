@@ -13,7 +13,7 @@ wget -r ftp://open-ease-stor.informatik.uni-bremen.de
 #    
 #    # Import from json to local mongo
 #    mongoimport --db $exp --collection tf --file ease.$exp.tf.json
-#    mongoimport --db $exp --collection logged_designators --file ease.$exp.logged_designators.json#
+#    mongoimport --db $exp --collection logged_designators --file ease.$exp.logged_designators.json
 #
 #    # set indexes in MongoDB
 #    mongo $exp --eval 'db.tf.ensureIndex( { __recorded : 1 } )'
