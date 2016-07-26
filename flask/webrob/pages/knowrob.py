@@ -51,15 +51,6 @@ def knowrob(category=None, exp=None):
     session['video'] = False
     return __knowrob_page__('knowrob_simple.html', session['user_container_name'], category, exp)
 
-@app.route('/knowrob/remote')
-@app.route('/knowrob/remote/exp/<category>/<exp>')
-@app.route('/knowrob/remote/<host>')
-@app.route('/knowrob/remote/<host>/exp/<category>/<exp>')
-@login_required
-def knowrob_remote(host='172.17.42.1', category=None, exp=None):
-    session['video'] = False
-    return __knowrob_page__('knowrob_simple.html', 'remote/'+host, category, exp)
-
 @app.route('/replay')
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')

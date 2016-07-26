@@ -85,6 +85,10 @@
     
     function on_episode_selected(lib) {
         ui.initQueryLibrary(lib.query);
+        // initialize canvas
+        ui.initCanvas();
+        ui.resizeCanvas();
+        // TODO(daniel): retract all user asserted facts!
     };
     
     function on_marker_contextmenu(marker) {};
