@@ -7,7 +7,7 @@ RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.c
 # install helper packages for ROS
 RUN apt-get -qq -y update && apt-get -qq -y install python-yaml python-catkin-pkg python-rospkg emacs ros-hydro-catkin git ros-hydro-iai-common-msgs \
                        ros-hydro-rosjava ros-hydro-rosbridge-suite ros-hydro-tf2-web-republisher ros-hydro-mjpeg-server \
-                       mongodb-clients mongodb-dev libmongo-client-dev ros-hydro-rosauth mencoder lame libavcodec53
+                       mongodb-clients mongodb-dev libmongo-client-dev ros-hydro-rosauth mencoder lame libavcodec-extra-53
 
 # create user 'ros'
 RUN useradd -m -d /home/ros -p ros ros && adduser ros sudo && chsh -s /bin/bash ros

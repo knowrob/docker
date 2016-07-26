@@ -37,7 +37,8 @@ def download_logged_image(filename):
 @login_required
 def transfer_logged_video(filename):
     data = base64.b64encode(file_read(session['user_container_name'], filename))
-    return '<a href="data:video/mpeg;base64,{}" download="video.mpg">Download video</a>'.format(urllib.quote(data.rstrip('\n')))
+    return '<video controls><source type="video/mp4" src="data:video/mp4;base64,{}"></video>'.format(urllib.quote(data.rstrip('\n')))
+    #return '<a href="data:video/mpeg;base64,{}" download="video.mp4">Download video</a>'.format(urllib.quote(data.rstrip('\n')))
 
 # FIXME: iframe does not work standalone right now, redirect to "/#kb" when used without parent frame
 @app.route('/kb/')
