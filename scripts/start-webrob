@@ -119,13 +119,13 @@ runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from postgres_d
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
 stopContainer "dockerbridge"
-runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG knowrob/dockerbridge" true
+runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG -e OPENEASE_DOCKER_ROS_DISTRO=$OPENEASE_DOCKER_ROS_DISTRO knowrob/dockerbridge" true 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a knowrob container for the tutorials
 runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
-runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 -p 127.0.0.1::9090 --volumes-from mesh_data --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo knowrob/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
+runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 -p 127.0.0.1::9090 --volumes-from mesh_data --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-daemon /opt/ros/${OPENEASE_DOCKER_ROS_DISTRO}/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -175,5 +175,6 @@ docker run --rm -i -p 127.0.0.1:$KNOWROB_WEB_PORT:5000 \
     -e TWITTER_APP_SECRET=$TWITTER_APP_SECRET \
     -e GOOGLE_APP_SECRET=$GOOGLE_APP_SECRET \
     -e GOOGLE_APP_ID=$GOOGLE_APP_ID \
+    -e OPENEASE_DOCKER_ROS_DISTRO=$OPENEASE_DOCKER_ROS_DISTRO\
     --name flask \
     openease/flask python runserver.py

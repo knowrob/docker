@@ -9,7 +9,7 @@ docker pull knowrob/user_data
 docker pull knowrob/postgres
 
 # Application container
-docker pull knowrob/hydro-knowrob-daemon
+docker pull knowrob/${OPENEASE_DOCKER_ROS_DISTRO}-knowrob-daemon
 docker pull knowrob/dockerbridge
 
 
