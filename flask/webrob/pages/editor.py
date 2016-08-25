@@ -18,7 +18,6 @@ from webrob.docker.docker_application import ensure_application_started
 __author__ = 'danielb@cs.uni-bremen.de'
 
 @app.route('/editor')
-@login_required
 def editor(filename=""):
     if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
         return redirect(url_for('user.logout'))
@@ -32,7 +31,6 @@ def editor(filename=""):
     return render_template('editor.html', **locals())
 
 @app.route('/knowrob/pkg_new', methods=['POST'])
-@login_required
 def pkg_new():
     packageName = json.loads(request.data)['packageName']
     
@@ -70,7 +68,6 @@ def pkg_new():
     return jsonify(result=None)
 
 @app.route('/knowrob/pkg_del', methods=['POST'])
-@login_required
 def pkg_del(packageName=None):
     pkgName = packageName
     if pkgName is None:
@@ -79,7 +76,6 @@ def pkg_del(packageName=None):
     return jsonify(result=None)
 
 @app.route('/knowrob/pkg_set', methods=['POST'])
-@login_required
 def pkg_set():
     # Update package name
     data = json.loads(request.data)
@@ -88,7 +84,6 @@ def pkg_set():
     return get_pkg_tree()
 
 @app.route('/knowrob/pkg_list', methods=['POST'])
-@login_required
 def pkg_list():
     # Return list of packages
     files = filter(lambda s: s['isdir'], docker_interface.file_ls(session['user_container_name'], '.')['children'])
@@ -96,7 +91,6 @@ def pkg_list():
     return jsonify(result=filenames)
 
 @app.route('/knowrob/pkg_read', methods=['POST'])
-@login_required
 def pkg_read():
     path = get_file_path(json.loads(request.data)['file'])
     # Read the file
@@ -104,7 +98,6 @@ def pkg_read():
     return jsonify(result=content)
 
 @app.route('/knowrob/pkg_down', methods=['POST'])
-@login_required
 def pkg_down():
     with LFTransfer(session['user_container_name']) as lft:
         name = session['pkg']
@@ -121,7 +114,6 @@ def pkg_down():
                          attachment_filename=zipName)
 
 @app.route('/knowrob/file_write', methods=['POST'])
-@login_required
 def file_write():
     data = json.loads(request.data)
     path = get_file_path(data['file'])
@@ -130,7 +122,6 @@ def file_write():
     return jsonify(result=None)
    
 @app.route('/knowrob/file_del', methods=['POST'])
-@login_required 
 def file_del():
     path = get_file_path(json.loads(request.data)['file'])
     docker_interface.file_rm(session['user_container_name'], path, True)

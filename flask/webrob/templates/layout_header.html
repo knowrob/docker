@@ -12,20 +12,19 @@
     <div class="metanav_left">
       <ul class="menu aligned-left" id="menu-left">
       </ul>
-    {% if current_user.is_authenticated %}
       <ul class="menu aligned-left" id="frame-menu-left">
       </ul>
-    {% endif %}
     </div>
     <div class="metanav_right">
-      {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('user.login') }}">Sign in</a>
-      {% else %}
         <ul class="menu aligned-right" id="frame-menu-right">
         </ul>
         <ul class="menu aligned-right" id="menu-right">
         </ul>
+        <!--
+      {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('user.login') }}">Sign in</a>
       {% endif %}
+        -->
     </div>
   </div>
   
@@ -40,7 +39,7 @@
     ];
   
     function FlaskUser(){
-        this.username = '{{ current_user.displayname or current_user.username }}';
+        this.username = '{{ current_user.displayname or current_user.username or "anonymous" }}';
         this.mail     = '{{ current_user.email }}';
         this.isLoggedIn = function() {
             return '{{ current_user.is_authenticated }}' == 'True';

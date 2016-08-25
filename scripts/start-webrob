@@ -82,6 +82,7 @@ runContainer "mongo_data" "-v /data/db busybox true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
+#runContainer "mongo_db" "-d -p 27017:27017 --volumes-from mongo_data mongo" true
 runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
