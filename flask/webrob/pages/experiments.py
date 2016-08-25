@@ -144,7 +144,6 @@ def admin_experiments():
     return render_template('admin/experiments.html', **locals())
 
 @app.route('/knowrob/exp_data/<category>/<exp>')
-@login_required
 def episode_data(category, exp):
     create_queries_file(category, exp)
     return send_from_directory('/episodes/'+category+'/'+exp, 'queries.json')

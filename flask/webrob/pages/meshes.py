@@ -43,7 +43,6 @@ def download_mesh_to_local_cache(src, dst):
             return False
 
 @app.route('/meshes/<path:mesh>')
-@login_required
 def download_mesh(mesh):
     meshFile = os.path.join('/home/ros/mesh_data', mesh)
     if not os.path.isfile(meshFile):
