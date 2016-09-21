@@ -66,7 +66,9 @@ def openease_remote():
     # (needed for accessing container)
     host_url = urlparse(request.host_url).hostname
     container_name = 'remote/172.17.42.1'
-    role_names = map(lambda x: str(x.name), current_user.roles)
+    role_names = []
+    if hasattr(current_user, 'roles'):
+      role_names = map(lambda x: str(x.name), current_user.roles)
     
     category = None
     exp = None

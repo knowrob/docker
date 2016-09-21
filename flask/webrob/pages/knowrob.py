@@ -134,7 +134,7 @@ def add_history_item():
   query = json.loads(request.data)['query']
   hfile = get_history_file()
   # Remove newline characters
-  query.replace("\n", " ")
+  #query.replace("\n", " ")
   
   # Read history
   lines = []
@@ -142,14 +142,17 @@ def add_history_item():
     f = open(hfile)
     lines = f.readlines()
     f.close()
-  # Append the last query
-  lines.append(query+".\n")
   # Remove old history items
-  numLines = len(lines)
-  lines = lines[max(0, numLines-MAX_HISTORY_LINES):numLines]
+  history = ''.join(lines).split("\n\n")
+  history = map(lambda x: x + '\n\n', history)
+  # Append the last query
+  history.append(query+".")
+  
+  numLines = len(history)
+  history = history[max(0, numLines-MAX_HISTORY_LINES):numLines]
   
   with open(hfile, "w") as f:
-    f.writelines(lines)
+    f.writelines(history)
   
   return jsonify(result=None)
 
@@ -172,8 +175,12 @@ def get_history_item():
     if index>=len(lines): index=len(lines)-1
     if index<0: return jsonify(item="", index=-1)
     
-    item = lines[len(lines)-index-1]
-    item = item[:len(item)-1]
+    # History items are separated with empty line (\n\n)
+    history = ''.join(lines).split("\n\n")
+    
+    item = history[len(history)-index-1]
+    if len(item)>0 and item[len(item)-1]=='\n':
+      item = item[:len(item)-1]
     
     return jsonify(item=item, index=index)
   
