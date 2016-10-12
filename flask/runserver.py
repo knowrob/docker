@@ -4,6 +4,7 @@
 
 from webrob.app_and_db import app, db
 from webrob.startup.init_app import init_app
+from webrob.pages.meshes import update_meshes
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -13,6 +14,7 @@ init_app(app, db)
 # Start a development web server if executed from the command line
 
 if __name__ == '__main__':
+    update_meshes()
     if 'DEBUG' in app.config and app.config['DEBUG']:
         app.run(host='0.0.0.0')
     else:
