@@ -19,14 +19,15 @@ def is_mesh_url_valid(url):
 
 def update_meshes():
     os.chdir('/home/ros/mesh_data')
+    # FIXME: make this threaded because it blocks flask
+    #  also it takes long time when no internet connection is available
     for (tool,url) in MESH_REPOSITORIES:
         if tool=="svn":
             update_meshes_svn(url)
         elif tool=="git":
             update_meshes_git(url)
-    # TODO: update meshes to use only browser supprted textures?
-    #call(["/usr/bin/convert", dst, p_dst+".png"])
-    #call(["/opt/webapp/update-texture-reference", dst])
+    # Convert tif images to png images
+    call(['/opt/webapp/convert-recursive', '/home/ros/mesh_data'])
 
 def update_meshes_svn(url):
     repo_name = basename(url)
@@ -46,32 +47,6 @@ def update_meshes_git(url):
     else:
       call(["/usr/bin/git","clone",url])
 
-
-#def download_mesh_to_local_cache(src, dst):
-    #"""
-    #download mesh file via http from trusted host
-    #that is defined in flask settings.
-    #"""
-    #dstDir = os.path.dirname(dst)
-    #p_src, ext = os.path.splitext(src)
-    #p_dst, ext = os.path.splitext(dst)
-    
-    #if is_mesh_url_valid(src):
-        #if not os.path.exists(dstDir):
-            #os.makedirs(dstDir)
-        #urlretrieve(src,dst)
-        
-        #if ext == ".tif":
-            #call(["/usr/bin/convert", dst, p_dst+".png"])
-        #if ext == ".dae":
-            #call(["/opt/webapp/update-texture-reference", dst])
-        
-        #return True
-    #else:
-        #if ext == ".png":
-            #return download_mesh_to_local_cache(p_src + ".tif", p_dst + ".tif")
-        #else:
-            #return False
 
 @app.route('/meshes/<path:mesh>')
 def download_mesh(mesh):
