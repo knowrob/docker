@@ -11,7 +11,7 @@ import traceback
 from urlparse import urlparse
 
 from webrob.app_and_db import app, db
-from webrob.docker.docker_application import ensure_application_started
+from webrob.docker.docker_application import ensure_application_started, restart_application
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import file_read
 from webrob.utility import *
@@ -128,6 +128,11 @@ def menu():
     }]
     
     return jsonify(menu_left=menu_left, menu_right=menu_right)
+
+@app.route('/knowrob/reset', methods=['POST'])
+def reset_knowledge_base():
+  restart_application()
+  return jsonify(result=None)
 
 @app.route('/knowrob/add_history_item', methods=['POST'])
 def add_history_item():
