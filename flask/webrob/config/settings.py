@@ -30,11 +30,13 @@ USER_ENABLE_CONFIRM_EMAIL = False
 MAX_HISTORY_LINES = 100
 
 MESH_REPOSITORIES = [
-    "http://svn.ai.uni-bremen.de/svn/cad_models/",
-    "https://github.com/code-iai/iai_maps/raw/master/",
-    "https://github.com/bbrieber/iai_robots/raw/master/",
-    "https://github.com/bbrieber/saphari_final_review/raw/master/",
-    "https://github.com/PR2/pr2_common/raw/master/"
+    ("svn", "http://svn.ai.uni-bremen.de/svn/cad_models"),
+    ("git", "https://github.com/code-iai/saphari_final_review"),
+    ("git", "https://github.com/code-iai/iai_maps"),
+    #("git", "https://github.com/code-iai/iai_robots"), # TODO: merge in benjamin changes
+    ("git", "https://github.com/bbrieber/iai_robots"),
+    ("git", "https://github.com/code-iai/longterm_fetch_and_place"),
+    ("git", "https://github.com/PR2/pr2_common"),
     #"https://github.com/code-iai/iai_robots/raw/master/",
     #"https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
 ]

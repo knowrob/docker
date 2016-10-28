@@ -18,10 +18,8 @@ def login_by_session():
     Returns authentication information for the currently logged in user as required by the knowrob.js authentication
     request
     """
-    if current_user.is_authenticated:
-        ip = docker_interface.get_container_ip(session['user_container_name'])
-        return generate_rosauth(session['user_container_name'], ip, True)
-    return jsonify({'error': 'not authenticated'})
+    ip = docker_interface.get_container_ip(session['user_container_name'])
+    return generate_rosauth(session['user_container_name'], ip, True)
 
 
 @app.route('/api/v1.0/refresh_by_session', methods=['GET'])
@@ -30,10 +28,8 @@ def refresh_by_session():
     Refreshes the running session for a currently logged in user. This prevents a users container from being terminated
     automatically.
     """
-    if current_user.is_authenticated:
-        docker_interface.refresh(current_user.username)
-        return jsonify({'result': 'success'})
-    return jsonify({'error': 'not authenticated'})
+    docker_interface.refresh(session['user_container_name'])
+    return jsonify({'result': 'success'})
 
 
 @app.route('/api/v1.0/auth_by_token/<string:token>', methods=['GET'])
