@@ -8,6 +8,7 @@ from flask_user import login_required
 from urllib import urlopen, urlretrieve
 from subprocess import call
 from posixpath import basename
+import thread
 
 from webrob.app_and_db import app
 from webrob.config.settings import MESH_REPOSITORIES
@@ -17,7 +18,7 @@ __author__ = 'danielb@cs.uni-bremen.de'
 def is_mesh_url_valid(url):
     return urlopen(url).getcode() == 200
 
-def update_meshes():
+def update_meshes_run():
     os.chdir('/home/ros/mesh_data')
     # FIXME: make this threaded because it blocks flask
     #  also it takes long time when no internet connection is available
@@ -28,6 +29,9 @@ def update_meshes():
             update_meshes_git(url)
     # Convert tif images to png images
     call(['/opt/webapp/convert-recursive', '/home/ros/mesh_data'])
+
+def update_meshes():
+    thread.start_new_thread(update_meshes_run, ())
 
 def update_meshes_svn(url):
     repo_name = basename(url)
