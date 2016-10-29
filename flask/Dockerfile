@@ -4,6 +4,7 @@ MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de
 # install python and flask
 RUN apt-get -qq update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq install -y -q curl python-all python-pip python-dev wget gcc imagemagick mongodb libffi-dev libpq-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq install -y -q subversion git
 
 RUN easy_install pymongo
 RUN pip install psycopg2 python-jsonrpc tornado

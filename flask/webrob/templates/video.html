@@ -21,7 +21,7 @@
     function on_marker_delete(ns) {};
     function on_designator_received(designatorHtml) {};
     function on_image_received(imageHtml, imageWidth, imageHeight) {};
-    function on_camera_pose_received(pose) {};
+    function on_camera_pose_received(pose) { ui.setCameraPose(pose); };
     function on_marker_contextmenu(marker) {};
     function on_render(camera,scene) {};
     function on_register_nodes() {};

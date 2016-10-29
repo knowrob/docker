@@ -100,12 +100,11 @@
             containerId: '#chart',
             topic: 'data_vis_msgs'
         });
-        // FIXME(daniel): task tree allways takes a lot of space
-        //graphClient = new TaskTreeVisClient({
-        //    ros: parent.client.ros,
-        //    containerId: '#chart',
-        //    topic: 'task_tree_msgs'
-        //});
+        graphClient = new TaskTreeVisClient({
+            ros: parent.client.ros,
+            containerId: '#designator',
+            topic: 'task_tree_msgs'
+        });
     };
 
     function resize() {
