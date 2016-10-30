@@ -33,8 +33,7 @@ MESH_REPOSITORIES = [
     ("svn", "http://svn.ai.uni-bremen.de/svn/cad_models"),
     ("git", "https://github.com/code-iai/saphari_final_review"),
     ("git", "https://github.com/code-iai/iai_maps"),
-    #("git", "https://github.com/code-iai/iai_robots"), # TODO: merge in benjamin changes
-    ("git", "https://github.com/bbrieber/iai_robots"),
+    ("git", "https://github.com/code-iai/iai_robots"),
     ("git", "https://github.com/code-iai/longterm_fetch_and_place"),
     ("git", "https://github.com/PR2/pr2_common"),
     #"https://github.com/code-iai/iai_robots/raw/master/",
