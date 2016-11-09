@@ -7,4 +7,4 @@ if [ -z "$SOURCE" ]; then
 fi
 
 echo "Restoring SQL backup from: $SOURCE"
-cat $SOURCE | docker exec -i postgres_db psql -a -e -Upostgres
+cat $SOURCE | docker exec -i postgres_db psql -a -e -Upostgres docker
