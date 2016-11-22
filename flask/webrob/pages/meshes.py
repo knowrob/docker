@@ -62,6 +62,10 @@ def download_mesh(mesh):
             meshFile = meshPath
     
     if meshFile == None:
+        if os.path.exists(mesh): meshFile = mesh
+        elif os.path.exists('/'+mesh): meshFile = '/'+mesh
+    
+    if meshFile == None:
         app.logger.info("Unable to download mesh " + mesh)
         return jsonify(result=None)
     
