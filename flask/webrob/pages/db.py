@@ -69,7 +69,9 @@ def db_page_route(table):
     for c in columns:
         if   str(c['type']) == 'BOOLEAN':  c['type'] = 'boolean'
         elif str(c['type']) == 'DATETIME': c['type'] = 'date'
-        elif str(c['type']) == 'INTEGER':  c['type'] = 'number'
+        elif str(c['type']) == 'INTEGER':
+            c['type'] = 'number'
+            c['format'] = '{0:d}'
         else: c['type'] = 'string'
         
         c['editable'] = c['name'] is not 'id'

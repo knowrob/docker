@@ -98,6 +98,7 @@
             category: '{{ category }}',
             episode: '{{ exp }}',
             user_interfaces: OPENEASE_USER_IFACES,
+            user_interfaces_flat: OPENEASE_USER_IFACES_FLAT,
             menu: menu,
             require_episode: true,
             use_console_overlay: true
@@ -115,10 +116,14 @@
     // Declare page frames: Each user interface of openEASE is
     // put into an iframe that is child of #page
     for(var i in OPENEASE_USER_IFACES) {
+        var elem = OPENEASE_USER_IFACES[i];
         var frame = document.createElement("iframe");
-        frame.id = OPENEASE_USER_IFACES[i].id+'-frame';
+        frame.id = elem.id+'-frame';
         frame.className = 'content-frame';
-        frame.src = OPENEASE_USER_IFACES[i].src;
+        if(elem.interfaces && elem.interfaces[0].src)
+            frame.src = elem.interfaces[0].src;
+        else
+            frame.src = elem.src;
         document.getElementById('page').appendChild(frame);
     };
   </script>

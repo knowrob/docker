@@ -1,0 +1,380 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<!-- TODO: use prolog only on parent frame -->
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
+  
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/BarChart.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TreeDiagram.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Timeline.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DataVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TaskTreeVisClient.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}"></script>
+ 
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/html.css') }}" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/annotated.css') }}" />
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch.min.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch-formatters.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <script type="text/javascript">
+    var ui;
+    var visClient, graphClient;
+    
+    $(document).ready(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true
+        });
+        ui = new KnowrobUI(parent.client, {
+            use_console_overlay: true
+        });
+        ui.init();
+        showSearchCourse();
+        resize();
+        
+        if(parent.client.nodesRegistered && !visClient) {
+            on_register_nodes();
+        }
+    });
+    
+    function on_marker_dblclick(marker) {
+        var prolog = parent.client.newProlog();
+        prolog.jsonQuery("term_to_atom("+marker.ns+",MarkerName), "+
+            "marker_queries(MarkerName, MarkerQueries).",
+            function(result) {
+                prolog.finishClient();
+                ui.loadObjectQueries(result.solution.MarkerQueries);
+            }
+        );
+    };
+    
+    function on_marker_delete(ns) {
+        if(parent.client.selectedMarker != undefined && ns === parent.client.selectedMarker) {
+            ui.initQueryLibrary();
+        }
+    };
+    
+    function on_designator_received(obj) {
+      $('#designator').html('');
+      $('#designator').append(obj);
+      $('#designator').change();
+    };
+    
+    function on_image_received(imageHtml, imageWidth, imageHeight) {
+        ui.imageWidth = imageWidth;
+        ui.imageHeight = imageHeight;
+        
+        document.getElementById('mjpeg').innerHTML = imageHtml;
+        $('#mjpeg').change();
+        $('#mjpeg').resize();
+    };
+    
+    function on_camera_pose_received(pose) {
+        ui.setCameraPose(pose);
+    };
+    
+    function on_episode_selected(lib) {
+        ui.initQueryLibrary(lib.query);
+        // initialize canvas
+        ui.initCanvas();
+        ui.resizeCanvas();
+        // TODO(daniel): retract all user asserted facts!
+    };
+    
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    
+    function on_register_nodes() {
+        visClient = new DataVisClient({
+            ros: parent.client.ros,
+            containerId: '#chart',
+            topic: 'data_vis_msgs'
+        });
+//         graphClient = new TaskTreeVisClient({
+//             ros: parent.client.ros,
+//             containerId: '#designator',
+//             topic: 'task_tree_msgs'
+//         });
+    };
+    
+    function resize() {
+        var pageLayout = $('#page-content').layout({
+            stateManagement__enabled: true,
+            south: { minSize: 60 },
+            center: {
+                minSize: 250,
+                size: 500,
+                // INNER-LAYOUT
+                childOptions: {
+                    center: {
+                        paneSelector: "#library",
+                        minSize: 150
+                    }
+                }
+            },
+            east: {
+                minSize: 250,
+                size: 500,
+                // INNER-LAYOUT
+                childOptions: {
+                    north: {
+                        paneSelector: "#markers",
+                        minSize: 50,
+                        onresize: function() { ui.resizeCanvas(); }
+                    },
+                    center: {
+                        paneSelector: "#console",
+                        onresize: function() {
+                            ace.edit("history").resize(true);
+                            ace.edit("user_query").resize(true);
+                        },
+                        minSize: 250
+                    }
+                }
+            },
+            west: {
+                minSize: 250,
+                size: 500,
+                initClosed: true,
+                // INNER-LAYOUT
+                childOptions: {
+                    center: { paneSelector: "#chart", minSize: 150 },
+                    south: { paneSelector: "#mjpeg", minSize: 150 }
+                }
+            }
+        });
+        ui.resizeCanvas();
+        
+        //$('#designator').change(function() { pageLayout.open('west'); });
+        $('#mjpeg').change(function() { pageLayout.open('west'); });
+        $('#chart').change(function() { pageLayout.open('west'); });
+        $('#mjpeg').resize(function(){
+            var timeout = function(){ if(resizeImage()) window.setTimeout(timeout, 10); };
+            if(resizeImage()) window.setTimeout(timeout, 10);
+        });
+    };
+    
+    function courseInput() {
+        return document.getElementById('course').value;
+    };
+    
+    function searchCourse() {
+        $.ajax({
+            url: "/teaching/search",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({course: courseInput()}),  
+            dataType: "json"
+        }).done( function (data) {
+          var course_list = document.createElement("ul");
+          course_list.className = 'course_list';
+          
+          for(var i in data) {
+              var li = document.createElement("li");
+              var a = document.createElement("a");
+              a.innerHTML = data[i].name + " " + data[i].term;
+              a.onclick = function() { showCourse(data[i].id); };
+              li.className = 'course_entry';
+              li.appendChild(a);
+              course_list.appendChild(li);
+          }
+          
+          var list = document.getElementById('course-list');
+          list.innerHTML = ''; // clear
+          list.appendChild(course_list);
+        });
+    };
+    
+    function showSearchCourse() {
+        document.getElementById('exercise-header-text').innerHTML  = "Please specify a course";
+        document.getElementById('exercise-content').innerHTML = 
+              '<form id="course-search-form" action="javascript:searchCourse();" class="form" role="form">\n'+
+              '    <div id="course-field" class="form-group">\n'+
+              '        <input placeholder="Course Description" class="form-control" id="course" name="course" type="text" value="" required autofocus style="margin: 0px;" />\n'+
+              '    </div>\n'+
+              '    <div id="course-field-btn" class="form-group">\n'+
+              '        <button class="btn btn-lg btn-primary btn-block" onclick="searchCourse()">Search</button>\n'+
+              '    </div>\n'+
+              '</form>\n'+
+              '<div id="course-list" />\n'+
+              '<div id="course-list-navigation" />\n';
+        document.getElementById('exercise-footer').innerHTML = '';
+    };
+    
+    function showCourse(course_id) {
+        $.ajax({
+            url: "/teaching/get_exercises",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                  course_id: course_id}),  
+            dataType: "json"
+        }).done( function (data) {
+          var exercise_list = document.createElement("ul");
+          exercise_list.className = 'exercise_list';
+          
+          for(var i in data) {
+              var li = document.createElement("li");
+              var a = document.createElement("a");
+              a.innerHTML = "" + data[i].number + ". " + data[i].title;
+              a.course_id = course_id;
+              a.exercise_id = data[i].id;
+              a.onclick = function() { showExercise(this.course_id, this.exercise_id); };
+              li.className = 'course_entry';
+              li.appendChild(a);
+              exercise_list.appendChild(li);
+          }
+          
+          var list = document.createElement("div");
+          list.id = 'exercise-list';
+          list.appendChild(exercise_list);
+          
+          var lib = document.getElementById('exercise-content');
+          lib.innerHTML = ''; // clear
+          lib.appendChild(list);
+          
+          document.getElementById('exercise-header-text').innerHTML  = 'Please select an exercise';
+          // TODO: show course name instead
+          //document.getElementById('exercise-header-text').innerHTML  = course_name;D
+          document.getElementById('exercise-footer').innerHTML = '';
+        });
+    };
+    
+    function showExercise(course_id, exercise_id) {
+        showTask(course_id, exercise_id, 1);
+    };
+    
+    function showTask(course_id, exercise_id, task_number) {
+        $.ajax({
+            url: "/teaching/get_task",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                  exercise_id: exercise_id,
+                  task_number: task_number}),  
+            dataType: "json"
+        }).done( function (data) {
+            // <h4>exercise.task_number.  exercise.task_title</h4>
+            var h4 = document.createElement("h4");
+            h4.innerHTML = data.this.number + '. ' + data.this.title;
+            // {{ content }}
+            var text = document.createElement("div");
+            text.id = 'exercise-task';
+            text.innerHTML = data.this.text;
+            // <div id="tut_nav">
+            var nav = document.createElement("div");
+            nav.id = 'exercise-task-footer';
+            nav.id = 'tut_nav';
+            if(data.prev) {
+                // <div style="float:left;">
+                //    <a onclick="showTask(prev)">Previous: prev.title</a>
+                // </div>
+                var link = document.createElement("div");
+                var link_a = document.createElement("a");
+                link.style.float = 'left';
+                link_a.innerHTML = 'Previous: ' + data.prev.title;
+                link_a.onclick = function() { showTask(course_id, exercise_id, data.prev.number); };
+                link.appendChild(link_a);
+                nav.appendChild(link);
+            }
+            // <div style="float:right;">
+            //    <a onclick="showTask(nxt)">Next: nxt.title</a>
+            // </div>
+            var link = document.createElement("div");
+            var link_a = document.createElement("a");
+            link.style.float = 'right';
+            if(data.next) {
+                link_a.innerHTML = 'Next: ' + data.next.title;
+                link_a.onclick = function() { showTask(course_id, exercise_id, data.next.number); };
+            } else {
+                link_a.innerHTML = 'Course Overview'
+                link_a.onclick = function() { showCourse(course_id); };
+            }
+            link.appendChild(link_a);
+            nav.appendChild(link);
+            
+            var lib = document.getElementById('exercise-content');
+            lib.innerHTML = ''; // clear
+            lib.appendChild(h4);
+            lib.appendChild(text);
+            
+            document.getElementById('exercise-footer').innerHTML = '';
+            document.getElementById('exercise-footer').appendChild(nav);
+            // <h2>exercise.title</h2>
+            document.getElementById('exercise-header-text').innerHTML = data.this.title;
+            
+            // hook for links of class "show_code" that pastes the content of the
+            // previous code block into the query field
+            $( "a.show_code" ).click(function( event ) {
+                plConsole.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+                event.preventDefault();
+            });
+        });
+    };
+  </script>
+
+<div id="page-content">
+    <div class="ui-layout-center">
+        <div id="library" class="black_border teaching-library">
+            <div id="exercise-header" class="content-box-header">
+                <h2 id="exercise-header-text"></h2>
+                <div id="exercise-header-icon" class="icon_find" onclick="showSearchCourse()"></div>
+            </div>
+            <div id="exercise-content"></div>
+            <div id="exercise-footer"></div>
+        </div>
+    </div>
+    
+    <div class="ui-layout-east" id="editor-container">
+        <div id="markers"></div>
+        <div id="console">
+            <div id="console_top">
+                <div id="history"></div>
+                <div id="user_query"></div>
+            </div>
+            <div id="console_bottom">
+                <div id="query_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
+                        <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
+                    </ul>
+                    <div class="clear">&nbsp;</div>
+                </div>
+            </div>
+        </div>   
+    </div>
+        
+    <div class="ui-layout-west">
+        <div id="chart"></div>   
+        <!-- <div id="designator"></div> -->
+        <div id="mjpeg"></div>
+    </div>
+</div>
+  
+{% endblock %}

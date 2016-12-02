@@ -24,7 +24,6 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100), nullable=False, default='')
     api_token = db.Column(db.String(64), nullable=False, default='')
     container_id = db.Column(db.String(255), nullable=False, default='')
-
     # Relationships
     roles = db.relationship('Role', secondary=user_roles,
             backref=db.backref('users', lazy='dynamic'))

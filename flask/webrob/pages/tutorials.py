@@ -9,6 +9,7 @@ import json
 
 from webrob.app_and_db import app
 from webrob.models.tutorials import read_tutorial_page
+from webrob.models.teaching import find_courses, get_exercises, get_task
 
 @app.route('/tutorials/')
 def tutorials():
@@ -85,3 +86,86 @@ def read_tutorial(cat_id, page):
         }
     
     return out
+
+@app.route('/teaching/search', methods=['POST'])
+def find_course():
+    data = json.loads(request.data)
+    course_name = data['course']
+    courses = []
+    for c in find_courses(course_name):
+        courses.append({
+            'id': c.id,
+            'name': c.name,
+            'term': c.term,
+            'university': c.university
+        })
+    return jsonify(courses)
+
+@app.route('/teaching/get_exercises', methods=['POST'])
+def get_exercise_():
+    data = json.loads(request.data)
+    course_id = data['course_id']
+    exercises = []
+    for e in get_exercises(course_id):
+        exercises.append({
+            'id': e.id,
+            'course_id': e.course_id,
+            'number': e.number,
+            'title': e.title
+        })
+    return jsonify(exercises)
+
+@app.route('/teaching/get_task', methods=['POST'])
+def get_task_():
+    data = json.loads(request.data)
+    exercise_id = data['exercise_id']
+    task_number = data['task_number']
+    app.logger.info("get_task " + str(exercise_id) + " " + str(task_number))
+    
+    task = get_task(exercise_id, task_number)
+    if task==None: return jsonify(None)
+    content = markdown(task.text, fenced_code=True)
+    
+    # automatically add "ask as query" links after code blocks
+    content = re.sub('</code>(\s)?</pre>', "</code></pre><div class='show_code'><a href='#' class='show_code'>Ask as query</a></div>", str(content))
+    content = Markup(content)
+    # check whether there is another task in this exercise
+    nxt  = get_task(exercise_id, task_number+1)
+    prev = get_task(exercise_id, task_number-1)
+    
+    out = {}
+    out['this'] = {
+        'exercise_id': task.exercise_id,
+        'number': task.number,
+        'title': task.title,
+        'text': content
+    }
+    if(nxt != None):
+        out['next'] = {
+            'exercise_id': nxt.exercise_id,
+            'number': nxt.number,
+            'title': nxt.title
+        }
+    if(prev != None):
+        out['prev'] = {
+            'exercise_id': prev.exercise_id,
+            'number': prev.number,
+            'title': prev.title
+        }
+    
+    return jsonify(out)
+
+@app.route('/teaching/')
+def teaching():
+    error=""
+    # determine hostname/IP we are currently using
+    # (needed for accessing container)
+    host_url = urlparse(request.host_url).hostname
+    container_name = session['user_container_name']
+    show_south_pane = False
+    #readonly = True
+    #authentication = False
+    session['video'] = 0
+
+    return render_template('knowrob_teaching.html', **locals())
+

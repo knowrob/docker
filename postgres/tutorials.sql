@@ -1,4 +1,37 @@
+
+drop table if exists course;
+drop table if exists course_exercise;
+drop table if exists course_task;
+
+create table course (
+    id serial primary key,
+    name text not null,
+    term text not null,
+    university text not null
+);
+
+create table course_exercise (
+    id serial primary key,
+    course_id integer not null,
+    number integer not null,
+    title text not null
+);
+
+create table course_task (
+    id serial primary key,
+    exercise_id integer not null,
+    number integer not null,
+    title text not null,
+    text text not null
+);
+
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+/*****************************************************************************************/
+
 drop table if exists tutorial;
+
 create table tutorial (
     id serial primary key,
     cat_id text not null,

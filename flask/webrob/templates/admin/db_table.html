@@ -109,6 +109,9 @@
                     {% endif %}
                     {% if column.type|string() == "number" %}
                     width: 60,
+                    {% if "{{ column.format }}" != "" %}
+                    format: "{{ column.format }}",
+                    {% endif %}
                     {% endif %}
                     {% if column.name|string() == "key" or column.name|string() == "title" or column.name|string() == "cat_title" %}
                     width: 100,

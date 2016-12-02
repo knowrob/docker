@@ -10,16 +10,12 @@
   </div>
   <div class="metanav">
     <div class="metanav_left">
-      <ul class="menu aligned-left" id="menu-left">
-      </ul>
-      <ul class="menu aligned-left" id="frame-menu-left">
-      </ul>
+      <ul class="menu aligned-left" id="menu-left"></ul>
+      <ul class="menu aligned-left" id="frame-menu-left"></ul>
     </div>
     <div class="metanav_right">
-        <ul class="menu aligned-right" id="frame-menu-right">
-        </ul>
-        <ul class="menu aligned-right" id="menu-right">
-        </ul>
+        <ul class="menu aligned-right" id="frame-menu-right"></ul>
+        <ul class="menu aligned-right" id="menu-right"></ul>
         <!--
       {% if not current_user.is_authenticated %}
         <a href="{{ url_for('user.login') }}">Sign in</a>
@@ -32,11 +28,30 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
   <script type="text/javascript">
     var OPENEASE_USER_IFACES = [
-        { id: 'kb', src:'/knowrob', name: 'Knowledge Base' },
-        { id: 'replay', src:'/video', name: 'Episode Replay' },
-        { id: 'editor', src:'/editor', name: 'Text Editor' },
-        { id: 'logs', src:'/log', name: 'Log' }
+        { id: 'cog', name: 'Cognitive Capabilities', interfaces: [
+          { id: 'kb', name: 'Question Answering', src:'/knowrob' },
+          { id: 'replay', name: 'Episode Replay', src:'/video' }
+        ]},
+        { id: 'teach', name: 'Teaching', interfaces: [
+          { id: 'exercises', name: 'Exercises', src:'/teaching' },
+          { id: 'tutorials', name: 'Tutorials', src:'/tutorials' }
+        ]},
+        { id: 'tools', name: 'Tools', interfaces: [
+          { id: 'edit', name: 'Prolog & OWL Editor', src:'/editor' },
+          { id: 'log', name: 'Knowledge Base Log', src:'/log' }
+        ]}
     ];
+    
+    var OPENEASE_USER_IFACES_FLAT = [];
+    for(var i in OPENEASE_USER_IFACES) {
+        var elem = OPENEASE_USER_IFACES[i];
+        var ifaces = elem.interfaces;
+        if(!ifaces) ifaces = [elem];
+        for(var j in ifaces) {
+            OPENEASE_USER_IFACES_FLAT.push(ifaces[j]);
+        }
+    };
+    
   
     function FlaskUser(){
         this.username = '{{ current_user.displayname or current_user.username or "anonymous" }}';
