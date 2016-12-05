@@ -40,7 +40,7 @@ def pkg_new():
         return jsonify(result=None)
     
     # Make sure templates are available
-    templatePath = os.path.abspath('webrob/templates/package')
+    templatePath = '/opt/webapp/webrob/templates/package'
     if not os.path.exists(templatePath):
         app.logger.warning("Package templates missing at " + templatePath + ".")
         return jsonify(result=None)
