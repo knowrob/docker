@@ -14,4 +14,5 @@
 /***********************************
  * Parse OWL files
  */
-:- owl_parser:owl_parse('package://%(pkgName)s/owl/test.owl').
+/* :- owl_parser:owl_parse('package://%(pkgName)s/owl/test.owl'). */
+

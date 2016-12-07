@@ -8,12 +8,15 @@ from urlparse import urlparse
 
 from flask import session, request, render_template, jsonify, send_file, redirect, url_for
 from flask_user import login_required
+from flask_user import current_app
 
 from webrob.app_and_db import app
 from webrob.docker import docker_interface
 from webrob.docker.docker_interface import LFTransfer
 from webrob.utility import copy_template_file
 from webrob.docker.docker_application import ensure_application_started
+
+from webrob.models.teaching import CourseExercise
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
@@ -30,11 +33,10 @@ def editor(filename=""):
     
     return render_template('editor.html', **locals())
 
-@app.route('/knowrob/pkg_new', methods=['POST'])
+@app.route('/pkg/new', methods=['POST'])
 def pkg_new():
     packageName = json.loads(request.data)['packageName']
     
-    # Create package root directory
     if docker_interface.file_exists(session['user_container_name'], packageName):
         app.logger.warning("Package already exists.")
         return jsonify(result=None)
@@ -67,7 +69,7 @@ def pkg_new():
     
     return jsonify(result=None)
 
-@app.route('/knowrob/pkg_del', methods=['POST'])
+@app.route('/pkg/del', methods=['POST'])
 def pkg_del(packageName=None):
     pkgName = packageName
     if pkgName is None:
@@ -75,7 +77,7 @@ def pkg_del(packageName=None):
     docker_interface.file_rm(session['user_container_name'], pkgName, True)
     return jsonify(result=None)
 
-@app.route('/knowrob/pkg_set', methods=['POST'])
+@app.route('/pkg/set', methods=['POST'])
 def pkg_set():
     # Update package name
     data = json.loads(request.data)
@@ -83,21 +85,21 @@ def pkg_set():
         session['pkg'] = data['packageName']
     return get_pkg_tree()
 
-@app.route('/knowrob/pkg_list', methods=['POST'])
+@app.route('/pkg/list', methods=['POST'])
 def pkg_list():
     # Return list of packages
     files = filter(lambda s: s['isdir'], docker_interface.file_ls(session['user_container_name'], '.')['children'])
     filenames = map(lambda s: s['name'], files)
     return jsonify(result=filenames)
 
-@app.route('/knowrob/pkg_read', methods=['POST'])
+@app.route('/pkg/read', methods=['POST'])
 def pkg_read():
     path = get_file_path(json.loads(request.data)['file'])
     # Read the file
     content = docker_interface.file_read(session['user_container_name'], path).splitlines(True)
     return jsonify(result=content)
 
-@app.route('/knowrob/pkg_down', methods=['POST'])
+@app.route('/pkg/down', methods=['POST'])
 def pkg_down():
     with LFTransfer(session['user_container_name']) as lft:
         name = session['pkg']
@@ -113,7 +115,61 @@ def pkg_down():
                          as_attachment=True,
                          attachment_filename=zipName)
 
-@app.route('/knowrob/file_write', methods=['POST'])
+@app.route('/pkg/save_exercise', methods=['POST'])
+def pkg_save_exercise():
+    db_adapter = current_app.user_manager.db_adapter
+    # Query exercise DB object
+    exercise_id = json.loads(request.data)['exercise_id']
+    exercise = CourseExercise.query.filter_by(id=exercise_id).first()
+    
+    with LFTransfer(session['user_container_name']) as lft:
+        # Create archive file
+        name    = exercise.title
+        zipName = name + '.zip'
+        lft.from_container(session['pkg'], name) # rename package to match exercise name
+        pkgPath = os.path.join(lft.get_filetransfer_folder(), name)
+        zipPath = os.path.join(lft.get_filetransfer_folder(), zipName)
+        zipf = zipfile.ZipFile(zipPath, 'w')
+        zipdir(pkgPath, lft.get_filetransfer_folder(), zipf)
+        zipf.close()
+        # Read archive as binary blob and save in SQL DB
+        zipfb = open(zipPath,'rb')
+        # NOTE: need to convert to base64 so that jsonify does not complain
+        exercise.archive = zipfb.read().encode('base64')
+        db_adapter.commit()
+        zipfb.close()
+        # TODO: remove zip file
+    
+    return jsonify(result=None)
+
+@app.route('/pkg/load_exercise', methods=['POST'])
+def pkg_load_exercise():
+    # Query exercise DB object
+    exercise_id = json.loads(request.data)['exercise_id']
+    exercise = CourseExercise.query.filter_by(id=exercise_id).first()
+    pkgName = exercise.title
+    zipName = pkgName + '.zip'
+    
+    if docker_interface.file_exists(session['user_container_name'], pkgName):
+        app.logger.warning("Package already exists.") # TODO: notify client
+        return jsonify(result=None)
+    
+    with LFTransfer(session['user_container_name']) as lft:
+      # Create zip file
+      zipPath = os.path.join(lft.get_filetransfer_folder(), zipName)
+      zipfb = open(zipPath, 'wb')
+      zipfb.write(exercise.archive.decode('base64'))
+      zipfb.close()
+      # unzip in intermediate container
+      zipf = zipfile.ZipFile(zipPath, 'r')
+      zipf.extractall(lft.get_filetransfer_folder())
+      zipf.close()
+      # copy to user container
+      lft.to_container(pkgName, pkgName)
+    
+    return jsonify(result=None)
+
+@app.route('/pkg/file_write', methods=['POST'])
 def file_write():
     data = json.loads(request.data)
     path = get_file_path(data['file'])
@@ -121,7 +177,7 @@ def file_write():
     
     return jsonify(result=None)
    
-@app.route('/knowrob/file_del', methods=['POST'])
+@app.route('/pkg/file_del', methods=['POST'])
 def file_del():
     path = get_file_path(json.loads(request.data)['file'])
     docker_interface.file_rm(session['user_container_name'], path, True)

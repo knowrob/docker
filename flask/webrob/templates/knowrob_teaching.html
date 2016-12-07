@@ -28,6 +28,7 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/teaching.js') }}"></script>
   
   <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
@@ -45,6 +46,7 @@
   <script type="text/javascript">
     var ui;
     var visClient, graphClient;
+    var current_exercise_id = 0;
     
     $(document).ready(function () {
         $("#dialog").dialog({
@@ -180,90 +182,13 @@
         });
     };
     
-    function courseInput() {
-        return document.getElementById('course').value;
-    };
-    
-    function searchCourse() {
-        $.ajax({
-            url: "/teaching/search",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({course: courseInput()}),  
-            dataType: "json"
-        }).done( function (data) {
-          var course_list = document.createElement("ul");
-          course_list.className = 'course_list';
-          
-          for(var i in data) {
-              var li = document.createElement("li");
-              var a = document.createElement("a");
-              a.innerHTML = data[i].name + " " + data[i].term;
-              a.onclick = function() { showCourse(data[i].id); };
-              li.className = 'course_entry';
-              li.appendChild(a);
-              course_list.appendChild(li);
-          }
-          
-          var list = document.getElementById('course-list');
-          list.innerHTML = ''; // clear
-          list.appendChild(course_list);
-        });
-    };
-    
     function showSearchCourse() {
-        document.getElementById('exercise-header-text').innerHTML  = "Please specify a course";
-        document.getElementById('exercise-content').innerHTML = 
-              '<form id="course-search-form" action="javascript:searchCourse();" class="form" role="form">\n'+
-              '    <div id="course-field" class="form-group">\n'+
-              '        <input placeholder="Course Description" class="form-control" id="course" name="course" type="text" value="" required autofocus style="margin: 0px;" />\n'+
-              '    </div>\n'+
-              '    <div id="course-field-btn" class="form-group">\n'+
-              '        <button class="btn btn-lg btn-primary btn-block" onclick="searchCourse()">Search</button>\n'+
-              '    </div>\n'+
-              '</form>\n'+
-              '<div id="course-list" />\n'+
-              '<div id="course-list-navigation" />\n';
-        document.getElementById('exercise-footer').innerHTML = '';
-    };
-    
-    function showCourse(course_id) {
-        $.ajax({
-            url: "/teaching/get_exercises",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({
-                  course_id: course_id}),  
-            dataType: "json"
-        }).done( function (data) {
-          var exercise_list = document.createElement("ul");
-          exercise_list.className = 'exercise_list';
-          
-          for(var i in data) {
-              var li = document.createElement("li");
-              var a = document.createElement("a");
-              a.innerHTML = "" + data[i].number + ". " + data[i].title;
-              a.course_id = course_id;
-              a.exercise_id = data[i].id;
-              a.onclick = function() { showExercise(this.course_id, this.exercise_id); };
-              li.className = 'course_entry';
-              li.appendChild(a);
-              exercise_list.appendChild(li);
-          }
-          
-          var list = document.createElement("div");
-          list.id = 'exercise-list';
-          list.appendChild(exercise_list);
-          
-          var lib = document.getElementById('exercise-content');
-          lib.innerHTML = ''; // clear
-          lib.appendChild(list);
-          
-          document.getElementById('exercise-header-text').innerHTML  = 'Please select an exercise';
-          // TODO: show course name instead
-          //document.getElementById('exercise-header-text').innerHTML  = course_name;D
-          document.getElementById('exercise-footer').innerHTML = '';
-        });
+        var header = document.getElementById('exercise-header-text');
+        var body   = document.getElementById('exercise-content');
+        var footer = document.getElementById('exercise-footer');
+        $('#exercise-header-icon-open').addClass('hidden-form');
+        ExerciseSelector(header, body, footer,
+            function(course, exercise) { showExercise(course.id, exercise.id) });
     };
     
     function showExercise(course_id, exercise_id) {
@@ -271,6 +196,7 @@
     };
     
     function showTask(course_id, exercise_id, task_number) {
+        current_exercise_id = exercise_id;
         $.ajax({
             url: "/teaching/get_task",
             type: "POST",
@@ -280,6 +206,8 @@
                   task_number: task_number}),  
             dataType: "json"
         }).done( function (data) {
+            $('#exercise-header-icon-open').removeClass('hidden-form');
+            
             // <h4>exercise.task_number.  exercise.task_title</h4>
             var h4 = document.createElement("h4");
             h4.innerHTML = data.this.number + '. ' + data.this.title;
@@ -313,6 +241,7 @@
                 link_a.innerHTML = 'Next: ' + data.next.title;
                 link_a.onclick = function() { showTask(course_id, exercise_id, data.next.number); };
             } else {
+                // FIXME: does not work anymore
                 link_a.innerHTML = 'Course Overview'
                 link_a.onclick = function() { showCourse(course_id); };
             }
@@ -335,6 +264,32 @@
                 plConsole.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
                 event.preventDefault();
             });
+            $( "a.edit_code" ).click(function( event ) {
+                var code = $(this).closest("pre + *").prev().find('code').html();
+                // TODO: load package template if not already done
+                // TODO: activate editor component and focus definition the predicate in the editor
+                event.preventDefault();
+            });
+        });
+    };
+    
+    function loadExercisePackage(exercise_id, then) {
+        $.ajax({
+            url: "/pkg/load_exercise",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                  exercise_id: exercise_id}),  
+            dataType: "json"
+        }).done( function (data) {
+            then();
+        });
+    };
+    
+    function openExercisePackage() {
+        loadExercisePackage(current_exercise_id, function() {
+            window.top.location.href = "/#edit";
+            //window.top.location.href = "/#edit?exercise="+current_exercise_id;
         });
     };
   </script>
@@ -344,7 +299,8 @@
         <div id="library" class="black_border teaching-library">
             <div id="exercise-header" class="content-box-header">
                 <h2 id="exercise-header-text"></h2>
-                <div id="exercise-header-icon" class="icon_find" onclick="showSearchCourse()"></div>
+                <div id="exercise-header-icon-open" class="exercise-header-icon icon_open hidden-form" onclick="openExercisePackage()"></div>
+                <div id="exercise-header-icon-find" class="exercise-header-icon icon_find" onclick="showSearchCourse()"></div>
             </div>
             <div id="exercise-content"></div>
             <div id="exercise-footer"></div>

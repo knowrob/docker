@@ -72,6 +72,7 @@ def db_page_route(table):
         elif str(c['type']) == 'INTEGER':
             c['type'] = 'number'
             c['format'] = '{0:d}'
+        #elif str(c['type']) == 'BLOB':
         else: c['type'] = 'string'
         
         c['editable'] = c['name'] is not 'id'

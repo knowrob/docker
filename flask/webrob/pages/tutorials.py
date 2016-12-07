@@ -120,7 +120,6 @@ def get_task_():
     data = json.loads(request.data)
     exercise_id = data['exercise_id']
     task_number = data['task_number']
-    app.logger.info("get_task " + str(exercise_id) + " " + str(task_number))
     
     task = get_task(exercise_id, task_number)
     if task==None: return jsonify(None)

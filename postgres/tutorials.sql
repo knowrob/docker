@@ -14,7 +14,8 @@ create table course_exercise (
     id serial primary key,
     course_id integer not null,
     number integer not null,
-    title text not null
+    title text not null,
+    archive blob
 );
 
 create table course_task (

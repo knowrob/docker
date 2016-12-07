@@ -14,6 +14,7 @@ class CourseExercise(db.Model):
     course_id = db.Column(db.Integer(), db.ForeignKey('course.id', ondelete='CASCADE'))
     number = db.Column(db.Integer())
     title = db.Column(db.String(50))
+    archive = db.Column(db.LargeBinary())
 
 class CourseTask(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

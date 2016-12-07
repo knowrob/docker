@@ -104,6 +104,8 @@
                 {% for column in columns %}
                 {
                     field: "{{ column.name }}",
+                    {% if column.name|string() == "blob" %}
+                    {% endif %}
                     {% if column.name|string() == "text" %}
                     encoded: false, editor: textEditor,
                     {% endif %}
