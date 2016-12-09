@@ -1,5 +1,5 @@
 #!/bin/bash
-CONTAINERS="dockerbridge nginx docker-gen mongo_db postgres_db `docker ps | grep knowrob/hydro-knowrob-daemon:latest | awk '{print $1}'` `docker ps | grep openease/knowrob:latest | awk '{print $1}'` `docker ps | grep openease/easeapp:latest | awk '{print $1}'`"
+CONTAINERS="dockerbridge nginx docker-gen mongo_db postgres_db `docker ps | grep -E knowrob/hydro-knowrob-daemon\|openease/knowrob\|openease/easeapp\|openease/login | awk '{print $1}'`"
 docker stop -t 3 $CONTAINERS
 if [ "$1" == "--rm" ]; then
 	docker rm $CONTAINERS
