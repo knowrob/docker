@@ -59,18 +59,18 @@ INSERT INTO Tutorial VALUES(110,'overview','openEASE Tutorials','Tutorial List',
 INSERT INTO Tutorial VALUES(220,'getting_started','Getting started','The user interface',
 'The user interface consists of six panes with different purposes.
 
-  * The *Prolog interaction area hl_console* in the upper left consists of the *history pane hl_history* in the top and the *query field hl_user&#95;query* at the bottom. Prolog queries are to be typed in the *query field hl_user&#95;query*, whereas the history of the queries with their respective results will be shown in the *history pane hl_history*.
+  * The *Prolog interaction area hl_console* consists of the *history pane hl_history* and the *query field hl_user&#95;query*. Prolog queries are to be typed in the *query field hl_user&#95;query*, whereas the history of the queries with their respective results will be shown in the *history pane hl_history*.
   * The pane in which this tutorial text is now displayed, the *query list pane hl_library*, usually contains a list of prepared queries with descriptions in English. If you click on an entry in this library, the corresponding Prolog query will be added to the *query field hl_user&#95;query*.
-  * The *3D display pane hl_markers* in the upper middle can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
-  * The *visual analytics pane hl_chart* in the lower middle can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization pane with the results of queries.
-  * The *belief pane hl_designator* in  the upper right enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
-  * The *image pane hl_mjpeg* in the lower right is used for displaying images captured by the robot''s camera.
+  * The *3D display pane hl_markers* can visualize the robot and its environment in a 3D canvas. Other information such as trajectories, robot and object poses can also be added and highlighted.
+  * The *visual analytics pane hl_chart* can visualize statistical data as bar charts and pie charts. Special query predicates allow to update the visualization pane with the results of queries.
+  * The *belief pane hl_designator* enables the user to inspect the internal data structures of the robot''s beliefs including object, action, and location descriptions used by the robot.
+  * The *image pane hl_mjpeg* is used for displaying images captured by the robot''s camera.
 
 All Panes except for the *3D display pane hl_markers* can be opened or closed by clicking the dark *grey bars hlc_ui-layout-toggler* on the edges or resized by dragging them.
 
 **Note:** 
 If the *3D display pane hl_markers* does not yet show a grid in the background, your knowledge
-base has not yet been loaded completely. In this case, please wait a moment and
+base has not yet been loaded completely. In this case, please wait a moment or
 reload the page.',1);
 
 INSERT INTO Tutorial VALUES(221,'getting_started','Getting started','Logic Programming (1)',
