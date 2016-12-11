@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<!-- TODO: use prolog only on parent frame -->
   <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
@@ -108,9 +107,6 @@
         ui.resizeCanvas();
         // TODO(daniel): retract all user asserted facts!
     };
-    
-    function on_marker_contextmenu(marker) {};
-    function on_render(camera,scene) {};
     
     function on_register_nodes() {
         visClient = new DataVisClient({
@@ -261,7 +257,9 @@
             // hook for links of class "show_code" that pastes the content of the
             // previous code block into the query field
             $( "a.show_code" ).click(function( event ) {
-                plConsole.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+                ui.console.setQueryValue(
+                    $(this).closest("pre + *").prev().find('code').html(),
+                    true);
                 event.preventDefault();
             });
             $( "a.edit_code" ).click(function( event ) {

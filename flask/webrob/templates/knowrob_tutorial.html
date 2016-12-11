@@ -1,66 +1,18 @@
-{% extends "layout_header.html" %}
+{% extends "layout.html" %}
 
 {% block head %}
-  <meta charset="utf-8" />
-  <link rel="stylesheet" media="all" type="text/css" href="{{ url_for('static', filename='lib/font/font.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/screen.css') }}"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/iosOverlay.css') }}"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/overlay/prettify.css') }}"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/layout/layout-default-1.4.0.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/bootstrap/css/bootstrap.min.css') }}"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/user.css') }}"/>
-
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/iosOverlay.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/spin.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/overlay/prettify.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
   
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-1.11.1.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.ui.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lib/jquery.ui.css') }}"/>
   
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ext-language_tools.js') }}"></script>
   
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/three.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/ColladaLoader.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/threejs/STLLoader.js') }}"></script>
-  
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/Ros3D.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ColladaAnimationCompress/ColladaLoader2.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/depthcloud/DepthCloud.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/EventEmitter2/eventemitter2.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Arrow.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Axes.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/Grid.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/MeshResource.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/models/TriangleList.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerControl.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerHandle.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarker.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/interactivemarkers/InteractiveMarkerMenu.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGridClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/maps/OccupancyGrid.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerArrayClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/MarkerClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/markers/Marker.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/roslibjs/roslib.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/urdf/UrdfClient.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/urdf/Urdf.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/Viewer.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/SceneNode.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/Highlighter.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/MouseHandler.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/ros/src/visualization/interaction/OrbitControls.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/json_prolog.js') }}"></script>
-  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3.v3.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/d3/d3-tip.js') }}"></script>
-
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/designator/desig.js') }}"></script>
-  
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_bold.typeface.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/font/helvetiker_regular.typeface.js') }}"></script>
 
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/google-jsapi.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/DonutChart.js') }}"></script>
@@ -71,92 +23,98 @@
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/TaskTreeVisClient.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/array-nonstandard.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/chart/Control.js') }}"></script>
-
+  
   <script type="text/javascript" src="{{ url_for('static', filename='lib/utility.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/canvas.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/console.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/client.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/episode.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/menu.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/kb-frame.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/knowrob/teaching.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.common.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.default.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.min.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lib/kendo/kendo.dataviz.default.min.css') }}" />
+  <script type="text/javascript"  src="{{ url_for('static', filename='lib/kendo/kendo.all.min.js') }}"></script>
+ 
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/html.css') }}" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='lib/jsondiff/annotated.css') }}" />
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch.min.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='lib/jsondiff/jsondiffpatch-formatters.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
   <script type="text/javascript">
-    var auth = '{{ authentication }}';
-    var wsproto = 'ws' + (location.protocol === 'https:'?'s':'');
-    var rosUrl = wsproto + '://{{ host_url }}/ws/{{ container_name }}/';
-    var rosViewer;
-    var plConsole;
-    var client = new KnowrobClient({
-            flask_user: flask_user,
-            ros_url: rosUrl,
-            authentication: auth,
-            auth_url: '/api/v1.0/auth_by_session',
-            meshPath: '/meshes/',
-            category: '{{ category }}',
-            episode: '{{ exp }}',
-            user_interfaces: OPENEASE_USER_IFACES,
-            menu: menu,
-            require_episode: false,
-            global_viewer: function() { return rosViewer.rosViewer; }
+    var ui;
+    var visClient, graphClient;
+    var current_exercise_id = 0;
+    
+    $(document).ready(function () {
+        $("#dialog").dialog({
+            autoOpen: false,
+            modal: true
         });
-    var imageWidth = function(doc) { return 0.0; };
-    var imageHeight = function(doc) { return 0.0; };
-    var ui = window;
-
-    function resizeImage() {
-        return imageResizer($('#mjpeg_image'), $('#mjpeg'),
-            imageWidth($('#mjpeg_image'))[0],
-            imageHeight($('#mjpeg_image'))[0]);
+        ui = new KnowrobUI(parent.client, {
+            use_console_overlay: true
+        });
+        ui.init();
+        loadTutorial('overview', 1);
+        resize();
+        
+        if(parent.client.nodesRegistered && !visClient) {
+            on_register_nodes();
+        }
+    });
+    
+    function on_marker_dblclick(marker) {
+        var prolog = parent.client.newProlog();
+        prolog.jsonQuery("term_to_atom("+marker.ns+",MarkerName), "+
+            "marker_queries(MarkerName, MarkerQueries).",
+            function(result) {
+                prolog.finishClient();
+                ui.loadObjectQueries(result.solution.MarkerQueries);
+            }
+        );
     };
     
-    function on_marker_dblclick(marker) {};
-    function on_marker_delete(ns) {};
-    function on_episode_selected(lib) {};
-    function on_marker_contextmenu(marker) {};
-    function on_render(camera,scene) {};
+    function on_marker_delete(ns) {
+        if(parent.client.selectedMarker != undefined && ns === parent.client.selectedMarker) {
+            ui.initQueryLibrary();
+        }
+    };
     
-    function on_designator_received(designatorHtml) {
-        document.getElementById('designator').innerHTML = designatorHtml;
-        $('#designator').change();
+    function on_designator_received(obj) {
+      $('#designator').html('');
+      $('#designator').append(obj);
+      $('#designator').change();
     };
     
     function on_image_received(imageHtml, imageWidth, imageHeight) {
         ui.imageWidth = imageWidth;
         ui.imageHeight = imageHeight;
+        
         document.getElementById('mjpeg').innerHTML = imageHtml;
         $('#mjpeg').change();
         $('#mjpeg').resize();
     };
     
+    function on_camera_pose_received(pose) {
+        ui.setCameraPose(pose);
+    };
+    
     function on_register_nodes() {
-        var visClient, graphClient;
         visClient = new DataVisClient({
             ros: parent.client.ros,
             containerId: '#chart',
             topic: 'data_vis_msgs'
         });
-        // FIXME(daniel): task tree allways takes a lot of space
-        //graphClient = new TaskTreeVisClient({
-        //    ros: parent.client.ros,
-        //    containerId: '#chart',
-        //    topic: 'task_tree_msgs'
-        //});
     };
     
-    function on_camera_pose_received(pose) {};
-    
-    $(document).ready(function () {
-        client.init();
-        
-        plConsole = new PrologConsole(client, {use_console_overlay: false});
-        plConsole.init();
-        
-        rosViewer = client.newCanvas({
-            divID: document.getElementById('markers')
-        });
-        resizeCanvas();
-        
+    function resizeImage() {
+        return imageResizer($('#mjpeg_image'), $('#mjpeg'),
+            imageWidth($('#mjpeg_image'))[0],
+            imageHeight($('#mjpeg_image'))[0]);
+    };
+
+    function resize() {
         var pageLayout = $('#page-content').layout({
             stateManagement__enabled: true,
             south: { minSize: 60 },
@@ -165,22 +123,22 @@
                 size: 500,
                 // INNER-LAYOUT
                 childOptions: {
-                    center: {
+                    center: { paneSelector: "#markers", minSize: 250,
+                      onresize: function() { ui.resizeCanvas(); } },
+                    south: {
                         paneSelector: "#console",
                         onresize: function() {
                             ace.edit("history").resize(true);
                             ace.edit("user_query").resize(true);
                         },
-                        minSize: 250
-                    },
-                    south: { paneSelector: "#library", minSize: 150 }
+                        minSize: 150
+                    }
                 }
             },
             center: {},
             east: {
                 minSize: 250,
                 size: 500,
-                initClosed: true,
                 // INNER-LAYOUT
                 childOptions: {
                     center: { paneSelector: "#designator", minSize: 250 },
@@ -189,11 +147,14 @@
             }
         });
         centerLayout = $('#editor-container').layout({
-            center: { paneSelector: "#markers", minSize: 50,
-                      onresize: function() { resizeCanvas(); } },
+            center: { paneSelector: "#library", minSize: 250 },
             south: { paneSelector: "#chart", initClosed: true, minSize: 50 }
         });
-        resizeCanvas();
+        pageLayout.open('east');
+        pageLayout.open('west');
+        centerLayout.open('south');
+        
+        ui.resizeCanvas();
         
         $('#designator').change(function() { pageLayout.open('east'); });
         $('#mjpeg').change(function() { pageLayout.open('east'); });
@@ -202,12 +163,6 @@
             var timeout = function(){ if(resizeImage()) window.setTimeout(timeout, 10); };
             if(resizeImage()) window.setTimeout(timeout, 10);
         });
-        
-        loadTutorial('overview', 1);
-    });
-
-    function resizeCanvas() {
-        rosViewer.resize($('#markers').width(), $('#markers').height());
     };
     
     function loadTutorial(category, page) {
@@ -268,7 +223,9 @@
             // hook for links of class "show_code" that pastes the content of the
             // previous code block into the query field
             $( "a.show_code" ).click(function( event ) {
-                plConsole.setQueryValue( $(this).closest("pre + *").prev().find('code').html() );
+                ui.console.setQueryValue(
+                    $(this).closest("pre + *").prev().find('code').html(),
+                    true);
                 event.preventDefault();
             });
         });
@@ -276,63 +233,69 @@
     
     function highlightElement(name, type, highlight) {
       if(typeof type == "string") {
+        var highlighter = $('#dom-highlight');
+        var element = undefined;
         if(type === "class") {
-          var elems = document.getElementsByClassName(name);
-          for (i = 0; i < elems.length; i++) {
-            elems[i].style.backgroundColor = highlight ? "#144F78" : "#BBB";
-            elems[i].style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
-            //elems[i].change();
-          }
+            element = $('.'+name);
         }
         else if(type === "id") {
-          document.getElementById(name).style.border = highlight ? "5px solid #144F78" : "1px solid #BBB";
-          //document.getElementById(name).style.margin = highlight ? "-5px !important" : "0px !important";
-          $('#'+name).change();
+            element = $('#'+name);
+        }
+        if(highlight && element) {
+            highlighter.css('display', 'block');
+            highlighter.css('width',  element.width());
+            highlighter.css('height', element.height());
+            highlighter.css('top',    element.offset().top);
+            highlighter.css('left',   element.offset().left);
+            element.change();
+        }
+        else {
+            highlighter.css('display', 'none');
         }
       }
     }; 
   </script>
 
-  <div class="page" id="page" style="overflow: hidden;">
-    <div id="page-content" style="width:100%; height:100%;">
-        <div class="ui-layout-center" id="editor-container">
-            <div id="markers"></div>
-            <div id="chart">
+<div id="page-content">
+    <div class="ui-layout-center" id="editor-container">
+        <div id="library" class="black_border tutorial-library">
+        </div>
+        <div id="chart">
 This pane can visualize statistical data using different chart types.
-            </div>	
-        </div>
+        </div>	
+    </div>
 
-        <div class="ui-layout-west">
-            <div id="console">
-                <div id="console_top">
-                    <div id="history" style="font-size:20px;"></div>
-                    <div id="user_query" style="font-size:20px;"></div>
+    <div class="ui-layout-west">
+        <div id="markers"></div>
+        <div id="console">
+            <div id="console_top">
+                <div id="history" style="font-size:20px;"></div>
+                <div id="user_query" style="font-size:20px;"></div>
+            </div>
+            <div id="console_bottom">
+                <div id="query_buttons">
+                    <ul class="query_button_group">
+                        <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
+                        <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
+                    </ul>
                 </div>
-                <div id="console_bottom">
-                    <div id="query_buttons">
-                        <ul class="query_button_group">
-                            <li><a href="#" class="query_button" id="btn_query"  onclick="plConsole.query()">Query</a></li>
-                            <li><a href="#" class="query_button" id="btn_query_next" onclick="plConsole.nextSolution()">Next Solution</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div id="library" class="black_border" style="position:relative; left:0px; top:470px; width:auto; font-size:10pt; padding:5px 15px; overflow:auto; margin-top:10px;">
-            </div>
-        </div>
-        
-        <div class="ui-layout-east">
-            <div id="designator">
-This pane enables the user to inspect the internal data structures of the robot's beliefs
-including object, action, and location descriptions used by the robot.
-            </div>
-            <div id="mjpeg">
-This pane is used for displaying images captured by the robot's camera.
-It's also possible to play videos in this pane (captured during task execution or generated
-by openEASE episode replay).
             </div>
         </div>
     </div>
-  </div>
+        
+    <div class="ui-layout-east">
+        <div id="designator">
+This pane enables the user to inspect the internal data structures of the robot's beliefs
+including object, action, and location descriptions used by the robot.
+        </div>
+        <div id="mjpeg">
+This pane is used for displaying images captured by the robot's camera.
+It's also possible to play videos in this pane (captured during task execution or generated
+by openEASE episode replay).
+        </div>
+    </div>
+    
+    <div id="dom-highlight">
+</div>
   
 {% endblock %}
