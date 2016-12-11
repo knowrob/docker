@@ -201,16 +201,19 @@
     <div class="ui-layout-west">
         <div id="console">
             <div id="console_top">
-                <div id="history"></div>
-                <div id="user_query">member(A, [a,b,c]).</div>
+                <div class="console_text" id="history"></div>
+                <div class="console_text" id="user_query">member(A, [a,b,c]).</div>
             </div>
             <div id="console_bottom">
                 <div id="query_buttons">
-                    <ul class="query_button_group">
+                    <ul class="query_button_group query_button_left">
                         <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query (ctrl+enter)"></a></li>
                         <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
                     </ul>
-                    <div class="clear">&nbsp;</div>
+                    <ul class="query_button_group query_button_right">
+                        <li><a href="#" class="query_button icon_zoom_in" id="btn_zoom_in" onclick="ui.console.zoomIn()"></a></li>
+                        <li><a href="#" class="query_button icon_zoom_out" id="btn_zoom_out" onclick="ui.console.zoomOut()"></a></li>
+                    </ul>
                 </div>
             </div>
         </div>

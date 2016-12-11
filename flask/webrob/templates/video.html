@@ -152,12 +152,12 @@
                 
                 <div id="init_query-field" class="form-group">
                     <label for="init_query">Initial Query</label>
-                    <div id="init_query"></div>
+                    <div class="console_text" id="init_query"></div>
                 </div>
                 
                 <div id="user_query-field" class="form-group">
                     <label for="user_query">Animation Query</label>
-                    <div id="user_query"></div>
+                    <div class="console_text" id="user_query"></div>
                 </div>
                 
         {% if current_user.is_authenticated and current_user.has_role('admin') %}
