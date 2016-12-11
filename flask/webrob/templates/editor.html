@@ -125,6 +125,7 @@
     function new_pkg() {
         save_editor_file_if_changed();
         var pkgName = prompt("Please enter a name for the package", "my_experiment");
+        if(!pkgName) return;
         $.ajax({
             url: "/pkg/new",
             type: "POST",
@@ -133,11 +134,14 @@
                 packageName: pkgName
             }),  
             dataType: "json",
-            success: function (data) {
+            success: function (response) {
                 update_pkg_list(false);
                 activate_pkg(pkgName);
+            },
+            error: function (response) {
+                alert(response.responseText);
             }
-        }).done( function (request) {});
+        });
     };
 
     /**
@@ -158,11 +162,14 @@
                 contentType: "application/json",
                 data: JSON.stringify({}),  
                 dataType: "json",
-                success: function (data) {
+                success: function (response) {
                     update_pkg_list(true);
                     hasChanges = false;
+                },
+                error: function (response) {
+                    alert(response.responseText);
                 }
-            }).done( function (request) {});
+            });
         }
     };
     
@@ -184,11 +191,11 @@
                 alert("User package consulted.");
             }
             else {
-                console.log("Failed to consult this package (please check logs).");
+                console.log("Failed to consult this package.");
                 if(x.error)
                     alert(x.error);
                 else
-                    alert("Failed to consult this package (please check logs).");
+                    alert("Failed to consult this package.");
             }
             pl.finishClient();
         });
@@ -214,23 +221,14 @@
             contentType: "application/json",
             data: JSON.stringify({}),  
             dataType: "json",
-            success: function (data) {
+            success: function (response) {
                 var select = document.getElementById("pkg-selection");
                 // Add packages as options
-                $.each(data.result, function(j, pkg) {
-                  var li = document.createElement("li");
-                  li.style.width = "100%";
-                  var item = document.createElement("a");
-                  item.href = "#";
-                  item.onclick = function() {
+                $.each(response.result, function(j, pkg) {
+                  select.appendChild(create_pkg_link(pkg, function() {
                       activate_pkg(pkg);
                       document.getElementById("pkg-value").innerHTML = pkg;
-                  };
-                  item.style.width = "100%";
-                  item.style.textAlign = "center";
-                  item.appendChild(document.createTextNode(pkg));
-                  li.appendChild(item);
-                  select.appendChild(li);
+                  }));
                 
                   //select.options.add(new Option(pkg,pkg));
                   if(! selection) {
@@ -238,6 +236,10 @@
                     selection = pkg;
                   }
                 });
+                select.appendChild(create_pkg_link("Create a Package", new_pkg));
+                if(! selection) {
+                    document.getElementById("pkg-value").innerHTML = "Create a Package";
+                }
                 // Select option
                 if(activate) {
                     if(selection) {
@@ -249,8 +251,24 @@
                     }
                     clear_editor();
                 }
+            },
+            error: function (response) {
+                alert(response.responseText);
             }
-        }).done( function (request) {});
+        });
+    };
+    
+    function create_pkg_link(text, onclick) {
+        var li = document.createElement("li");
+        li.style.width = "100%";
+        var item = document.createElement("a");
+        item.href = "#";
+        item.onclick = onclick;
+        item.style.width = "100%";
+        item.style.textAlign = "center";
+        item.appendChild(document.createTextNode(text));
+        li.appendChild(item);
+        return li;
     };
 
     /**
@@ -265,16 +283,17 @@
             url: "/pkg/set",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({
-                packageName: pkgName
-            }),  
+            data: JSON.stringify({packageName: pkgName}),  
             dataType: "json",
-            success: function (data) {
-                refresh_pkg_files(data.result);
+            success: function (response) {
+                refresh_pkg_files(response.result);
+            },
+            error: function (response) {
+                alert(response.responseText);
             }
-        }).done( function (request) {});
-    }
-    ;
+        });
+    };
+    
     function refresh_pkg_files(result) {
         var list = document.getElementById("file-list");
         list.innerHTML = "";
@@ -327,6 +346,7 @@
         $form.submit();
     };
 
+{% if current_user.is_authenticated and current_user.has_role('admin') %}
     /**
      * Select this package for an exercise.
      **/
@@ -349,12 +369,16 @@
                     
                 }),  
                 dataType: "json",
-                success: function (data) {
+                success: function (response) {
                     alert("Exercise saved successfully.");
+                },
+                error: function (response) {
+                    alert(response.responseText);
                 }
-            }).done( function (request) {});
+            });
         });
     };
+{% endif %}
 
     /**
      * Upload package from client harddrive.
@@ -385,11 +409,14 @@
             contentType: "application/json",
             data: JSON.stringify({'file': fileName}),  
             dataType: "json",
-            success: function (data) {
-                set_editor_text(data.result.join(''));
+            success: function (response) {
+                set_editor_text(response.result.join(''));
                 set_active_file(fileName);
+            },
+            error: function (response) {
+                alert(response.responseText);
             }
-        }).done( function (request) {})
+        });
     };
     
     function set_active_file(fileName) {
@@ -416,8 +443,11 @@
             contentType: "application/json",
             data: JSON.stringify({'file': file, 'content': content}),  
             dataType: "json",
-            success: function (data) {}
-        }).done( function (request) {})
+            success: function (response) {},
+            error: function (response) {
+                alert(response.responseText);
+            }
+        });
     };
     
     /**
@@ -530,10 +560,13 @@
                 contentType: "application/json",
                 data: JSON.stringify({file: activeFile}),  
                 dataType: "json",
-                success: function (data) {
-                    refresh_pkg_files(data.result);
+                success: function (response) {
+                    refresh_pkg_files(response.result);
+                },
+                error: function (response) {
+                    alert(response.responseText);
                 }
-            }).done( function (request) {})
+            });
         }
     };
 
@@ -561,16 +594,6 @@
         fileSelector.click();
     };
     
-    function on_marker_dblclick(marker) {};
-    function on_marker_delete(ns) {};
-    function on_designator_received(designatorHtml) {};
-    function on_image_received(imageHtml, imageWidth, imageHeight) {};
-    function on_camera_pose_received(pose) {};
-    function on_episode_selected(lib) {};
-    function on_marker_contextmenu(marker) {};
-    function on_render(camera,scene) {};
-    function on_register_nodes() {};
-    
 </script>
 {% endblock %}
 
@@ -596,7 +619,7 @@
   
   <div id="page-content" style="width:100%; height:100%;">
     <!-- A hidden form used for the download of packages. -->
-    <form id="download" action="/knowrob/pkg_down" method="POST">
+    <form id="download" action="/pkg/down" method="POST">
         <input type="hidden" />
     </form>
     <!-- A global dialog. -->
@@ -607,12 +630,10 @@
     </div>
 
     <div class="ui-layout-west">
-        <div>
-        <ul class="menu pkg-menu"><li>
+        <div><ul class="menu pkg-menu"><li>
             <a href="#" id='pkg-value'></a>
             <ul id='pkg-selection'></ul>
-        </li></ul>
-        </div>
+        </li></ul></div>
         <div><ul id="file-list"></ul></div>
     </div>
   </div>
