@@ -10,6 +10,7 @@ import json
 import random
 import string
 import shutil
+import subprocess
 
 import StringIO
 from ftplib import FTP
@@ -35,6 +36,9 @@ def download_episode(category=None, exp=None):
     if data == None:
         app.logger.info("No episode data available for %s/%s" % (category, exp))
         return jsonify(result=None)
+    
+    data['episodes'] = get_experiment_episodes(category, exp)
+    
     return jsonify(data)
 
 @app.route('/upload_episode', methods=['POST'])
@@ -227,6 +231,52 @@ def get_experiment_list():
 
 def get_experiment_path(category, exp):
     return "/episodes/"+category+"/"+exp
+
+def get_episode_owl_file(episode_path):
+    if not os.path.isdir(episode_path): return None
+    for owl_file in os.listdir(episode_path):
+        if owl_file.endswith('.owl'): return os.path.join(episode_path, owl_file)
+    return None
+
+def get_episode_interval(owl_file_path):
+
+    out=[]
+    for key in ['startTime','endTime']:
+        args = {'file': owl_file_path, 'key': key}
+        
+        p1 = subprocess.Popen(["/usr/bin/awk",
+                               "/<owl:NamedIndividual rdf:about=\".*Experiment_.*\">/,/<owl:NamedIndividual>/",
+                               owl_file_path],
+                              stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(["/bin/grep", key],
+                              stdin=p1.stdout, stdout=subprocess.PIPE)
+        p1.stdout.close()
+        p3 = subprocess.Popen(["/bin/grep", "-oE", "[0-9]+\.*[0-9]*"],
+                              stdin=p2.stdout, stdout=subprocess.PIPE)
+        p2.stdout.close()
+        
+        out.append(p3.communicate()[0])
+    return out
+
+def get_experiment_episodes(category, exp):
+    out = []
+    root_path = get_experiment_path(category, exp)
+    for episode in os.listdir(root_path):
+        if episode.startswith('.'): continue
+        p = os.path.join(root_path, episode)
+        if not os.path.isdir(p): continue
+        owl_file = get_episode_owl_file(p)
+        if owl_file==None: continue
+        
+        interval = get_episode_interval(owl_file)
+        if len(interval)==0: continue
+        
+        out.append({'name': episode,
+                    'start-time': interval[0],
+                    'end-time': interval[1]})
+    
+    return out
+    
 
 def create_queries_file(cat,exp):
     path = get_experiment_path(cat,exp)

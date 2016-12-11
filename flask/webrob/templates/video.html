@@ -17,15 +17,6 @@
   <script type="text/javascript">
     var ui;
     
-    function on_marker_dblclick(marker) {};
-    function on_marker_delete(ns) {};
-    function on_designator_received(designatorHtml) {};
-    function on_image_received(imageHtml, imageWidth, imageHeight) {};
-    function on_camera_pose_received(pose) { ui.setCameraPose(pose); };
-    function on_marker_contextmenu(marker) {};
-    function on_render(camera,scene) {};
-    function on_register_nodes() {};
-    
     function on_episode_selected(lib) {
         // stop replay if active
         ui.stopStreaming();
@@ -81,8 +72,6 @@
         ui.init();
         resize();
       
-        //document.getElementById("summary").innerHTML='<img class="picture" src="/knowrob/knowrob_data/plan_summary_imgs/'+message.data+'" width="300" height="240"/>';
-      
         $("#replay-start-time").on("change", function(){
           if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value){
               document.getElementById("replay-start-time").value = document.getElementById("replay-end-time").value - 1;
@@ -95,12 +84,6 @@
           }
           ui.updateEndTime();
         });
-      
-        //var visClient = new TaskTreeVisClient({
-        //    ros: knowrob.ros,
-        //    containerId: '#tasktree',
-        //    topic: 'task_tree_msgs'
-        //});
     });
   </script>
   
