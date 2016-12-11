@@ -74,13 +74,13 @@
       
         $("#replay-start-time").on("change", function(){
           if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value){
-              document.getElementById("replay-start-time").value = document.getElementById("replay-end-time").value - 1;
+              document.getElementById("replay-start-time").value = document.getElementById("replay-end-time").value;
           }
           ui.updateStartTime();
         });
         $("#replay-end-time").on("change", function(){
           if(document.getElementById("replay-start-time").value > document.getElementById("replay-end-time").value) {
-              document.getElementById("replay-end-time").value = document.getElementById("replay-start-time").value + 1;
+              document.getElementById("replay-end-time").value = document.getElementById("replay-start-time").value;
           }
           ui.updateEndTime();
         });
@@ -123,30 +123,31 @@
                 <a href="#">Settings</a>
             </h1>
             <form id="replay-configuration-form" action="" class="form hidden-form" role="form" onsubmit="return false">              
-                <div id="name-field">
-                    <input id="name-text" type="text" placeholder="Video Query Name"/>
+                <div id="replay-video-title-field" class="form-group">
+                    <label for="replay-fps">Video Title</label>
+                    <input id="replay-video-title-text" type="text"></input>
                 </div>
 
-                <div id="time-sequence-field" style="margin-bottom:10px;">
-                    <select id="time-sequence-dropdown" onchange="ui.setTimeSlides()"/>
+                <div id="replay-episode-field" class="form-group">
+                    <label for="replay-fps">Episode Selection</label>
+                    <select id="replay-episode-dropdown" onchange="ui.setTimeSlides()"></select>
                 </div>
                         
                 <div id="replay-start-time-field">
-                    <select id="time-sequence-dropdown" onchange="ui.setTimeSlides()"/>
-                    <label for="replay-start-time">Start Time</label>
-                    <input id="replay-start-time" type="range" min="0" max="0" value="0" oninput="ui.updateStartTime()" />
+                    <label for="replay-start-time">Video Start Time</label>
+                    <input id="replay-start-time" type="range" min="0" max="0" value="0" oninput="ui.updateStartTime()"></input>
                     <div id="replay-start-value">00:00</div>
                 </div>
                 
                 <div id="replay-end-time-field" class="form-group">
-                    <label for="replay-end-time">End Time</label>
-                    <input id="replay-end-time" type="range" min="0" max="0" value="0" oninput="ui.updateEndTime()" />
+                    <label for="replay-end-time">Video End Time</label>
+                    <input id="replay-end-time" type="range" min="0" max="0" value="0" oninput="ui.updateEndTime()"></input>
                     <div id="replay-end-value">00:00</div>
                 </div>
                 
                 <div id="replay-fps-field" class="form-group">
                     <label for="replay-fps">Frames Per Second</label>
-                    <input id="replay-fps" type="number" id="fps" value="6" />
+                    <input id="replay-fps" type="number" id="fps" value="6"></input>
                 </div>
                 
                 <div id="init_query-field" class="form-group">

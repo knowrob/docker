@@ -254,8 +254,11 @@ def get_episode_interval(owl_file_path):
         p3 = subprocess.Popen(["/bin/grep", "-oE", "[0-9]+\.*[0-9]*"],
                               stdin=p2.stdout, stdout=subprocess.PIPE)
         p2.stdout.close()
-        
-        out.append(p3.communicate()[0])
+        time = p3.communicate()[0]
+        if time!=None and time!="":
+            out.append(float(time))
+        else:
+            out.append(None)
     return out
 
 def get_experiment_episodes(category, exp):
@@ -272,8 +275,8 @@ def get_experiment_episodes(category, exp):
         if len(interval)==0: continue
         
         out.append({'name': episode,
-                    'start-time': interval[0],
-                    'end-time': interval[1]})
+                    'start': interval[0],
+                    'end': interval[1]})
     
     return out
     

@@ -120,7 +120,7 @@ def menu():
     
     menu_left = []
     menu_right = [{
-        'text': 'Episode Selection',
+        'text': 'Experiment Selection',
         'submenu': [{
             'text': '',
             'submenu_page': episode_page
