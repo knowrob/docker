@@ -15,7 +15,7 @@ create table course_exercise (
     course_id integer not null,
     number integer not null,
     title text not null,
-    archive blob
+    archive bytea
 );
 
 create table course_task (
