@@ -60,7 +60,7 @@ def get_webapp_image_names():
     return None
 
 
-def start_user_container(application_image, user_container_name):
+def start_user_container(application_image, user_container_name, ros_distribution):
     """
     Starts a user container based on the given image. If the container already exists, it will stop and remove the
     container first. Also, a data container is created and mounted inside the given container, and a rosauth secret
@@ -76,7 +76,7 @@ def start_user_container(application_image, user_container_name):
         client.notify("create_user_data_container", user_container_name)
         client.notify("files_writesecret", user_container_name, random_string(16))
         clear_secretcache()
-        client.notify("start_user_container", application_image, user_container_name)
+        client.notify("start_user_container", application_image, user_container_name, ros_distribution)
     except JsonRpcError, e:
         flash("Error: Connection to your OpenEASE instance failed.")
         app.logger.error("ConnectionError during connect: " + str(e.message) + str(e.data) + "\n")

@@ -17,6 +17,7 @@ from webrob.docker.docker_interface import file_read
 from webrob.utility import *
 from webrob.pages.experiments import get_experiment_download_url, get_experiment_list, experiment_load_queries
 from webrob.config.settings import MAX_HISTORY_LINES
+from webrob.config.settings import ROS_DISTRIBUTION
 
 __author__ = 'danielb@cs.uni-bremen.de'
 
@@ -43,7 +44,7 @@ def transfer_logged_video(filename):
 @app.route('/knowrob/')
 @app.route('/knowrob/exp/<category>/<exp>')
 def knowrob(category=None, exp=None):
-    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+    if not ensure_application_started('openease/'+ROS_DISTRIBUTION+'-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     session['video'] = False
     return __knowrob_page__('knowrob_simple.html', session['user_container_name'], category, exp)
@@ -52,7 +53,7 @@ def knowrob(category=None, exp=None):
 @app.route('/video')
 @app.route('/video/exp/<category>/<exp>')
 def video(category=None, exp=None):
-    if not ensure_application_started('knowrob/hydro-knowrob-daemon'):
+    if not ensure_application_started('openease/'+ROS_DISTRIBUTION+'-knowrob-daemon'):
         return redirect(url_for('user.logout'))
     session['video'] = True
     return __knowrob_page__('video.html', session['user_container_name'], category, exp)

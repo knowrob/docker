@@ -9,8 +9,9 @@ docker pull knowrob/user_data
 docker pull knowrob/postgres
 
 # Application container
-docker pull knowrob/hydro-knowrob-daemon
 docker pull knowrob/dockerbridge
+docker pull openease/hydro-knowrob-daemon
+docker pull openease/indigo-knowrob-daemon
 
 
 # WebApp container

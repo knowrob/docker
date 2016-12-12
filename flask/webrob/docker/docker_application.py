@@ -1,6 +1,7 @@
 from flask import session
 
 from webrob.docker import docker_interface
+from webrob.config.settings import ROS_DISTRIBUTION
 
 
 def ensure_application_started(application_container):
@@ -28,6 +29,6 @@ def start_application():
     if not 'user_container_name' in session: return False
     application_container = session['application_container']
     
-    docker_interface.start_user_container(application_container, session['user_container_name'])
+    docker_interface.start_user_container(application_container, session['user_container_name'], ROS_DISTRIBUTION)
     
     return True

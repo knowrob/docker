@@ -87,6 +87,6 @@ fi
 
 $DIR/../../scripts/start-apt-cacher
 $DIR/../../scripts/start-nexus
-echo "Building knowrob/hydro-knowrob-daemon....";
-docker build -t knowrob/hydro-knowrob-daemon .
+echo "Building openease/hydro-knowrob-daemon....";
+docker build -t openease/hydro-knowrob-daemon .
 

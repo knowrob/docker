@@ -31,11 +31,11 @@ class DockerBridge(pyjsonrpc.HttpRequestHandler):
         dockermanager.create_user_data_container(container_name)
 
     @pyjsonrpc.rpcmethod
-    def start_user_container(self, application_image, user_container_name):
+    def start_user_container(self, application_image, user_container_name, ros_distribution):
         check_containername(user_container_name, 'container_name')
         check_imagename(application_image, 'container_image')
 
-        dockermanager.start_user_container(application_image, user_container_name)
+        dockermanager.start_user_container(application_image, user_container_name, ros_distribution)
         timeout.setTimeout(user_container_name, 600)
     
     @pyjsonrpc.rpcmethod

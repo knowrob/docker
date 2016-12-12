@@ -42,7 +42,7 @@ class DockerManager(object):
             self.__client.create_container('mongo', detach=True, name='mongo_db')
             self.__client.start('mongo', volumes_from=['mongo_data'])
 
-    def start_user_container(self, application_image, user_container_name, limit_resources=True):
+    def start_user_container(self, application_image, user_container_name, ros_distribution, limit_resources=True):
         try:
             all_containers = self.__client.containers(all=True)
             # Make sure common containers are up and running
@@ -57,8 +57,8 @@ class DockerManager(object):
                    "VIRTUAL_PORT": '9090',
                    "ROS_PACKAGE_PATH": ":".join([
                        "/home/ros/src",
-                       "/opt/ros/hydro/share",
-                       "/opt/ros/hydro/stacks",
+                       "/opt/ros/"+ros_distribution+"/share",
+                       "/opt/ros/"+ros_distribution+"/stacks",
                        user_home_dir
             ])}
             if limit_resources:
@@ -73,7 +73,7 @@ class DockerManager(object):
             self.__client.create_container(application_image, detach=True, tty=True, environment=env,
                                            name=user_container_name, mem_limit=mem_limit, cpu_shares=cpu_shares,
                                            memswap_limit=mem_limit*4,
-                                           entrypoint=['/opt/ros/hydro/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
+                                           entrypoint=['/opt/ros/'+ros_distribution+'/bin/roslaunch', 'knowrob_roslog_launch', 'knowrob_ease.launch'])
                 
             # Read links and volumes from webapp_container ENV
             inspect = self.__client.inspect_image(application_image)

@@ -1,5 +1,6 @@
-FROM knowrob/hydro-knowrob-base
+FROM openease/hydro-knowrob-base
 MAINTAINER Moritz Tenorth, moritz@tenorth.de
+
 USER root
 RUN apt-get -y update && apt-get -y install openjdk-7-jdk texlive-latex-base imagemagick
 RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" 1 && \

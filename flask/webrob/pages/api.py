@@ -8,6 +8,7 @@ from webrob.docker import docker_interface
 from webrob.docker.docker_interface import generate_mac
 from webrob.models.users import User
 from webrob.utility import random_string
+from webrob.config.settings import ROS_DISTRIBUTION
 
 __author__ = 'mhorst@cs.uni-bremen.de'
 
@@ -54,8 +55,8 @@ def start_container(token):
     user = user_by_token(token)
     if user is None:
         return jsonify({'error': 'wrong api token'})
-
-    docker_interface.start_user_container('knowrob/hydro-knowrob-base', user.username)
+    
+    docker_interface.start_user_container('openease/'+ROS_DISTRIBUTION+'-knowrob-daemon', user.username, ROS_DISTRIBUTION)
     host_url = urlparse(request.host_url).hostname
     return jsonify({'result': 'success',
                     'url': '//'+host_url+'/ws/'+user.username+'/'})
