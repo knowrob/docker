@@ -216,8 +216,8 @@ class FileManager(object):
                 break
 
     def __create_temp_container(self, cmd, data_container, user=0):
-        return self.docker.create_container(stdin_open=True,  image='busybox:latest', command=cmd, user=user,
-                                            host_config={"LogConfig": {"Config": "", "Type": "none"},
+        return self.docker.create_container(stdin_open=True,  image='busybox:latest', command=cmd, user=str(user),
+                                            host_config={"LogConfig": {"Config": {}, "Type": "none"},
                                                          "VolumesFrom": [data_container] })
 
     def __create_temp_lft_container(self, cmd, data_container=None, user=0):
@@ -225,8 +225,8 @@ class FileManager(object):
         volumes = ['lft_data']
         if data_container is not None:
             volumes.append(data_container)
-        return self.docker.create_container(stdin_open=True, image='busybox:latest', command=cmd, user=user,
-                                            host_config={"LogConfig": {"Config": "", "Type": "none"},
+        return self.docker.create_container(stdin_open=True, image='busybox:latest', command=cmd, user=str(user),
+                                            host_config={"LogConfig": {"Config": {}, "Type": "none"},
                                                          "VolumesFrom": volumes})
 
     def __attach(self, container, streamtype):
