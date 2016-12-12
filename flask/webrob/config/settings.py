@@ -29,13 +29,5 @@ USER_ENABLE_CONFIRM_EMAIL = False
 
 MAX_HISTORY_LINES = 100
 
-MESH_REPOSITORIES = [
-    ("svn", "http://svn.ai.uni-bremen.de/svn/cad_models"),
-    ("git", "https://github.com/code-iai/saphari_final_review"),
-    ("git", "https://github.com/code-iai/iai_maps"),
-    ("git", "https://github.com/code-iai/iai_robots"),
-    ("git", "https://github.com/code-iai/longterm_fetch_and_place"),
-    ("git", "https://github.com/PR2/pr2_common"),
-    #"https://github.com/code-iai/iai_robots/raw/master/",
-    #"https://code.ros.org/svn/wg-ros-pkg/stacks/pr2_common/trunk/"
-]
+MESH_REPOSITORIES = map(lambda x: tuple(x.split(' ')),
+                        os.environ.get('OPENEASE_MESHES').split(','))

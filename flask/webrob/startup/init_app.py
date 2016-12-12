@@ -75,6 +75,7 @@ def init_app(app, db_instance, extra_config_settings={}):
     # Load all models.py files to register db.Models with SQLAlchemy
     from webrob.models import users
     from webrob.models import tutorials
+    from webrob.models import teaching
     from webrob.models import experiments
 
     # Load all views.py files to register @app.routes() with Flask

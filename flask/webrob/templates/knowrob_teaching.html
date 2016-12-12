@@ -56,7 +56,7 @@
             use_console_overlay: true
         });
         ui.init();
-        loadTutorial('overview', 1);
+        showSearchCourse();
         resize();
         
         if(parent.client.nodesRegistered && !visClient) {
@@ -100,125 +100,159 @@
         ui.setCameraPose(pose);
     };
     
+    function on_episode_selected(lib) {
+        ui.initQueryLibrary(lib.query);
+        // initialize canvas
+        ui.initCanvas();
+        ui.resizeCanvas();
+        // TODO(daniel): retract all user asserted facts!
+    };
+    
     function on_register_nodes() {
         visClient = new DataVisClient({
             ros: parent.client.ros,
             containerId: '#chart',
             topic: 'data_vis_msgs'
         });
+//         graphClient = new TaskTreeVisClient({
+//             ros: parent.client.ros,
+//             containerId: '#designator',
+//             topic: 'task_tree_msgs'
+//         });
     };
     
-    function resizeImage() {
-        return imageResizer($('#mjpeg_image'), $('#mjpeg'),
-            imageWidth($('#mjpeg_image'))[0],
-            imageHeight($('#mjpeg_image'))[0]);
-    };
-
     function resize() {
         var pageLayout = $('#page-content').layout({
             stateManagement__enabled: true,
             south: { minSize: 60 },
-            west: {
+            center: {
                 minSize: 250,
                 size: 500,
                 // INNER-LAYOUT
                 childOptions: {
-                    center: { paneSelector: "#markers", minSize: 250,
-                      onresize: function() { ui.resizeCanvas(); } },
-                    south: {
-                        paneSelector: "#console",
-                        onresize: function() {
-                            ace.edit("history").resize(true);
-                            ace.edit("user_query").resize(true);
-                        },
+                    center: {
+                        paneSelector: "#library",
                         minSize: 150
                     }
                 }
             },
-            center: {},
             east: {
                 minSize: 250,
                 size: 500,
                 // INNER-LAYOUT
                 childOptions: {
-                    center: { paneSelector: "#designator", minSize: 250 },
+                    north: {
+                        paneSelector: "#markers",
+                        minSize: 50,
+                        onresize: function() { ui.resizeCanvas(); }
+                    },
+                    center: {
+                        paneSelector: "#console",
+                        onresize: function() {
+                            ace.edit("history").resize(true);
+                            ace.edit("user_query").resize(true);
+                        },
+                        minSize: 250
+                    }
+                }
+            },
+            west: {
+                minSize: 250,
+                size: 500,
+                initClosed: true,
+                // INNER-LAYOUT
+                childOptions: {
+                    center: { paneSelector: "#chart", minSize: 150 },
                     south: { paneSelector: "#mjpeg", minSize: 150 }
                 }
             }
         });
-        centerLayout = $('#editor-container').layout({
-            center: { paneSelector: "#library", minSize: 250 },
-            south: { paneSelector: "#chart", initClosed: true, minSize: 50 }
-        });
-        pageLayout.open('east');
-        pageLayout.open('west');
-        centerLayout.open('south');
-        
         ui.resizeCanvas();
         
-        $('#designator').change(function() { pageLayout.open('east'); });
-        $('#mjpeg').change(function() { pageLayout.open('east'); });
-        $('#chart').change(function() { centerLayout.open('south'); });
+        //$('#designator').change(function() { pageLayout.open('west'); });
+        $('#mjpeg').change(function() { pageLayout.open('west'); });
+        $('#chart').change(function() { pageLayout.open('west'); });
         $('#mjpeg').resize(function(){
             var timeout = function(){ if(resizeImage()) window.setTimeout(timeout, 10); };
             if(resizeImage()) window.setTimeout(timeout, 10);
         });
     };
     
-    function loadTutorial(category, page) {
+    function showSearchCourse() {
+        var header = document.getElementById('exercise-header-text');
+        var body   = document.getElementById('exercise-content');
+        var footer = document.getElementById('exercise-footer');
+        $('#exercise-header-icon-open').addClass('hidden-form');
+        ExerciseSelector(header, body, footer,
+            function(course, exercise) { showExercise(course.id, exercise.id) });
+    };
+    
+    function showExercise(course_id, exercise_id) {
+        showTask(course_id, exercise_id, 1);
+    };
+    
+    function showTask(course_id, exercise_id, task_number) {
+        current_exercise_id = exercise_id;
         $.ajax({
-            url: "/tutorials/get",
+            url: "/teaching/get_task",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({category: category, page: page}),  
+            data: JSON.stringify({
+                  exercise_id: exercise_id,
+                  task_number: task_number}),  
             dataType: "json"
         }).done( function (data) {
-            var lib = document.getElementById('library');
-            lib.innerHTML = ''; // clear
-            // <h2>tut.cat_title</h2>
-            var h2 = document.createElement("h2");
-            h2.innerHTML = data.this.cat_id;
-            lib.appendChild(h2);
-            // <h4>tut.page.  tut.title</h4>
+            $('#exercise-header-icon-open').removeClass('hidden-form');
+            
+            // <h4>exercise.task_number.  exercise.task_title</h4>
             var h4 = document.createElement("h4");
-            h4.innerHTML = data.this.page + '. ' + data.this.title;
-            lib.appendChild(h4);
+            h4.innerHTML = data.this.number + '. ' + data.this.title;
             // {{ content }}
             var text = document.createElement("div");
+            text.id = 'exercise-task';
             text.innerHTML = data.this.text;
-            lib.appendChild(text);
             // <div id="tut_nav">
             var nav = document.createElement("div");
+            nav.id = 'exercise-task-footer';
             nav.id = 'tut_nav';
             if(data.prev) {
                 // <div style="float:left;">
-                //    <a onclick="loadTutorial(prev.cat_id, prev.page)">Previous: prev.title</a>
+                //    <a onclick="showTask(prev)">Previous: prev.title</a>
                 // </div>
                 var link = document.createElement("div");
                 var link_a = document.createElement("a");
                 link.style.float = 'left';
-                link_a.innerHTML = 'Previous: ' + data.prev.title
-                link_a.onclick = function() { loadTutorial(data.prev.cat_id, data.prev.page); };
+                link_a.innerHTML = 'Previous: ' + data.prev.title;
+                link_a.onclick = function() { showTask(course_id, exercise_id, data.prev.number); };
                 link.appendChild(link_a);
                 nav.appendChild(link);
             }
             // <div style="float:right;">
-            //    <a onclick="loadTutorial(nxt.cat_id, nxt.page)">Next: nxt.title</a>
+            //    <a onclick="showTask(nxt)">Next: nxt.title</a>
             // </div>
             var link = document.createElement("div");
             var link_a = document.createElement("a");
             link.style.float = 'right';
             if(data.next) {
-                link_a.innerHTML = 'Next: ' + data.next.title
-                link_a.onclick = function() { loadTutorial(data.next.cat_id, data.next.page); };
+                link_a.innerHTML = 'Next: ' + data.next.title;
+                link_a.onclick = function() { showTask(course_id, exercise_id, data.next.number); };
             } else {
-                link_a.innerHTML = 'Tutorial Overview'
-                link_a.onclick = function() { loadTutorial('overview', 1); };
+                // FIXME: does not work anymore
+                link_a.innerHTML = 'Course Overview'
+                link_a.onclick = function() { showCourse(course_id); };
             }
             link.appendChild(link_a);
             nav.appendChild(link);
             
-            lib.appendChild(nav);
+            var lib = document.getElementById('exercise-content');
+            lib.innerHTML = ''; // clear
+            lib.appendChild(h4);
+            lib.appendChild(text);
+            
+            document.getElementById('exercise-footer').innerHTML = '';
+            document.getElementById('exercise-footer').appendChild(nav);
+            // <h2>exercise.title</h2>
+            document.getElementById('exercise-header-text').innerHTML = data.this.title;
             
             // hook for links of class "show_code" that pastes the content of the
             // previous code block into the query field
@@ -228,49 +262,55 @@
                     true);
                 event.preventDefault();
             });
+            $( "a.edit_code" ).click(function( event ) {
+                var code = $(this).closest("pre + *").prev().find('code').html();
+                // TODO: load package template if not already done
+                // TODO: activate editor component and focus definition the predicate in the editor
+                event.preventDefault();
+            });
         });
     };
     
-    function highlightElement(name, type, highlight) {
-      if(typeof type == "string") {
-        var highlighter = $('#dom-highlight');
-        var element = undefined;
-        if(type === "class") {
-            element = $('.'+name);
-        }
-        else if(type === "id") {
-            element = $('#'+name);
-        }
-        if(highlight && element) {
-            highlighter.css('display', 'block');
-            highlighter.css('width',  element.width());
-            highlighter.css('height', element.height());
-            highlighter.css('top',    element.offset().top);
-            highlighter.css('left',   element.offset().left);
-            element.change();
-        }
-        else {
-            highlighter.css('display', 'none');
-        }
-      }
-    }; 
+    function loadExercisePackage(exercise_id, then) {
+        $.ajax({
+            url: "/pkg/load_exercise",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                  exercise_id: exercise_id}),  
+            dataType: "json"
+        }).done( function (data) {
+            then();
+        });
+    };
+    
+    function openExercisePackage() {
+        loadExercisePackage(current_exercise_id, function() {
+            window.top.location.href = "/#edit";
+            //window.top.location.href = "/#edit?exercise="+current_exercise_id;
+        });
+    };
   </script>
 
 <div id="page-content">
-    <div class="ui-layout-center" id="editor-container">
-        <div id="library" class="black_border tutorial-library">
+    <div class="ui-layout-center">
+        <div id="library" class="black_border teaching-library">
+            <div id="exercise-header" class="content-box-header">
+                <h2 id="exercise-header-text"></h2>
+                <div id="exercise-header-icon-open" class="exercise-header-icon icon_open hidden-form" onclick="openExercisePackage()"></div>
+                <div id="exercise-header-icon-find" class="exercise-header-icon icon_find" onclick="showSearchCourse()"></div>
+            </div>
+            <div id="exercise-content"></div>
+            <div id="exercise-footer"></div>
         </div>
-        <div id="chart">
-This pane can visualize statistical data using different chart types.
-        </div>	
     </div>
-
-    <div class="ui-layout-west">
+    
+    <div class="ui-layout-east" id="editor-container">
         <div id="markers"></div>
         <div id="console">
             <div id="console_top">
-                <div class="console_text" id="history" style="font-size:20px;"></div>
-                <div class="console_text" id="user_query" style="font-size:20px;"></div>
+                <div class="console_text" id="history"></div>
+                <div class="console_text" id="user_query"></div>
             </div>
             <div id="console_bottom">
                 <div id="query_buttons">
@@ -278,24 +318,17 @@ This pane can visualize statistical data using different chart types.
                         <li><a href="#" class="query_button icon_question" id="btn_query" onclick="ui.console.query()" title="Ask a query"></a></li>
                         <li><a href="#" class="query_button icon_redo" id="btn_query_next" onclick="ui.console.nextSolution()" title="Infer next solution"></a></li>
                     </ul>
+                    <div class="clear">&nbsp;</div>
                 </div>
             </div>
-        </div>
+        </div>   
     </div>
         
-    <div class="ui-layout-east">
-        <div id="designator">
-This pane enables the user to inspect the internal data structures of the robot's beliefs
-including object, action, and location descriptions used by the robot.
-        </div>
-        <div id="mjpeg">
-This pane is used for displaying images captured by the robot's camera.
-It's also possible to play videos in this pane (captured during task execution or generated
-by openEASE episode replay).
-        </div>
+    <div class="ui-layout-west">
+        <div id="chart"></div>   
+        <!-- <div id="designator"></div> -->
+        <div id="mjpeg"></div>
     </div>
-    
-    <div id="dom-highlight">
 </div>
   
 {% endblock %}

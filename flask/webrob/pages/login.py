@@ -54,6 +54,15 @@ def show_user_data():
     return render_template('main.html', **locals())
     #return render_template('show_user_data.html', **locals())
 
+
+# Special route for EASE reviewers
+@app.route('/ease-review')
+def ease_review():
+    session['exp-category'] = 'Pick-and-Place'
+    session['exp-name'] = 'pr2-general-pick-and-place_0'
+    return redirect('/')
+
+
 @app.route('/remote')
 def openease_remote():
     if not current_user.is_authenticated:
