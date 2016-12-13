@@ -1,33 +1,21 @@
-FROM openease/hydro-knowrob-base
-MAINTAINER Moritz Tenorth, moritz@tenorth.de
+FROM openease/hydro-swi
+MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de
 
-USER root
-RUN apt-get -y install openjdk-7-jdk texlive-latex-base imagemagick
-RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" 1 && \
-	update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac" 1 && \
-	update-alternatives --set java "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" && \
-	update-alternatives --set javac "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac"
+# Initialize the catkin workspace
 USER ros
-# set up workspace and setup knowrob
 WORKDIR /home/ros/src
-
-RUN echo "Cloning repositories..."
 RUN /usr/bin/python /opt/ros/hydro/bin/catkin_init_workspace
 
-# dummy 'add' command to always check out the repositories
-#ADD ./Dockerfile /
-RUN git clone --recursive https://github.com/knowrob/knowrob.git -b master
-RUN git clone --recursive https://github.com/knowrob/knowrob_addons.git -b master
-RUN git clone --recursive https://github.com/knowrob/knowrob_tutorials.git -b master
-RUN git clone --recursive https://github.com/code-iai/knowrob_dev.git
-RUN git clone https://github.com/code-iai/iai_maps.git
-RUN git clone https://github.com/code-iai/iai_common_msgs.git
-RUN git clone https://github.com/code-iai/iai_cad_tools.git
+RUN echo "Cloning repositories..."
+RUN git clone --recursive https://github.com/knowrob/knowrob.git -b master && \
+    git clone --recursive https://github.com/knowrob/knowrob_addons.git -b master && \
+    git clone --recursive https://github.com/code-iai/knowrob_dev.git -b master && \
+    git clone https://github.com/code-iai/iai_maps.git && \
+    git clone https://github.com/code-iai/iai_common_msgs.git && \
+    git clone https://github.com/code-iai/iai_cad_tools.git
+
 WORKDIR /home/ros
-
-ENV OPEN_EASE_APPLICATION true
-
-# build the catkin workspace
+# Build the catkin workspace
 RUN /opt/ros/hydro/bin/catkin_make
 
 # ENTRYPOINT /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob_ease.launch
