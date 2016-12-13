@@ -12,7 +12,7 @@ RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.c
 # Install ROS
 RUN apt-get -qq update && \
     apt-get -qq -y install wget apt-utils
-RUN sh -c '. /etc/lsb-release && echo "deb ${ROS_SOURCES} precise main" > /etc/apt/sources.list.d/ros-latest.list' 
+RUN sh -c '. /etc/lsb-release && echo "deb ${ROS_SOURCES} precise main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN wget http://packages.ros.org/ros.key -O - | apt-key add - && \
     apt-get -qq -y update && \
     apt-get -qq -y install ros-hydro-desktop swi-prolog swi-prolog-java libjson-java \
@@ -47,8 +47,8 @@ RUN mkdir /home/ros/src && \
 
 RUN echo "export LD_LIBRARY_PATH=/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /home/ros/.bashrc && \
-    echo source /home/ros/devel/setup.bash >> /home/ros/.bashrc && \
-    echo source /home/ros/.bashrc >> /home/ros/.bash_profile
+    echo "source /opt/ros/hydro/setup.bash" >> /home/ros/.bashrc && \
+    echo "source /home/ros/.bashrc" >> /home/ros/.bash_profile
 
 ENV PATH=/home/ros/devel/bin:/opt/ros/hydro/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games \
     ROS_PACKAGE_PATH=/home/ros/src:/opt/ros/hydro/share:/opt/ros/hydro/stacks \

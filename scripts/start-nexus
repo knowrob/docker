@@ -26,7 +26,7 @@ JSON_REPOSITORIES_POST='{"data":{
   "exposed":true,
   "checksumPolicy":"WARN",
   "remoteStorage":{
-    "remoteStorageUrl":"http://www.informatik.uni-bremen.de/~danielb",
+    "remoteStorageUrl":"https://github.com/stonier/rosjava_mvn_repo/raw/master",
     "authentication":null,"connectionSettings":null
   }
 }}'
@@ -74,7 +74,7 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" nexus-run 2>/dev/null)
 if [ $? -eq 1 ]; then # container does not exist
   echo "No nexus container exists, creating a new one..."
   cd `dirname $SCRIPT`/../nexus
-  docker build -t nexus .
+  docker build "$@" -t nexus .
   docker run -d -p 8081:8081 --name nexus-run nexus
   
   RUNNING=$(docker inspect --format="{{ .State.Running }}" nexus-run 2>/dev/null)

@@ -45,8 +45,8 @@ RUN mkdir /home/ros/src && \
 
 RUN echo "export LD_LIBRARY_PATH=/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server" >> /home/ros/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> /home/ros/.bashrc && \
-    echo source /home/ros/devel/setup.bash >> /home/ros/.bashrc && \
-    echo source /home/ros/.bashrc >> /home/ros/.bash_profile
+    echo "source /opt/ros/indigo/setup.bash" >> /home/ros/.bashrc && \
+    echo "source /home/ros/.bashrc" >> /home/ros/.bash_profile
 
 # set pre-build variables: only packages in /opt/ros
 ENV PATH /home/ros/devel/bin:/opt/ros/indigo/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
