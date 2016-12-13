@@ -1,6 +1,6 @@
 
 docker push knowrob/postgres
-docker push knowrob/hydro-knowrob-daemon
 docker push knowrob/dockerbridge
+docker push openease/indigo-knowrob-daemon
 docker push openease/flask
 docker push openease/dns
