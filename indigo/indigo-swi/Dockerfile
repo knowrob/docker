@@ -51,18 +51,18 @@ RUN echo "export LD_LIBRARY_PATH=/usr/lib/jvm/default-java/jre/lib/amd64:/usr/li
 # set pre-build variables: only packages in /opt/ros
 ENV PATH /home/ros/devel/bin:/opt/ros/indigo/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-ENV PATH=/home/ros/devel/bin:/opt/ros/indigo/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games \
-    ROS_PACKAGE_PATH=/home/ros/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks \
-    CMAKE_PREFIX_PATH=/home/ros/indigo/catkin_ws/devel:/opt/ros/indigo \
-    PKG_CONFIG_PATH=/home/ros/devel/lib/pkgconfig:/opt/ros/indigo/lib/pkgconfig \
-    ROS_MASTER_URI=http://localhost:11311 \
-    ROS_MAVEN_DEPLOYMENT_REPOSITORY=/home/ros/devel/share/maven \
-    ROS_MAVEN_PATH=/home/ros/devel/share/maven:/opt/ros/indigo/share/maven \
-    ROS_WORKSPACE=/home/ros \
-    ROS_IP=127.0.0.1 \
-    SWI_HOME_DIR=/usr/lib/swi-prolog \
-    PYTHONPATH=/home/ros/devel/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages \
-    LD_LIBRARY_PATH=/home/ros/devel/lib:/opt/ros/indigo/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/indigo/lib/python2.7/dist-packages
+ENV PATH=/home/ros/devel/bin:/opt/ros/indigo/bin:.:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+ENV ROS_PACKAGE_PATH=/home/ros/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks
+ENV CMAKE_PREFIX_PATH=/home/ros/indigo/catkin_ws/devel:/opt/ros/indigo
+ENV PKG_CONFIG_PATH=/home/ros/devel/lib/pkgconfig:/opt/ros/indigo/lib/pkgconfig
+ENV ROS_MASTER_URI=http://localhost:11311
+ENV ROS_MAVEN_DEPLOYMENT_REPOSITORY=/home/ros/devel/share/maven
+ENV ROS_MAVEN_PATH=/home/ros/devel/share/maven:/opt/ros/indigo/share/maven
+ENV ROS_WORKSPACE=/home/ros
+ENV ROS_IP=127.0.0.1
+ENV SWI_HOME_DIR=/usr/lib/swi-prolog
+ENV PYTHONPATH=/home/ros/devel/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages
+ENV LD_LIBRARY_PATH=/home/ros/devel/lib:/opt/ros/indigo/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/indigo/lib/python2.7/dist-packages
 
 # Use nexus server that mirrors maven central and ROS repository.
 # NOTE: Requires that nexus server was started before build.
@@ -73,8 +73,8 @@ ADD mvn-settings.xml /home/ros/.m2/settings.xml
 
 # Configuration of links and volumes
 # TODO: Mount mesh_data read only. Note: Meshes can be generated in knowrob_vis and saved in mesh_data 
-ENV DOCKER_LINKS mongo_db:mongo \
-    DOCKER_VOLUMES episode_data:ro mesh_data
+ENV DOCKER_LINKS mongo_db:mongo
+ENV DOCKER_VOLUMES episode_data:ro mesh_data
 
 # Forward ports: webserver + rosbridge
 EXPOSE 1111 9090
