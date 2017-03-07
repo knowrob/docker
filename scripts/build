@@ -45,14 +45,31 @@ function build() {
 	cd $DIR/../$1 && docker build $_NOCACHE -t $2 .
 }
 
-if [ "${BUILDOPTS["knowrob"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
+if [ "${BUILDOPTS["hydro"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
 	echo "Starting caching containers..."
 	$DIR/start-apt-cacher
 	$DIR/start-nexus
-	echo "Building knowrob"
-	build hydro-swi knowrob/hydro-swi
-	build hydro-knowrob/hydro-knowrob-base knowrob/hydro-knowrob-base
-	build hydro-knowrob/hydro-knowrob-daemon knowrob/hydro-knowrob-daemon
+	echo "Building hydro"
+	build hydro/hydro-swi openease/hydro-swi
+	build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
+fi
+
+if [ "${BUILDOPTS["indigo"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
+	echo "Starting caching containers..."
+	$DIR/start-apt-cacher
+	$DIR/start-nexus
+	echo "Building indigo"
+	build indigo/indigo-swi openease/indigo-swi
+	build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
+fi
+
+if [ "${BUILDOPTS["kinetic"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
+	echo "Starting caching containers..."
+	$DIR/start-apt-cacher
+	$DIR/start-nexus
+	echo "Building kinetic"
+	build kinetic/kinetic-swi openease/kinetic-swi
+	build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
 fi
 
 if [ "${BUILDOPTS["dockerbridge"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then
