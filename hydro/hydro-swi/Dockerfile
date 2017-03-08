@@ -8,6 +8,7 @@ ARG ROS_SOURCES="http://packages.ros.org.ros.informatik.uni-freiburg.de/ros/ubun
 # Use apt-cacher container
 # NOTE: Requires that apt-cacher server was started before build.
 RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+RUN echo 'Acquire::http { Proxy "http://172.17.0.1:3142"; };' >> /etc/apt/apt.conf.d/02proxy
 
 # Install ROS
 RUN apt-get -qq update && \

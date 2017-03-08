@@ -6,9 +6,11 @@ SCRIPT=`readlink -f "$0"`
 # Wait for valid HTTP response
 apt_cacher_wait () {
    X=""
-   while [ Y"$X" = Y"" ]; do
+   ORX=""
+   while [ Y"$X" = Y"" ] && [ Y"$ORX" = Y"" ]; do
        sleep 1
        X=`curl -g -s http://172.17.42.1:3142`
+       ORX=`curl -g -s http://172.17.0.1:3142`
    done
 }
 
