@@ -45,32 +45,31 @@ function build() {
 	cd $DIR/../$1 && docker build $_NOCACHE -t $2 .
 }
 
-if [ "${BUILDOPTS["hydro"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
-	echo "Starting caching containers..."
-	$DIR/start-apt-cacher
-	$DIR/start-nexus
-	echo "Building hydro"
-	build hydro/hydro-swi openease/hydro-swi
-	build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
+if [[ -z "$OPENEASE_ROS_DISTRIBUTION" ]]; then
+       echo "No ros distribution given as the environment variable, building hydro as default"
 fi
 
-if [ "${BUILDOPTS["indigo"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
-	echo "Starting caching containers..."
-	$DIR/start-apt-cacher
-	$DIR/start-nexus
-	echo "Building indigo"
-	build indigo/indigo-swi openease/indigo-swi
-	build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
+if [ "${BUILDOPTS["all"]}" == true ] || [ "${BUILDOPTS["knowrob"]}" == true ]; then
+       echo "Starting caching containers..."
+       $DIR/start-apt-cacher
+       $DIR/start-nexus
+
+
+       if [ "$OPENEASE_ROS_DISTRIBUTION" == "indigo" ] ; then
+	        echo "Building indigo"
+	        build indigo/indigo-swi openease/indigo-swi
+	        build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
+       elif [ "$OPENEASE_ROS_DISTRIBUTION" == "kinetic" ] ; then
+	        echo "Building kinetic"
+	        build kinetic/kinetic-swi openease/kinetic-swi
+	        build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
+       else	
+	        echo "Building hydro"
+	        build hydro/hydro-swi openease/hydro-swi
+	        build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
+       fi
 fi
 
-if [ "${BUILDOPTS["kinetic"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
-	echo "Starting caching containers..."
-	$DIR/start-apt-cacher
-	$DIR/start-nexus
-	echo "Building kinetic"
-	build kinetic/kinetic-swi openease/kinetic-swi
-	build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
-fi
 
 if [ "${BUILDOPTS["dockerbridge"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then
 	build dockerbridge knowrob/dockerbridge
