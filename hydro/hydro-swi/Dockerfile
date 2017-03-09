@@ -8,6 +8,7 @@ ARG ROS_SOURCES="http://packages.ros.org.ros.informatik.uni-freiburg.de/ros/ubun
 # Use apt-cacher container
 # NOTE: Requires that apt-cacher server was started before build.
 RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+RUN echo 'Acquire::http { Proxy "http://172.17.0.1:3142"; };' >> /etc/apt/apt.conf.d/02proxy
 
 # Install ROS
 RUN apt-get -qq update && \
@@ -65,7 +66,7 @@ ENV PATH=/home/ros/devel/bin:/opt/ros/hydro/bin:.:/usr/local/sbin:/usr/local/bin
 
 # Use nexus server that mirrors maven central and ROS repository.
 # NOTE: Requires that nexus server was started before build.
-ENV ROS_MAVEN_REPOSITORY http://172.17.42.1:8081/nexus/content/groups/public
+ENV ROS_MAVEN_REPOSITORY http://central
 # Configure maven to use the nexus server
 RUN mkdir -p /home/ros/.m2
 ADD mvn-settings.xml /home/ros/.m2/settings.xml

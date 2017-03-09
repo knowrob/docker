@@ -13,6 +13,12 @@
       <mirrorOf>*</mirrorOf>
       <url>http://172.17.42.1:8081/nexus/content/groups/public</url>
     </mirror>
+    <mirror>
+      <!--This sends everything else to /public -->
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>
+      <url>http://172.17.0.1:8081/nexus/content/groups/public</url>
+    </mirror>
   </mirrors>
   <profiles>
     <profile>

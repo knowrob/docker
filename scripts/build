@@ -45,15 +45,31 @@ function build() {
 	cd $DIR/../$1 && docker build $_NOCACHE -t $2 .
 }
 
-if [ "${BUILDOPTS["knowrob"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ] ; then
-	echo "Starting caching containers..."
-	$DIR/start-apt-cacher
-	$DIR/start-nexus
-	echo "Building knowrob"
-	build hydro-swi knowrob/hydro-swi
-	build hydro-knowrob/hydro-knowrob-base knowrob/hydro-knowrob-base
-	build hydro-knowrob/hydro-knowrob-daemon knowrob/hydro-knowrob-daemon
+if [[ -z "$OPENEASE_ROS_DISTRIBUTION" ]]; then
+       echo "No ros distribution given as the environment variable, building hydro as default"
 fi
+
+if [ "${BUILDOPTS["all"]}" == true ] || [ "${BUILDOPTS["knowrob"]}" == true ]; then
+       echo "Starting caching containers..."
+       $DIR/start-apt-cacher
+       $DIR/start-nexus
+
+
+       if [ "$OPENEASE_ROS_DISTRIBUTION" == "hydro" ] ; then
+                echo "Building hydro"
+	        build hydro/hydro-swi openease/hydro-swi
+	        build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
+       elif [ "$OPENEASE_ROS_DISTRIBUTION" == "kinetic" ] ; then
+	        echo "Building kinetic"
+	        build kinetic/kinetic-swi openease/kinetic-swi
+	        build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
+       else	
+	        echo "Building indigo"
+	        build indigo/indigo-swi openease/indigo-swi
+	        build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
+       fi
+fi
+
 
 if [ "${BUILDOPTS["dockerbridge"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then
 	build dockerbridge knowrob/dockerbridge
