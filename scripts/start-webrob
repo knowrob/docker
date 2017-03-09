@@ -82,8 +82,8 @@ runContainer "mongo_data" "-v /data/db busybox true"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check if mongo_db is running or stopped and start otherwise
-#runContainer "mongo_db" "-d -p 27017:27017 --volumes-from mongo_data mongo" true
-runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
+runContainer "mongo_db" "-d -p 27017:27017 --volumes-from mongo_data mongo" true
+#runContainer "mongo_db" "-d --volumes-from mongo_data mongo" true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -121,13 +121,6 @@ runContainer "postgres_db" "-d -e POSTGRES_USER=docker --volumes-from postgres_d
 # Stop any dockerbridge containers and re-create them to reflect changes to EASE_DEBUG immediately
 stopContainer "dockerbridge"
 runContainer "dockerbridge" "-d -v /var/run/docker.sock:/var/run/docker.sock -e EASE_DEBUG=$EASE_DEBUG knowrob/dockerbridge" true
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# start a knowrob container for the tutorials
-runContainer "data_tutorials" "-v /etc/rosauth knowrob/user_data true"
-< /dev/urandom tr -dc _A-Z-a-z-0-9 | head --bytes=16 | docker run --rm -i --volumes-from data_tutorials busybox sh -c 'cat > /etc/rosauth/secret'
-runContainer "tutorials" "-d -e VIRTUAL_HOST=tutorials -e VIRTUAL_PORT=9090 -p 127.0.0.1::9090 --volumes-from mesh_data --volumes-from data_tutorials --volumes-from episode_data:ro --link mongo_db:mongo openease/hydro-knowrob-daemon /opt/ros/hydro/bin/roslaunch knowrob_roslog_launch knowrob.launch" true
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # start a container for the flask secret
