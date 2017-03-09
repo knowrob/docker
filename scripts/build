@@ -55,18 +55,18 @@ if [ "${BUILDOPTS["all"]}" == true ] || [ "${BUILDOPTS["knowrob"]}" == true ]; t
        $DIR/start-nexus
 
 
-       if [ "$OPENEASE_ROS_DISTRIBUTION" == "indigo" ] ; then
-	        echo "Building indigo"
-	        build indigo/indigo-swi openease/indigo-swi
-	        build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
+       if [ "$OPENEASE_ROS_DISTRIBUTION" == "hydro" ] ; then
+                echo "Building hydro"
+	        build hydro/hydro-swi openease/hydro-swi
+	        build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
        elif [ "$OPENEASE_ROS_DISTRIBUTION" == "kinetic" ] ; then
 	        echo "Building kinetic"
 	        build kinetic/kinetic-swi openease/kinetic-swi
 	        build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
        else	
-	        echo "Building hydro"
-	        build hydro/hydro-swi openease/hydro-swi
-	        build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
+	        echo "Building indigo"
+	        build indigo/indigo-swi openease/indigo-swi
+	        build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
        fi
 fi
 
