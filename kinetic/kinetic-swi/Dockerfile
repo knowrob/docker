@@ -68,7 +68,7 @@ ENV LD_LIBRARY_PATH=/home/ros/devel/lib:/opt/ros/kinetic/lib:/usr/lib/jvm/defaul
 
 # Use nexus server that mirrors maven central and ROS repository.
 # NOTE: Requires that nexus server was started before build.
-ENV ROS_MAVEN_REPOSITORY http://localhost:8081/nexus/content/groups/public
+ENV ROS_MAVEN_REPOSITORY http://central
 # Configure maven to use the nexus server
 RUN mkdir -p /home/ros/.m2
 ADD mvn-settings.xml /home/ros/.m2/settings.xml
@@ -80,5 +80,3 @@ ENV DOCKER_VOLUMES episode_data:ro mesh_data
 
 # Forward ports: webserver + rosbridge
 EXPOSE 1111 9090
-# Map ports for nexus
-EXPOSE 8081
