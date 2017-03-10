@@ -1,12 +1,12 @@
 FROM ubuntu:14.04
 MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de	
 
+ARG HOST_IP=172.17.0.1
 ARG ROS_SOURCES="http://packages.ros.org/ros/ubuntu"
 
 # Use apt-cacher container
 # NOTE: Requires that apt-cacher server was started before build.
-RUN echo 'Acquire::http { Proxy "http://172.17.42.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
-RUN echo 'Acquire::http { Proxy "http://172.17.0.1:3142"; };' >> /etc/apt/apt.conf.d/02proxy
+RUN echo 'Acquire::http { Proxy "http://'${HOST_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
 # Install ROS
 RUN apt-get -qq update && \
@@ -67,7 +67,7 @@ ENV LD_LIBRARY_PATH=/home/ros/devel/lib:/opt/ros/indigo/lib:/usr/lib/jvm/default
 
 # Use nexus server that mirrors maven central and ROS repository.
 # NOTE: Requires that nexus server was started before build.
-ENV ROS_MAVEN_REPOSITORY http://central
+ENV ROS_MAVEN_REPOSITORY=http://${HOST_IP}:8081/nexus/content/groups/public
 # Configure maven to use the nexus server
 RUN mkdir -p /home/ros/.m2
 ADD mvn-settings.xml /home/ros/.m2/settings.xml

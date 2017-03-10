@@ -50,6 +50,8 @@ if [[ -z "$OPENEASE_ROS_DISTRIBUTION" ]]; then
 fi
 
 if [ "${BUILDOPTS["all"]}" == true ] || [ "${BUILDOPTS["knowrob"]}" == true ]; then
+       HOST_IP=`ip route list dev docker0 | awk 'NR==1 {print $NF}'`
+
        echo "Starting caching containers..."
        $DIR/start-apt-cacher
        $DIR/start-nexus
@@ -57,15 +59,18 @@ if [ "${BUILDOPTS["all"]}" == true ] || [ "${BUILDOPTS["knowrob"]}" == true ]; t
 
        if [ "$OPENEASE_ROS_DISTRIBUTION" == "hydro" ] ; then
                 echo "Building hydro"
-	        build hydro/hydro-swi openease/hydro-swi
+	        #build hydro/hydro-swi openease/hydro-swi
+                $DIR/../hydro/hydro-swi/build.sh
 	        build hydro/hydro-knowrob-daemon openease/hydro-knowrob-daemon
        elif [ "$OPENEASE_ROS_DISTRIBUTION" == "kinetic" ] ; then
 	        echo "Building kinetic"
-	        build kinetic/kinetic-swi openease/kinetic-swi
+	        #build kinetic/kinetic-swi openease/kinetic-swi
+                $DIR/../kinetic/kinetic-swi/build.sh
 	        build kinetic/kinetic-knowrob-daemon openease/kinetic-knowrob-daemon
        else	
 	        echo "Building indigo"
-	        build indigo/indigo-swi openease/indigo-swi
+	        #build indigo/indigo-swi openease/indigo-swi
+                $DIR/../indigo/indigo-swi/build.sh
 	        build indigo/indigo-knowrob-daemon openease/indigo-knowrob-daemon
        fi
 fi
@@ -78,7 +83,7 @@ fi
 if [ "${BUILDOPTS["webapps"]}" == true ] || [ "${BUILDOPTS["default"]}" == true ] || [ "${BUILDOPTS["all"]}" == true ]; then
 	build user_data knowrob/user_data
 	build flask openease/flask
-    build dns openease/dns
+        build dns openease/dns
 	#build webapps/easeapp openease/easeapp
 	#build webapps/login openease/login
 	#build webapps/knowrob openease/knowrob

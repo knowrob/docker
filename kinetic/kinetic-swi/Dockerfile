@@ -1,6 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER Daniel Beßler, danielb@cs.uni-bremen.de	
 
+ARG HOST_IP=172.17.0.1
 ARG ROS_SOURCES="http://packages.ros.org/ros/ubuntu"
 
 # Use apt-cacher container
@@ -67,8 +68,7 @@ ENV PYTHONPATH=/home/ros/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/
 ENV LD_LIBRARY_PATH=/home/ros/devel/lib:/opt/ros/kinetic/lib:/usr/lib/jvm/default-java/jre/lib/amd64:/usr/lib/jvm/default-java/jre/lib/amd64/server:/opt/ros/kinetic/lib/python2.7/dist-packages
 
 # Use nexus server that mirrors maven central and ROS repository.
-# NOTE: Requires that nexus server was started before build.
-ENV ROS_MAVEN_REPOSITORY http://central
+ENV ROS_MAVEN_REPOSITORY=http://${HOST_IP}:8081/nexus/content/groups/public
 # Configure maven to use the nexus server
 RUN mkdir -p /home/ros/.m2
 ADD mvn-settings.xml /home/ros/.m2/settings.xml
