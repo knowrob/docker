@@ -22,11 +22,15 @@ def update_meshes_run():
     os.chdir('/home/ros/mesh_data')
     # FIXME: make this threaded because it blocks flask
     #  also it takes long time when no internet connection is available
-    for (tool,url) in MESH_REPOSITORIES:
-        if tool=="svn":
-            update_meshes_svn(url)
-        elif tool=="git":
-            update_meshes_git(url)
+    for repo in MESH_REPOSITORIES:
+        try:
+            (tool,url) = repo
+            if tool=="svn":
+                update_meshes_svn(url)
+            elif tool=="git":
+                update_meshes_git(url)
+        except Exception:
+            app.logger.warn("Unable to update repository: '" + str(repo) + "'.")
     # Convert tif images to png images
     call(['/opt/webapp/convert-recursive', '/home/ros/mesh_data'])
 
