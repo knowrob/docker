@@ -1,4 +1,4 @@
-from flask import jsonify, request, session, redirect
+from flask import jsonify, request, session, redirect, render_template
 from flask_login import current_user
 from flask_user import login_required
 import time
@@ -90,7 +90,7 @@ def refresh_by_token(token):
 @login_required
 def create_api_token():
     create_token()
-    return redirect('/')
+    return render_template('show_user_data.html', **locals())
 
 
 def create_token():

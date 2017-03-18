@@ -1,10 +1,50 @@
-{% extends 'flask_user/public_base.html' %}
-{% block bodyargs %} {% endblock %}
-{% block content_inner %}
+{% extends "layout.html" %}
+{% block bodyargs %}{% if overlay %} onload="showSpinnerOverlay()"{% endif %}{% endblock %}
+
+{% block head %}
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/ace/ace.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='lib/layout/jquery.layout-1.4.0.js') }}"></script>
+  <script type="text/javascript">
+    function on_marker_dblclick(marker) {};
+    function on_marker_delete(ns) {};
+    function on_designator_received(designatorHtml) {};
+    function on_image_received(imageHtml, imageWidth, imageHeight) {};
+    function on_camera_pose_received(pose) {};
+    function on_episode_selected(lib) {};
+    function on_marker_contextmenu(marker) {};
+    function on_render(camera,scene) {};
+    function on_register_nodes() {};
+    
+    $(document).ready(function () {
+      update_editor();
+      $('#page-content').layout();
+    });
+  </script>
+  
+  <script id="entity_body" type="text/pain">{{log}}</script>
+  <script type="text/javascript">
+    function update_editor() {
+        var edit = ace.edit("editor");
+        edit.resize(true);
+        edit.setTheme("ace/theme/solarized_light");
+        edit.getSession().setUseWrapMode(true);
+        edit.setOptions({
+            showGutter: true,
+            printMarginColumn: true,
+            highlightActiveLine: true,
+            highlightGutterLine: true,
+            readOnly: true
+        });
+        edit.setValue(document.getElementById('entity_body').innerHTML, -1);
+    }
+  </script>
+{% endblock %}
+{% block content %}
 
 <div class="page-centered">
     <div class="headline"><div class="content-box" id="welcome-headline-box">
-<h1 class="content-box-header">Welcome to openEASE</h1>You successfully logged into openEASE!<br><br>Through this web interface, we provide access to comprehensive episodic memory of bleeding edge autonomous robotic experiments performed in realistic environments. The episodic memory is represented based on predicate logics using the programming language <a href="http://www.swi-prolog.org/">Prolog</a>. Please consider stepping through the <a href="tutorials">query language tutorials</a> and watching the <a href="http://www.youtube-nocookie.com/embed/iu_Y7mxDjgA">tutorial video</a> linked at the bottom of this page before investigating one of the experiments.<br><br> The experiments are ordered according to their corresponding research projects. To access the experiments, please click on the <a href="knowrob">Knowledge Base</a> menu entry at the top left of this page or select one of the experiments directly from the menu at the top right of this page. This will redirect you to the <a href="knowrob">main user interface</a> of openEASE.
+<h1 class="content-box-header">openEASE User Profile</h1>
     </div></div>
 
     <div id="page-body">
@@ -13,7 +53,7 @@
             <dl>
                 <dt>Username: </dt><dd>{{ current_user.username }}</dd>
                 <dt>Email: </dt><dd>{{ current_user.email }}</dd>
-                <dt>Roles: </dt><dd>{{ role_names }}</dd>
+                <dt>Admin rights: </dt><dd>{{ current_user.has_role("admin") }}</dd>
                 <dt>API token: </dt><dd>{{ session.api_token }} (<a href="{{ url_for('create_api_token') }}">create new</a>)</dd>
             </dl>
         </div>

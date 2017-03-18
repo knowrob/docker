@@ -58,7 +58,7 @@ public class EASERos extends Ros {
     @Override
     public boolean connect() {
         throw new UnsupportedOperationException(
-                "Connect on ros instance is not supported, use connect on EASEClient instance");
+                "Connect on ros instance is not supported, use connect on BridgeClient instance");
     }
 
     /**

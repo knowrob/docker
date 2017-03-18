@@ -193,6 +193,11 @@ def get_history_item():
   else:
     return jsonify(item="", index=-1)
 
+@app.route('/userdata')
+@login_required
+def user_data():
+    return render_template('show_user_data.html', **locals())
+
 @app.route('/knowrob/admin/cookie')
 @login_required
 def admin_cookie():
