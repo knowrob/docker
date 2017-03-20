@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for TIF in `find $1 -name "*.tif"`; do
+  PNG="`dirname $TIF`/`basename "$TIF" .tif`.png";
+  # FIXME: if textures change in repository they are not converted again!
+  if test -e "$PNG"; then
+    continue;
+  else
+    /usr/bin/convert $TIF $PNG;
+  fi
+done
