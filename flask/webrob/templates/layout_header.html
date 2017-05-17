@@ -35,12 +35,24 @@
         { id: 'teach', name: 'Teaching', interfaces: [
           //{ id: 'exercises', name: 'Exercises', src:'/teaching' },
           { id: 'tutorials', name: 'Tutorials', src:'/tutorials' }
-        ]},
-        { id: 'tools', name: 'Tools', interfaces: [
-          { id: 'edit', name: 'Prolog & OWL Editor', src:'/editor' },
-          { id: 'log', name: 'Knowledge Base Log', src:'/log' }
         ]}
     ];
+
+    if ('{{ current_user.is_authenticated }}' == 'True')
+    {
+        OPENEASE_USER_IFACES.push({ id: 'tools', name: 'Tools', interfaces: [
+          { id: 'edit', name: 'Prolog & OWL Editor', src:'/editor' },
+          { id: 'log', name: 'Knowledge Base Log', src:'/log' },
+          { id: 'userdata', name: 'User Details', src:'/userdata' }
+        ]});
+    }
+    else
+    {
+        OPENEASE_USER_IFACES.push({ id: 'tools', name: 'Tools', interfaces: [
+          { id: 'edit', name: 'Prolog & OWL Editor', src:'/editor' },
+          { id: 'log', name: 'Knowledge Base Log', src:'/log' }
+        ]});
+    }
     
     var OPENEASE_USER_IFACES_FLAT = [];
     for(var i in OPENEASE_USER_IFACES) {
