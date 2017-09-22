@@ -13,7 +13,8 @@ RUN git clone --recursive https://github.com/knowrob/knowrob.git -b kinetic && \
     git clone https://github.com/code-iai/iai_common_msgs.git && \
     git clone https://github.com/code-iai/iai_cad_tools.git && \
     git clone https://github.com/RobotWebTools/mjpeg_server.git && \
-    git clone https://github.com/RobotWebTools/tf2_web_republisher.git
+    git clone https://github.com/RobotWebTools/tf2_web_republisher.git && \
+    git clone https://github.com/andreihaidu/knowrob_robcog.git
 
 WORKDIR /home/ros
 # Build the catkin workspace
