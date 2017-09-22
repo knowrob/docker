@@ -34,10 +34,14 @@ def download_logged_image(filename):
 
 @app.route('/knowrob/local_data/<path:filename>')
 def transfer_logged_video(filename):
-    # TODO: stream the video
     data = base64.b64encode(file_read(session['user_container_name'], filename))
     return '<video controls><source type="video/mp4" src="data:video/mp4;base64,{}"></video>'.format(urllib.quote(data.rstrip('\n')))
-    #return '<a href="data:video/mpeg;base64,{}" download="video.mp4">Download video</a>'.format(urllib.quote(data.rstrip('\n')))
+    
+@app.route('/knowrob/user_data/<path:filename>')
+@app.route('/user_data/<path:filename>')
+def transfer_logged_memory(filename):
+    return file_read(session['user_container_name'], filename)
+
 
 # FIXME: iframe does not work standalone right now, redirect to "/#kb" when used without parent frame
 @app.route('/kb/')
