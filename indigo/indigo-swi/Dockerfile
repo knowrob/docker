@@ -10,7 +10,8 @@ RUN echo 'Acquire::http { Proxy "http://'${HOST_IP}':3142"; };' >> /etc/apt/apt.
 
 # Install ROS
 RUN apt-get -qq update && \
-    apt-get -qq -y install wget apt-utils
+    apt-get -qq -y install wget apt-utils software-properties-common python-software-properties
+RUN add-apt-repository ppa:openjdk-r/ppa
 RUN sh -c '. /etc/lsb-release && echo "deb ${ROS_SOURCES} $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116 && \
     apt-get -qq -y update && \
@@ -20,15 +21,15 @@ RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365B
                            ros-indigo-rosjava ros-indigo-rosbridge-suite ros-indigo-tf2-web-republisher \
                            ros-indigo-mjpeg-server mongodb-clients mongodb-dev libmongo-client-dev \
                            ros-indigo-rosauth mencoder lame libavcodec-extra-54 \
-                           openjdk-7-jdk texlive-latex-base imagemagick && \
+                           openjdk-8-jdk texlive-latex-base imagemagick gnuplot&& \
     apt-get -qq -y autoremove && \
     apt-get -qq -y clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/*
-RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" 1 && \
-    update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac" 1 && \
-    update-alternatives --set java "/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre/bin/java" && \
-    update-alternatives --set javac "/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/javac"
+RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/bin/java" 1 && \
+    update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/javac" 1 && \
+    update-alternatives --set java "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/bin/java" && \
+    update-alternatives --set javac "/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/javac"
 # ROS environment setup
 RUN cp /opt/ros/indigo/setup.sh /etc/profile.d/ros_indigo.sh && rosdep init
 
